@@ -2,6 +2,7 @@
 
 import { Player } from "@remotion/player";
 import { type ComponentType, useCallback } from "react";
+import { previewLoaders } from "@/lib/preview-loaders";
 
 // A single live composition preview, autoplaying + looping. This module is only
 // ever reached through a dynamic import (see gallery-browser.tsx), so neither
@@ -29,20 +30,24 @@ export function LivePreview({
   height: number;
 }) {
   // Lazy-load only this one composition into its own chunk via Remotion's
-  // native lazyComponent. The Player wraps it in React.Suspense internally and
-  // compiles the chunk on demand. Our composition modules use a named export
-  // keyed by `id`, so we remap it to the default export Suspense requires.
-  const lazyComponent = useCallback(
-    () =>
-      import(`@workspace/compositions/compositions/${modulePath}`).then(
-        (mod) => ({
-          default: (
-            mod as Record<string, ComponentType<Record<string, unknown>>>
-          )[id]!,
-        }),
-      ),
-    [modulePath, id],
-  );
+  // native lazyComponent. The generated loader map keeps every import() a
+  // static literal — a wildcard import(`…/${modulePath}`) makes Turbopack
+  // build the entire compositions tree the first time any preview mounts.
+  // Our composition modules use a named export keyed by `id`, so we remap it
+  // to the default export Suspense requires.
+  const lazyComponent = useCallback(() => {
+    const load = previewLoaders[modulePath];
+    if (!load) {
+      throw new Error(
+        `No preview loader for "${modulePath}" — run: bun run --cwd apps/web sources`,
+      );
+    }
+    return load().then((mod) => ({
+      default: (mod as Record<string, ComponentType<Record<string, unknown>>>)[
+        id
+      ]!,
+    }));
+  }, [modulePath, id]);
 
   return (
     <Player

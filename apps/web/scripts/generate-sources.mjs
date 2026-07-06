@@ -19,7 +19,7 @@ const entries = [];
 // same-named component (e.g. the `backgrounds/` grouping dir) is recursed into
 // one level so grouped categories are picked up too. Underscore/dot-prefixed
 // dirs (helpers like `_chat-demo`) are skipped.
-function collect(dir) {
+function collect(dir, prefix = "") {
   for (const name of readdirSync(dir)) {
     if (name.startsWith("_") || name.startsWith(".")) continue;
     const full = join(dir, name);
@@ -28,7 +28,7 @@ function collect(dir) {
     try {
       component = readFileSync(join(full, `${name}.tsx`), "utf-8");
     } catch {
-      collect(full); // grouping dir (no same-named .tsx) — descend one level
+      collect(full, `${prefix}${name}/`); // grouping dir — descend one level
       continue;
     }
     let meta = "";
@@ -37,7 +37,12 @@ function collect(dir) {
     } catch {
       meta = "";
     }
-    entries.push({ id: name, component, meta });
+    entries.push({
+      id: name,
+      modulePath: `${prefix}${name}/${name}`,
+      component,
+      meta,
+    });
   }
 }
 
@@ -55,3 +60,21 @@ const out = `${banner}export type CompositionSource = {\n  component: string;\n 
 const target = join(repoRoot, "apps", "web", "lib", "generated-sources.ts");
 writeFileSync(target, out, "utf-8");
 console.log(`Wrote ${entries.length} source entries → ${target}`);
+
+// Preview loader map: one static import() literal per composition, so each
+// compiles as its own on-demand chunk. The wildcard import this replaces
+// (import(`…/${modulePath}`)) made Turbopack build a context module over the
+// whole compositions tree — every module compiled the first time any preview
+// mounted, which wedged dev for minutes.
+const loaderBody = entries
+  .map(
+    (e) =>
+      `  ${JSON.stringify(e.modulePath)}: () =>\n    import(${JSON.stringify(`@workspace/compositions/compositions/${e.modulePath}`)}),`,
+  )
+  .join("\n");
+
+const loaderOut = `${banner}export const previewLoaders: Record<\n  string,\n  () => Promise<Record<string, unknown>>\n> = {\n${loaderBody}\n};\n`;
+
+const loaderTarget = join(repoRoot, "apps", "web", "lib", "preview-loaders.ts");
+writeFileSync(loaderTarget, loaderOut, "utf-8");
+console.log(`Wrote ${entries.length} preview loaders → ${loaderTarget}`);
