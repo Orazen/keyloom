@@ -2,10 +2,6 @@
 
 import dynamic from "next/dynamic";
 
-// The gallery imports the entire Remotion composition library (componentsById +
-// @remotion/player). Loading it with ssr:false keeps that heavy graph out of the
-// `/` route's server render path, so the page shell appears immediately and the
-// gallery hydrates in behind a skeleton instead of blocking the whole route.
 const GalleryBrowser = dynamic(
   () => import("./gallery-browser").then((m) => m.GalleryBrowser),
   { ssr: false, loading: () => <GallerySkeleton /> },
@@ -18,6 +14,7 @@ export function GalleryMount() {
 function GallerySkeleton() {
   return (
     <div className="space-y-6">
+      <div className="h-56 rounded-2xl bg-[#0e0e12] sm:h-60" />
       <div className="flex items-center gap-2 py-2.5">
         <div className="h-7 w-7 shrink-0 rounded-md bg-muted/40" />
         <div className="h-5 w-px shrink-0 bg-border" />

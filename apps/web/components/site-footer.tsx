@@ -15,7 +15,9 @@ export function SiteFooter() {
             height={20}
             className="size-5"
           />
-          <span className="font-semibold text-foreground">Keyloom</span>
+          <span className="font-heading font-semibold tracking-tight text-foreground">
+            Keyloom
+          </span>
         </Link>
 
         <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-muted-foreground">
@@ -54,7 +56,7 @@ export function SiteFooter() {
           </a>
         </nav>
 
-        <p className="text-[12px] tabular-nums text-muted-foreground">
+        <p className="font-mono text-[11px] tabular-nums text-muted-foreground">
           © {year} The Experience Company · MIT
         </p>
       </div>

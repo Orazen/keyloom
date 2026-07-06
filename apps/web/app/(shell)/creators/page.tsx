@@ -11,7 +11,6 @@ export const metadata: Metadata = {
     "Components built for short-form creators — TikTok-style captions, vertical voiceover tools, and viral-content scenes.",
 };
 
-// Curated list of creator-focused composition ids. Add new ones here.
 const CREATOR_IDS = [
   "TikTokCaption",
   "CaptionTrack",
@@ -20,8 +19,7 @@ const CREATOR_IDS = [
 ] as const;
 
 export default function CreatorsPage() {
-  // Strip `calculateMetadata` — it's a function and can't be serialized
-  // across the RSC → Client Component boundary into CreatorPreviewCard.
+  // calculateMetadata is a function and can't cross the RSC boundary
   const items = CREATOR_IDS.map((id) => compositionsById[id])
     .filter((c): c is NonNullable<typeof c> => Boolean(c))
     .map(({ calculateMetadata: _calc, ...rest }) => rest);
@@ -29,10 +27,10 @@ export default function CreatorsPage() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 md:py-10 lg:px-8 xl:px-12">
       <header className="mb-10 space-y-3">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          For Creators
+        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+          For creators · 9:16 · TikTok / Reels / Shorts
         </p>
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
           Built for short-form
         </h1>
         <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground">

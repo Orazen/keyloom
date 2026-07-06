@@ -6,7 +6,9 @@ import {
   PlusSignIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
+import { Progress } from "@workspace/ui/components/progress";
 import { useActionState, useState } from "react";
 import {
   createKeyAction,
@@ -59,6 +61,14 @@ function CopyButton({
   );
 }
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+      {children}
+    </h2>
+  );
+}
+
 export function AccountClient({ email, mcpUrl, subscription, keys }: Props) {
   const [state, formAction, pending] = useActionState(createKeyAction, {});
 
@@ -76,30 +86,55 @@ export function AccountClient({ email, mcpUrl, subscription, keys }: Props) {
   );
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-5 py-10 sm:px-6">
       <header>
-        <h1 className="text-xl font-semibold">Your keyloom MCP</h1>
-        <p className="text-sm text-muted-foreground">{email}</p>
+        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+          MCP server
+        </p>
+        <h1 className="mt-2 font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
+          Your Keyloom MCP
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Render any scene in the library straight from Claude or Cursor. Signed
+          in as <span className="text-foreground">{email}</span>.
+        </p>
       </header>
 
-      {/* Plan / usage */}
-      <section className="rounded-xl border border-border p-4">
-        <h2 className="mb-2 text-sm font-medium">Plan</h2>
+      <section className="rounded-xl border border-border bg-card p-5">
+        <div className="flex items-center justify-between gap-3">
+          <SectionLabel>Plan</SectionLabel>
+          {subscription ? (
+            <div className="flex items-center gap-1.5">
+              <Badge variant="secondary" className="capitalize">
+                {subscription.plan}
+              </Badge>
+              <Badge variant="outline" className="capitalize">
+                {subscription.status}
+              </Badge>
+            </div>
+          ) : null}
+        </div>
+
         {subscription ? (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between text-sm">
-              <div>
-                <span className="font-medium capitalize">
-                  {subscription.plan}
-                </span>{" "}
-                <span className="text-muted-foreground">
-                  ({subscription.status})
+          <div className="mt-4 flex flex-col gap-4">
+            <div>
+              <p className="flex items-baseline gap-1.5">
+                <span className="font-heading text-3xl font-semibold tracking-tight tabular-nums">
+                  {subscription.rendersUsed}
                 </span>
-              </div>
-              <div className="text-muted-foreground">
-                {subscription.rendersUsed}/{subscription.renderQuota} renders
-                used
-              </div>
+                <span className="text-sm text-muted-foreground">
+                  of {subscription.renderQuota} renders used
+                </span>
+              </p>
+              <Progress
+                className="mt-3"
+                value={Math.min(
+                  100,
+                  (subscription.rendersUsed /
+                    Math.max(1, subscription.renderQuota)) *
+                    100,
+                )}
+              />
             </div>
             {subscription.plan === "free" ? (
               <div className="flex flex-wrap items-center gap-2">
@@ -122,32 +157,37 @@ export function AccountClient({ email, mcpUrl, subscription, keys }: Props) {
             ) : null}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">No subscription yet.</p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            No subscription yet.
+          </p>
         )}
       </section>
 
-      {/* Connect */}
-      <section className="rounded-xl border border-border p-4">
-        <h2 className="mb-2 text-sm font-medium">Connect in Claude / Cursor</h2>
-        <p className="mb-2 text-xs text-muted-foreground">
+      <section className="rounded-xl border border-border bg-card p-5">
+        <SectionLabel>Connect in Claude / Cursor</SectionLabel>
+        <p className="mt-3 text-sm text-muted-foreground">
           Add this remote MCP server, using one of your API keys as the bearer
           token.
         </p>
-        <div className="flex items-center gap-2">
-          <code className="flex-1 truncate rounded-md bg-muted px-2 py-1 text-xs">
+        <div className="mt-3 flex items-center gap-2">
+          <code className="h-8 flex-1 truncate rounded-md border border-border bg-muted px-2.5 leading-8 font-mono text-xs">
             {mcpUrl}
           </code>
           <CopyButton value={mcpUrl} label="Copy URL" />
         </div>
-        <pre className="mt-2 overflow-x-auto rounded-md bg-muted p-3 text-[11px] leading-relaxed">
-          {connectorSnippet}
-        </pre>
+        <div className="relative mt-2">
+          <pre className="overflow-x-auto rounded-md border border-border bg-muted p-3 pr-24 font-mono text-[11px] leading-relaxed">
+            {connectorSnippet}
+          </pre>
+          <div className="absolute top-2 right-2">
+            <CopyButton value={connectorSnippet} label="Copy" />
+          </div>
+        </div>
       </section>
 
-      {/* API keys */}
-      <section className="rounded-xl border border-border p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-medium">API keys</h2>
+      <section className="rounded-xl border border-border bg-card p-5">
+        <div className="flex items-center justify-between gap-3">
+          <SectionLabel>API keys</SectionLabel>
           <form action={formAction}>
             <Button type="submit" size="sm" disabled={pending}>
               <HugeiconsIcon icon={PlusSignIcon} size={14} />
@@ -157,16 +197,16 @@ export function AccountClient({ email, mcpUrl, subscription, keys }: Props) {
         </div>
 
         {state.error ? (
-          <p className="mb-3 text-xs text-destructive">{state.error}</p>
+          <p className="mt-3 text-xs text-destructive">{state.error}</p>
         ) : null}
 
         {state.fullKey ? (
-          <div className="mb-3 rounded-md border border-amber-500/40 bg-amber-500/10 p-3">
+          <div className="mt-3 rounded-md border border-amber-500/40 bg-amber-500/10 p-3">
             <p className="mb-1 text-xs font-medium">
               Copy this key now — it won't be shown again.
             </p>
             <div className="flex items-center gap-2">
-              <code className="flex-1 truncate rounded bg-background px-2 py-1 text-xs">
+              <code className="flex-1 truncate rounded border border-border bg-background px-2 py-1 font-mono text-xs">
                 {state.fullKey}
               </code>
               <CopyButton value={state.fullKey} />
@@ -175,19 +215,21 @@ export function AccountClient({ email, mcpUrl, subscription, keys }: Props) {
         ) : null}
 
         {keys.length === 0 ? (
-          <p className="text-xs text-muted-foreground">
+          <p className="mt-3 text-xs text-muted-foreground">
             No keys yet. Create one to connect.
           </p>
         ) : (
-          <ul className="flex flex-col gap-2">
+          <ul className="mt-4 flex flex-col gap-2">
             {keys.map((k) => (
               <li
                 key={k.id}
-                className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm"
+                className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2"
               >
-                <div>
-                  <code className="text-xs">{k.prefix}…</code>
-                  <span className="ml-2 text-xs text-muted-foreground">
+                <div className="flex min-w-0 items-baseline gap-2.5">
+                  <code className="truncate font-mono text-xs">
+                    {k.prefix}…
+                  </code>
+                  <span className="shrink-0 font-mono text-[11px] tabular-nums text-muted-foreground">
                     {new Date(k.createdAt).toLocaleDateString()}
                   </span>
                 </div>

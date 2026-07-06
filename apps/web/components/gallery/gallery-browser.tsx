@@ -17,18 +17,11 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import * as React from "react";
 
-// Remotion lives behind this dynamic import, so @remotion/player and the
-// composition components are never part of the homepage's initial bundle. A
-// preview is mounted only while its card is in the viewport (see GalleryCard),
-// so the page only ever runs a handful of composition chunks at a time — never
-// all 73 (bundle-dynamic-imports + rendering-content-visibility, Vercel React).
 const LivePreview = dynamic(
   () => import("./live-preview").then((m) => m.LivePreview),
   { ssr: false },
 );
 
-// Public-facing labels for the internal category ids. Order here is the order
-// the tabs render in; only categories that actually have items are shown.
 const CATEGORY_LABELS: Record<CompositionCategory, string> = {
   text: "Text",
   social: "Social Media",
@@ -43,24 +36,40 @@ const CATEGORY_LABELS: Record<CompositionCategory, string> = {
 
 const CATEGORY_ORDER = Object.keys(CATEGORY_LABELS) as CompositionCategory[];
 
+const CATEGORY_DOTS: Record<CompositionCategory, string> = {
+  text: "#8b5cf6",
+  social: "#ec4899",
+  data: "#06b6d4",
+  devtools: "#22c55e",
+  marketing: "#f59e0b",
+  layout: "#64748b",
+  captions: "#f43f5e",
+  media: "#3b82f6",
+  background: "#a1a1aa",
+};
+
 type Filter = "all" | CompositionCategory;
 
-// Background compositions are studio-only backdrops, not standalone products —
-// keep them out of the gallery. They stay fully available inside the editor.
 const VISIBLE_COMPOSITIONS = compositions.filter(
   (c) => c.category !== "background",
 );
+
+const DROP_SIZE = 6;
+const NEWEST = VISIBLE_COMPOSITIONS.slice(-DROP_SIZE).reverse();
+
+const PRESENT_CATEGORIES = CATEGORY_ORDER.filter((c) =>
+  VISIBLE_COMPOSITIONS.some((comp) => comp.category === c),
+);
+
+const COUNT_BY_CATEGORY = VISIBLE_COMPOSITIONS.reduce((counts, c) => {
+  counts.set(c.category, (counts.get(c.category) ?? 0) + 1);
+  return counts;
+}, new Map<CompositionCategory, number>());
 
 export function GalleryBrowser() {
   const [filter, setFilter] = React.useState<Filter>("all");
   const [query, setQuery] = React.useState("");
   const [searchOpen, setSearchOpen] = React.useState(false);
-
-  // Which categories are actually populated, in CATEGORY_ORDER.
-  const presentCategories = React.useMemo(() => {
-    const seen = new Set(VISIBLE_COMPOSITIONS.map((c) => c.category));
-    return CATEGORY_ORDER.filter((c) => seen.has(c));
-  }, []);
 
   const items = React.useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -76,7 +85,7 @@ export function GalleryBrowser() {
 
   return (
     <div className="space-y-6">
-      {/* Filter bar: search + category tabs */}
+      <DropBanner />
       <div className="sticky top-14 z-30 -mx-5 border-b border-dashed border-border bg-background/95 px-5 py-2.5 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:-mx-8 sm:px-8 lg:-mx-10 lg:px-10">
         <div className="flex items-center gap-2">
           {searchOpen ? (
@@ -122,13 +131,16 @@ export function GalleryBrowser() {
               <nav className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <CategoryTab
                   label="All"
+                  count={VISIBLE_COMPOSITIONS.length}
                   active={filter === "all"}
                   onClick={() => setFilter("all")}
                 />
-                {presentCategories.map((c) => (
+                {PRESENT_CATEGORIES.map((c) => (
                   <CategoryTab
                     key={c}
                     label={CATEGORY_LABELS[c]}
+                    dot={CATEGORY_DOTS[c]}
+                    count={COUNT_BY_CATEGORY.get(c) ?? 0}
                     active={filter === c}
                     onClick={() => setFilter(c)}
                   />
@@ -156,10 +168,14 @@ export function GalleryBrowser() {
 
 function CategoryTab({
   label,
+  count,
+  dot,
   active,
   onClick,
 }: {
   label: string;
+  count: number;
+  dot?: string;
   active: boolean;
   onClick: () => void;
 }) {
@@ -168,23 +184,96 @@ function CategoryTab({
       type="button"
       onClick={onClick}
       className={cn(
-        "shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium whitespace-nowrap transition-colors",
+        "flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium whitespace-nowrap transition-colors",
         active
           ? "bg-foreground text-background"
           : "text-muted-foreground hover:bg-accent hover:text-foreground",
       )}
     >
+      {dot ? (
+        <span
+          aria-hidden
+          className="size-1.5 rounded-full"
+          style={{ backgroundColor: dot }}
+        />
+      ) : null}
       {label}
+      <span
+        className={cn(
+          "font-mono text-[10px] tabular-nums",
+          active ? "text-background/60" : "text-muted-foreground/60",
+        )}
+      >
+        {count}
+      </span>
     </button>
   );
 }
 
+function DropBanner() {
+  const featured = NEWEST[0];
+  if (!featured) return null;
+
+  const names = NEWEST.slice(0, 3)
+    .map((c) => c.title)
+    .join(", ");
+  const aspect = featured.width / featured.height;
+  const previewHeight = aspect >= 1 ? 168 : 220;
+
+  return (
+    <section className="flex items-center justify-between gap-8 overflow-hidden rounded-2xl bg-[#0e0e12] p-6 text-white sm:p-8">
+      <div className="min-w-0">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/50">
+          Latest drop
+        </p>
+        <h2 className="mt-2 text-pretty font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
+          {NEWEST.length} new scenes just landed.
+        </h2>
+        <p className="mt-2 max-w-md text-pretty text-sm leading-relaxed text-white/60">
+          {names} and more — fresh off the loom.
+        </p>
+        <Button asChild size="sm" className="mt-5">
+          <Link href={`/studio?component=${featured.id}`} prefetch={false}>
+            Open in Studio
+          </Link>
+        </Button>
+      </div>
+
+      <div
+        className="hidden shrink-0 overflow-hidden rounded-xl ring-1 ring-white/10 md:block"
+        style={{ height: previewHeight, aspectRatio: `${aspect}` }}
+      >
+        <LivePreview
+          modulePath={compositionModulePath(featured)}
+          id={featured.id}
+          defaultProps={featured.defaultProps}
+          durationInFrames={featured.durationInFrames}
+          fps={featured.fps}
+          width={featured.width}
+          height={featured.height}
+        />
+      </div>
+    </section>
+  );
+}
+
+function formatAspect(width: number, height: number): string {
+  const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
+  const g = gcd(width, height);
+  const rw = width / g;
+  const rh = height / g;
+  if (rw > 32 || rh > 32) return `${width}×${height}`;
+  return `${rw}:${rh}`;
+}
+
+function formatTimecode(frames: number, fps: number): string {
+  const totalSeconds = Math.round(frames / fps);
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
 function GalleryCard({ info }: { info: AnyCompositionInfo }) {
-  // Mount the live preview the first time the card nears the viewport, then keep
-  // it mounted for good. This defers Remotion off the initial load (cards below
-  // the fold don't compile/mount until you scroll to them) WITHOUT re-blanking:
-  // once a preview has loaded, scrolling away and back leaves it in place instead
-  // of tearing it down and reloading. Same idea as <img loading="lazy">.
   const ref = React.useRef<HTMLAnchorElement | null>(null);
   const [visible, setVisible] = React.useState(false);
   React.useEffect(() => {
@@ -194,7 +283,7 @@ function GalleryCard({ info }: { info: AnyCompositionInfo }) {
       ([entry]) => {
         if (entry?.isIntersecting) {
           setVisible(true);
-          io.disconnect(); // loaded once — never tear it back down
+          io.disconnect();
         }
       },
       { rootMargin: "200px" },
@@ -203,26 +292,15 @@ function GalleryCard({ info }: { info: AnyCompositionInfo }) {
     return () => io.disconnect();
   }, []);
 
-  // The tile takes the composition's own aspect ratio, so the preview fills it
-  // edge-to-edge: nothing is cropped off and there are no letterbox gutters (no
-  // "black stripe" from the tile background showing through). Cards in a row may
-  // differ in height as a result — that's the trade for showing each scene whole.
   const compAspect = info.width / info.height;
 
   return (
     <Link
       ref={ref}
-      // Clicking a component opens it in the full Studio (more features than the
-      // standalone editor) with that composition added as the first clip.
       href={`/studio?component=${info.id}`}
-      // No prefetch: the studio is a heavy route; hover-prefetching every card
-      // would kick off its compile. Click still works.
       prefetch={false}
       className="group block"
     >
-      {/* Media tile: borderless, big radius, subtle ring. The tile matches the
-          composition's aspect ratio, so the preview fills it edge-to-edge with
-          no crop and no letterbox gutters. */}
       <div
         className="relative overflow-hidden rounded-2xl bg-muted/40 ring-1 ring-border/50 transition-all duration-200 group-hover:ring-border group-hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.25)]"
         style={{ aspectRatio: `${compAspect}` }}
@@ -239,16 +317,19 @@ function GalleryCard({ info }: { info: AnyCompositionInfo }) {
               height={info.height}
             />
           ) : (
-            // Off-screen placeholder — no Remotion mounted.
             <div className="h-full w-full bg-muted/40" />
           )}
         </div>
+        <span className="pointer-events-none absolute top-2 right-2 rounded-md bg-black/55 px-1.5 py-0.5 font-mono text-[10px] font-medium tabular-nums text-white backdrop-blur-sm">
+          {formatTimecode(info.durationInFrames, info.fps)}
+        </span>
       </div>
       <div className="px-0.5 pt-3">
         <h3 className="truncate text-[15px] font-semibold leading-tight text-foreground">
           {info.title}
         </h3>
-        <p className="mt-1 truncate text-[13px] text-muted-foreground">
+        <p className="mt-1.5 truncate font-mono text-[11px] text-muted-foreground">
+          {formatAspect(info.width, info.height)} ·{" "}
           {CATEGORY_LABELS[info.category]}
         </p>
       </div>

@@ -1,7 +1,11 @@
 import { AuthKitProvider } from "@workos-inc/authkit-nextjs/components";
 import { MotionConfig } from "motion/react";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+  Bricolage_Grotesque,
+  Instrument_Sans,
+  JetBrains_Mono,
+} from "next/font/google";
 import Script from "next/script";
 
 import "@workspace/ui/globals.css";
@@ -20,9 +24,17 @@ export const metadata: Metadata = {
     "A library of cinematic scenes for Remotion. No After Effects, no animation team — drop in, render, ship.",
 };
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+const fontSans = Instrument_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
-const fontMono = Geist_Mono({
+const fontDisplay = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-display",
+});
+
+const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 });
@@ -37,20 +49,15 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       className={cn(
-        "antialiased",
+        "antialiased font-sans",
+        fontSans.variable,
+        fontDisplay.variable,
         fontMono.variable,
-        "font-sans",
-        geist.variable,
       )}
     >
       <body className="min-h-screen bg-background text-foreground overflow-x-hidden">
         <ThemeProvider>
-          {/* Honor the OS "reduce motion" setting for every motion-library
-              animation (WCAG 2.3.3). `user` reduces transform/layout
-              animations to instant transitions when the preference is on. */}
           <MotionConfig reducedMotion="user">
-            {/* Provides client-side auth state (useAuth) app-wide so the navbar
-                can reflect sign-in status. */}
             <AuthKitProvider>
               <QueryProvider>{children}</QueryProvider>
             </AuthKitProvider>

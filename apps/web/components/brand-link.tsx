@@ -12,7 +12,9 @@ export function BrandLink() {
         height={20}
         className="size-5"
       />
-      <span className="text-sm font-semibold">Keyloom</span>
+      <span className="font-heading text-[15px] font-semibold tracking-tight">
+        Keyloom
+      </span>
     </Link>
   );
 }
