@@ -39,7 +39,6 @@ import {
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
   useSidebar,
 } from "@workspace/ui/components/sidebar";
 import { TooltipProvider } from "@workspace/ui/components/tooltip";
@@ -108,7 +107,7 @@ export function AppSidebar({ footer }: { footer?: React.ReactNode }) {
   return (
     <TooltipProvider delayDuration={0}>
       <Sidebar collapsible="icon">
-        <SidebarHeader className="h-12 justify-center border-b border-border px-3 group-data-[collapsible=icon]:px-2">
+        <SidebarHeader className="h-12 justify-center px-3 group-data-[collapsible=icon]:px-2">
           <Link
             href="/"
             className="flex items-center gap-2 px-1 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
@@ -130,9 +129,6 @@ export function AppSidebar({ footer }: { footer?: React.ReactNode }) {
         <SidebarContent className="gap-1 pt-5">
           {SECTIONS.map((section, i) => (
             <React.Fragment key={section.label ?? `section-${i}`}>
-              {i > 0 && (
-                <SidebarSeparator className="mx-3 group-data-[collapsible=icon]:hidden" />
-              )}
               <SidebarGroup className="py-1">
                 {section.label && (
                   <SidebarGroupLabel className="font-mono text-[10px] uppercase tracking-[0.16em]">

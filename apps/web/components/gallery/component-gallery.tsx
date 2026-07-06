@@ -16,6 +16,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import * as React from "react";
+import { formatDuration } from "@/lib/timecode";
 
 // The ONE component gallery — used by both the landing page and the dashboard.
 // Clicking a card opens it in the editor (/component/[id]/edit).
@@ -60,13 +61,6 @@ const COUNT_BY_CATEGORY = VISIBLE.reduce((counts, c) => {
   counts.set(c.category, (counts.get(c.category) ?? 0) + 1);
   return counts;
 }, new Map<CompositionCategory, number>());
-
-function formatTimecode(frames: number, fps: number): string {
-  const totalSeconds = Math.round(frames / fps);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}:${String(seconds).padStart(2, "0")}`;
-}
 
 // Tall 4:5 portrait preview frame — responsive components reflow to fill it.
 const PREVIEW_W = 1080;
@@ -273,7 +267,7 @@ function GalleryCard({ info }: { info: AnyCompositionInfo }) {
           )}
         </div>
         <span className="pointer-events-none absolute top-2 right-2 rounded-md bg-black/55 px-1.5 py-0.5 font-mono text-[10px] font-medium tabular-nums text-white backdrop-blur-sm">
-          {formatTimecode(info.durationInFrames, info.fps)}
+          {formatDuration(info.durationInFrames / info.fps)}
         </span>
       </div>
 

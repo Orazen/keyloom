@@ -23,10 +23,18 @@ function env(name: string): string | null {
   return v ? v : null;
 }
 
+// Filenames carry boilerplate ("…-meme-green-screen.webm") that reads as noise
+// in card titles — the key keeps the full name for category matching.
+const TITLE_NOISE = /\b(meme|green screen|template)\b/gi;
+
 function titleFromKey(key: string): string {
   const file = key.split("/").pop() ?? key;
   const base = file.replace(VIDEO_EXT, "");
-  const words = base.replace(/[_-]+/g, " ").trim();
+  const words = base
+    .replace(/[_-]+/g, " ")
+    .replace(TITLE_NOISE, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   return words.replace(/\b\w/g, (c) => c.toUpperCase()) || base || "Template";
 }
 

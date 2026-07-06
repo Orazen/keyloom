@@ -1,12 +1,30 @@
 "use client";
 
 import { cn } from "@workspace/ui/lib/utils";
-import { useEffect, useRef } from "react";
-import { backgroundForTemplate, type MemeTemplate } from "@/lib/memes";
-import { DEFAULT_CAPTION } from "./meme-layout";
+import { useEffect, useRef, useState } from "react";
+import type { MemeTemplate } from "@/lib/memes";
+import { formatDuration } from "@/lib/timecode";
 
-// Preview caption mirrors the editor's default so the gallery matches the edit view.
-const SAMPLE_CAPTION = DEFAULT_CAPTION.text;
+const PASTELS = [
+  "#fde7ef",
+  "#e3f1fd",
+  "#e5f6e9",
+  "#efe9fd",
+  "#fdf3e3",
+  "#e9f7f6",
+];
+
+function pastelFor(id: string): string {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+  }
+  return PASTELS[hash % PASTELS.length] as string;
+}
+
+function isPack(template: MemeTemplate): boolean {
+  return /pack/i.test(template.id);
+}
 
 type MemeThumbnailProps = {
   template: MemeTemplate;
@@ -19,7 +37,6 @@ type MemeThumbnailProps = {
   onSelect: (t: MemeTemplate) => void;
 };
 
-/** A single template preview: default background + clip + sample caption. */
 export function MemeThumbnail({
   template,
   mode,
@@ -27,9 +44,9 @@ export function MemeThumbnail({
   onSelect,
 }: MemeThumbnailProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const bgSrc = backgroundForTemplate(template.id)?.src;
+  const [duration, setDuration] = useState<number | null>(null);
+  const pack = isPack(template);
 
-  // Reel mode: play (with sound) only the card scrolled into view; pause others.
   useEffect(() => {
     if (mode !== "view") return;
     const v = videoRef.current;
@@ -39,7 +56,6 @@ export function MemeThumbnail({
         if (entry?.isIntersecting) {
           v.muted = false;
           v.play().catch(() => {
-            // Unmuted autoplay blocked — retry muted so it at least plays.
             v.muted = true;
             v.play().catch(() => {});
           });
@@ -54,24 +70,19 @@ export function MemeThumbnail({
     return () => io.disconnect();
   }, [mode]);
 
-  return (
-    <button
-      type="button"
-      onClick={() => onSelect(template)}
-      // containerType lets the caption size in cqw units so it matches the
-      // editor's proportions (72px on a 1080-wide frame) at any card size.
-      style={{ containerType: "inline-size" }}
+  const tile = (
+    <div
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-border bg-muted/40 transition hover:border-primary hover:shadow-md",
-        className,
+        "group relative w-full overflow-hidden rounded-2xl",
+        mode === "hover" ? "aspect-[9/16]" : "h-full",
+        pack ? "bg-[#0e0e12]" : "bg-muted/40",
       )}
     >
-      {bgSrc ? (
-        // biome-ignore lint/performance/noImgElement: local preview thumbnail
-        <img
-          src={bgSrc}
-          alt=""
-          className="absolute inset-0 size-full object-cover"
+      {!pack ? (
+        <div
+          aria-hidden
+          className="absolute inset-0 dark:opacity-15"
+          style={{ backgroundColor: pastelFor(template.id) }}
         />
       ) : null}
 
@@ -82,6 +93,7 @@ export function MemeThumbnail({
         loop
         playsInline
         preload="metadata"
+        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
         className="absolute inset-0 size-full object-contain"
         onMouseEnter={
           mode === "hover"
@@ -100,23 +112,60 @@ export function MemeThumbnail({
         }
       />
 
-      <span
-        className="absolute left-[6%] right-[6%] top-[12%] text-center text-white"
-        // cqw units mirror the editor's caption (72px / 9px stroke on 1080px).
-        style={{
-          fontFamily: "TikTok Sans",
-          fontWeight: 800,
-          fontSize: "6.6667cqw",
-          lineHeight: 1.05,
-          WebkitTextStroke: "0.83cqw #000",
-          paintOrder: "stroke fill",
-        }}
-      >
-        {SAMPLE_CAPTION}
-      </span>
+      {duration !== null ? (
+        <span className="pointer-events-none absolute top-2 left-2 rounded-md bg-black/55 px-1.5 py-0.5 font-mono text-[10px] font-medium tabular-nums text-white backdrop-blur-sm">
+          {formatDuration(duration)}
+        </span>
+      ) : null}
 
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 text-left">
-        <span className="text-xs font-medium text-white">{template.title}</span>
+      {pack ? (
+        <span className="pointer-events-none absolute top-2 right-2 rounded-md bg-white/15 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white backdrop-blur-sm">
+          Pack
+        </span>
+      ) : null}
+
+      {mode === "hover" ? (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 transition-opacity group-hover:opacity-100">
+          <span className="rounded-full bg-primary px-3.5 py-1.5 text-[13px] font-medium text-primary-foreground">
+            Use template →
+          </span>
+        </div>
+      ) : (
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-left">
+          <span className="text-xs font-medium text-white">
+            {template.title}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+
+  if (mode === "view") {
+    return (
+      <button
+        type="button"
+        onClick={() => onSelect(template)}
+        className={cn("block", className)}
+      >
+        {tile}
+      </button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(template)}
+      className={cn("block w-full text-left", className)}
+    >
+      {tile}
+      <div className="flex items-baseline justify-between gap-3 px-0.5 pt-2.5">
+        <span className="truncate text-[13px] font-medium leading-tight">
+          {template.title}
+        </span>
+        <span className="shrink-0 font-mono text-[10px] text-muted-foreground">
+          9:16
+        </span>
       </div>
     </button>
   );
