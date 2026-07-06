@@ -1,9 +1,8 @@
 "use client";
 
 import { cn } from "@workspace/ui/lib/utils";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { MemeTemplate } from "@/lib/memes";
-import { formatDuration } from "@/lib/timecode";
 
 const PASTELS = [
   "#fde7ef",
@@ -44,7 +43,6 @@ export function MemeThumbnail({
   onSelect,
 }: MemeThumbnailProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [duration, setDuration] = useState<number | null>(null);
   const pack = isPack(template);
 
   useEffect(() => {
@@ -93,7 +91,6 @@ export function MemeThumbnail({
         loop
         playsInline
         preload="metadata"
-        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
         className="absolute inset-0 size-full object-contain"
         onMouseEnter={
           mode === "hover"
@@ -112,31 +109,19 @@ export function MemeThumbnail({
         }
       />
 
-      {duration !== null ? (
-        <span className="pointer-events-none absolute top-2 left-2 rounded-md bg-black/55 px-1.5 py-0.5 font-mono text-[10px] font-medium tabular-nums text-white backdrop-blur-sm">
-          {formatDuration(duration)}
-        </span>
-      ) : null}
-
       {pack ? (
         <span className="pointer-events-none absolute top-2 right-2 rounded-md bg-white/15 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white backdrop-blur-sm">
           Pack
         </span>
       ) : null}
 
-      {mode === "hover" ? (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 transition-opacity group-hover:opacity-100">
-          <span className="rounded-full bg-primary px-3.5 py-1.5 text-[13px] font-medium text-primary-foreground">
-            Use template →
-          </span>
-        </div>
-      ) : (
+      {mode === "view" ? (
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-left">
           <span className="text-xs font-medium text-white">
             {template.title}
           </span>
         </div>
-      )}
+      ) : null}
     </div>
   );
 

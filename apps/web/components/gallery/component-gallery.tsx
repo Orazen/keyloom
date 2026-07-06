@@ -21,7 +21,6 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import * as React from "react";
 import { LatestDrop } from "@/components/dashboard/latest-drop";
-import { formatDuration } from "@/lib/timecode";
 
 // The dashboard's component gallery. Clicking a card opens it in the editor
 // (/component/[id]/edit).
@@ -162,7 +161,6 @@ export function ComponentGallery() {
           <CategoryTab
             key={c}
             label={CATEGORY_LABELS[c]}
-            dot={CATEGORY_DOTS[c]}
             count={COUNT_BY_CATEGORY.get(c) ?? 0}
             active={filter === c}
             onClick={() => setFilter(c)}
@@ -213,13 +211,11 @@ export function ComponentGallery() {
 function CategoryTab({
   label,
   count,
-  dot,
   active,
   onClick,
 }: {
   label: string;
   count: number;
-  dot?: string;
   active: boolean;
   onClick: () => void;
 }) {
@@ -234,13 +230,6 @@ function CategoryTab({
           : "bg-card text-muted-foreground shadow-sm hover:text-foreground",
       )}
     >
-      {dot ? (
-        <span
-          aria-hidden
-          className="size-1.5 rounded-full"
-          style={{ backgroundColor: dot }}
-        />
-      ) : null}
       {label}
       <span
         className={cn(
@@ -287,14 +276,6 @@ function useMountOnVisible() {
   return { ref, visible };
 }
 
-function TimecodeChip({ info }: { info: AnyCompositionInfo }) {
-  return (
-    <span className="pointer-events-none absolute top-2 right-2 rounded-md bg-black/55 px-1.5 py-0.5 font-mono text-[10px] font-medium tabular-nums text-white backdrop-blur-sm">
-      {formatDuration(info.durationInFrames / info.fps)}
-    </span>
-  );
-}
-
 function FeaturedCard({ info }: { info: AnyCompositionInfo }) {
   const { ref, visible } = useMountOnVisible();
 
@@ -317,7 +298,6 @@ function FeaturedCard({ info }: { info: AnyCompositionInfo }) {
             height={FEATURED_PREVIEW_H}
           />
         ) : null}
-        <TimecodeChip info={info} />
       </div>
       <div className="flex items-center justify-between gap-3 px-4 pb-3.5 pt-1">
         <h3 className="truncate text-[15px] font-semibold leading-tight">
@@ -351,7 +331,6 @@ function GalleryCard({ info }: { info: AnyCompositionInfo }) {
             height={PREVIEW_H}
           />
         ) : null}
-        <TimecodeChip info={info} />
       </div>
       <div className="flex items-center justify-between gap-2 px-3 pb-3 pt-1">
         <h3 className="truncate text-[13px] font-semibold leading-tight">
