@@ -1,6 +1,10 @@
 "use client";
 
-import { Cancel01Icon, Search01Icon } from "@hugeicons/core-free-icons";
+import {
+  Cancel01Icon,
+  PlusSignIcon,
+  Search01Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   compositionModulePath,
@@ -16,10 +20,11 @@ import { cn } from "@workspace/ui/lib/utils";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import * as React from "react";
+import { LatestDrop } from "@/components/dashboard/latest-drop";
 import { formatDuration } from "@/lib/timecode";
 
-// The ONE component gallery — used by both the landing page and the dashboard.
-// Clicking a card opens it in the editor (/component/[id]/edit).
+// The dashboard's component gallery. Clicking a card opens it in the editor
+// (/component/[id]/edit).
 
 const LivePreview = dynamic(
   () => import("./live-preview").then((m) => m.LivePreview),
@@ -62,19 +67,28 @@ const COUNT_BY_CATEGORY = VISIBLE.reduce((counts, c) => {
   return counts;
 }, new Map<CompositionCategory, number>());
 
+// Hand-picked scenes for the featured row; anything missing from the registry
+// is skipped, and the row tops up from the front of the library.
+const FEATURED_IDS = ["TikTokCaption", "TweetCard", "Terminal"];
+const FEATURED_COUNT = 3;
+const FEATURED = [
+  ...FEATURED_IDS.map((id) => VISIBLE.find((c) => c.id === id)).filter(
+    (c): c is (typeof VISIBLE)[number] => Boolean(c),
+  ),
+  ...VISIBLE.filter((c) => !FEATURED_IDS.includes(c.id)),
+].slice(0, FEATURED_COUNT);
+
 // Tall 4:5 portrait preview frame — responsive components reflow to fill it.
 const PREVIEW_W = 1080;
 const PREVIEW_H = 1350;
 
-export function ComponentGallery({
-  stickyOffsetClass = "top-0",
-}: {
-  /** Tailwind top-* offset so the sticky filter bar sits under the page header. */
-  stickyOffsetClass?: string;
-}) {
+// Landscape frame for the larger featured cards.
+const FEATURED_PREVIEW_W = 1280;
+const FEATURED_PREVIEW_H = 800;
+
+export function ComponentGallery() {
   const [filter, setFilter] = React.useState<Filter>("all");
   const [query, setQuery] = React.useState("");
-  const [searchOpen, setSearchOpen] = React.useState(false);
 
   const presentCategories = React.useMemo(() => {
     const seen = new Set(VISIBLE.map((c) => c.category));
@@ -93,89 +107,105 @@ export function ComponentGallery({
     });
   }, [filter, query]);
 
+  // The featured row only makes sense in the unfiltered default view.
+  const showFeatured = filter === "all" && query.trim() === "";
+
   return (
-    <div>
-      <div
-        className={cn(
-          "sticky z-20 mx-1 mb-8 mt-3 rounded-full border border-border bg-background/80 px-2.5 py-2 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/70",
-          stickyOffsetClass,
-        )}
-      >
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="font-heading text-3xl font-semibold tracking-tight">
+          Components
+        </h1>
         <div className="flex items-center gap-2">
-          {searchOpen ? (
-            <div className="flex flex-1 items-center gap-2">
-              <div className="relative flex-1">
-                <HugeiconsIcon
-                  icon={Search01Icon}
-                  size={15}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                />
-                <Input
-                  autoFocus
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search components..."
-                  className="h-8 pl-9 text-[13px]"
-                />
-              </div>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label="Close search"
-                onClick={() => {
-                  setSearchOpen(false);
-                  setQuery("");
-                }}
+          <div className="relative">
+            <HugeiconsIcon
+              icon={Search01Icon}
+              size={14}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search scenes..."
+              className="h-9 w-48 rounded-full pl-8 text-[13px] sm:w-60"
+            />
+            {query ? (
+              <button
+                type="button"
+                aria-label="Clear search"
+                onClick={() => setQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
-                <HugeiconsIcon icon={Cancel01Icon} size={15} />
-              </Button>
-            </div>
-          ) : (
-            <>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label="Search components"
-                className="shrink-0"
-                onClick={() => setSearchOpen(true)}
-              >
-                <HugeiconsIcon icon={Search01Icon} size={15} />
-              </Button>
-              <div className="h-5 w-px shrink-0 bg-border" />
-              <nav className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <CategoryTab
-                  label="All"
-                  count={VISIBLE.length}
-                  active={filter === "all"}
-                  onClick={() => setFilter("all")}
-                />
-                {presentCategories.map((c) => (
-                  <CategoryTab
-                    key={c}
-                    label={CATEGORY_LABELS[c]}
-                    dot={CATEGORY_DOTS[c]}
-                    count={COUNT_BY_CATEGORY.get(c) ?? 0}
-                    active={filter === c}
-                    onClick={() => setFilter(c)}
-                  />
-                ))}
-              </nav>
-            </>
-          )}
+                <HugeiconsIcon icon={Cancel01Icon} size={13} />
+              </button>
+            ) : null}
+          </div>
+          <Button asChild className="rounded-full">
+            <Link href="/studio">
+              <HugeiconsIcon icon={PlusSignIcon} size={15} />
+              New project
+            </Link>
+          </Button>
         </div>
       </div>
 
-      {items.length === 0 ? (
-        <p className="py-20 text-center text-sm text-muted-foreground">
-          No components match “{query}”.
-        </p>
-      ) : (
-        <div className="grid grid-cols-2 items-start gap-x-5 gap-y-8 lg:grid-cols-3 xl:grid-cols-4">
-          {items.map((info) => (
-            <GalleryCard key={info.id} info={info} />
-          ))}
-        </div>
-      )}
+      <LatestDrop />
+
+      <nav className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <CategoryTab
+          label="All"
+          count={VISIBLE.length}
+          active={filter === "all"}
+          onClick={() => setFilter("all")}
+        />
+        {presentCategories.map((c) => (
+          <CategoryTab
+            key={c}
+            label={CATEGORY_LABELS[c]}
+            dot={CATEGORY_DOTS[c]}
+            count={COUNT_BY_CATEGORY.get(c) ?? 0}
+            active={filter === c}
+            onClick={() => setFilter(c)}
+          />
+        ))}
+      </nav>
+
+      {showFeatured ? (
+        <section>
+          <h2 className="font-heading text-xl font-semibold tracking-tight">
+            Featured
+          </h2>
+          <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURED.map((info) => (
+              <FeaturedCard key={info.id} info={info} />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <section>
+        {showFeatured ? (
+          <h2 className="font-heading text-xl font-semibold tracking-tight">
+            All scenes
+          </h2>
+        ) : null}
+        {items.length === 0 ? (
+          <p className="py-20 text-center text-sm text-muted-foreground">
+            No components match “{query}”.
+          </p>
+        ) : (
+          <div
+            className={cn(
+              "grid grid-cols-2 items-start gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5",
+              showFeatured && "mt-4",
+            )}
+          >
+            {items.map((info) => (
+              <GalleryCard key={info.id} info={info} />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
@@ -201,7 +231,7 @@ function CategoryTab({
         "flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium whitespace-nowrap transition-colors",
         active
           ? "bg-foreground text-background"
-          : "text-muted-foreground hover:bg-accent hover:text-foreground",
+          : "bg-card text-muted-foreground shadow-sm hover:text-foreground",
       )}
     >
       {dot ? (
@@ -224,7 +254,19 @@ function CategoryTab({
   );
 }
 
-function GalleryCard({ info }: { info: AnyCompositionInfo }) {
+function CategoryChip({ category }: { category: CompositionCategory }) {
+  const color = CATEGORY_DOTS[category];
+  return (
+    <span
+      className="shrink-0 rounded-md px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.1em]"
+      style={{ backgroundColor: `${color}1f`, color }}
+    >
+      {CATEGORY_LABELS[category]}
+    </span>
+  );
+}
+
+function useMountOnVisible() {
   const ref = React.useRef<HTMLAnchorElement | null>(null);
   const [visible, setVisible] = React.useState(false);
   React.useEffect(() => {
@@ -242,42 +284,80 @@ function GalleryCard({ info }: { info: AnyCompositionInfo }) {
     io.observe(el);
     return () => io.disconnect();
   }, []);
+  return { ref, visible };
+}
+
+function TimecodeChip({ info }: { info: AnyCompositionInfo }) {
+  return (
+    <span className="pointer-events-none absolute top-2 right-2 rounded-md bg-black/55 px-1.5 py-0.5 font-mono text-[10px] font-medium tabular-nums text-white backdrop-blur-sm">
+      {formatDuration(info.durationInFrames / info.fps)}
+    </span>
+  );
+}
+
+function FeaturedCard({ info }: { info: AnyCompositionInfo }) {
+  const { ref, visible } = useMountOnVisible();
 
   return (
     <Link
       ref={ref}
       href={`/component/${info.id}/edit`}
       prefetch={false}
-      className="group block"
+      className="group block overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-shadow hover:shadow-md"
     >
-      <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-muted/40 ring-1 ring-border/50 transition-all duration-200 group-hover:ring-border group-hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.25)]">
-        <div className="absolute inset-0">
-          {visible ? (
-            <LivePreview
-              modulePath={compositionModulePath(info)}
-              id={info.id}
-              defaultProps={info.defaultProps as Record<string, unknown>}
-              durationInFrames={info.durationInFrames}
-              fps={info.fps}
-              width={PREVIEW_W}
-              height={PREVIEW_H}
-            />
-          ) : (
-            <div className="h-full w-full bg-muted/40" />
-          )}
-        </div>
-        <span className="pointer-events-none absolute top-2 right-2 rounded-md bg-black/55 px-1.5 py-0.5 font-mono text-[10px] font-medium tabular-nums text-white backdrop-blur-sm">
-          {formatDuration(info.durationInFrames / info.fps)}
-        </span>
+      <div className="relative m-2 aspect-[16/10] overflow-hidden rounded-xl bg-muted/40">
+        {visible ? (
+          <LivePreview
+            modulePath={compositionModulePath(info)}
+            id={info.id}
+            defaultProps={info.defaultProps as Record<string, unknown>}
+            durationInFrames={info.durationInFrames}
+            fps={info.fps}
+            width={FEATURED_PREVIEW_W}
+            height={FEATURED_PREVIEW_H}
+          />
+        ) : null}
+        <TimecodeChip info={info} />
       </div>
-
-      <div className="px-0.5 pt-3">
-        <h3 className="truncate text-[15px] font-semibold leading-tight text-foreground">
+      <div className="flex items-center justify-between gap-3 px-4 pb-3.5 pt-1">
+        <h3 className="truncate text-[15px] font-semibold leading-tight">
           {info.title}
         </h3>
-        <p className="mt-1 truncate font-mono text-[11px] text-muted-foreground">
-          {CATEGORY_LABELS[info.category]}
-        </p>
+        <CategoryChip category={info.category} />
+      </div>
+    </Link>
+  );
+}
+
+function GalleryCard({ info }: { info: AnyCompositionInfo }) {
+  const { ref, visible } = useMountOnVisible();
+
+  return (
+    <Link
+      ref={ref}
+      href={`/component/${info.id}/edit`}
+      prefetch={false}
+      className="group block overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-shadow hover:shadow-md"
+    >
+      <div className="relative m-2 aspect-[4/5] overflow-hidden rounded-xl bg-muted/40">
+        {visible ? (
+          <LivePreview
+            modulePath={compositionModulePath(info)}
+            id={info.id}
+            defaultProps={info.defaultProps as Record<string, unknown>}
+            durationInFrames={info.durationInFrames}
+            fps={info.fps}
+            width={PREVIEW_W}
+            height={PREVIEW_H}
+          />
+        ) : null}
+        <TimecodeChip info={info} />
+      </div>
+      <div className="flex items-center justify-between gap-2 px-3 pb-3 pt-1">
+        <h3 className="truncate text-[13px] font-semibold leading-tight">
+          {info.title}
+        </h3>
+        <CategoryChip category={info.category} />
       </div>
     </Link>
   );
