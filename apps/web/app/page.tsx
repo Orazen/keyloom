@@ -3,7 +3,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@workspace/ui/components/button";
 import Image from "next/image";
 import Link from "next/link";
-import GradualBlur from "@/components/GradualBlur";
+import GradualBlur from "@/components/gradual-blur";
 import { ComponentShowcase } from "@/components/landing/component-showcase";
 import { HeroReelBadges } from "@/components/landing/hero-reel-badges";
 import NavbarMenuFull from "@/components/landing/navbar-menu";

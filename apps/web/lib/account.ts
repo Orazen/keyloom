@@ -11,9 +11,6 @@ import {
   users,
 } from "./db";
 
-/** Free-tier defaults applied on first sign-in (before any Dodo subscription). */
-const FREE_PLAN = { plan: "free", renderQuota: 3 } as const;
-
 /**
  * Ensure just the `users` row exists — a single round-trip. Use for paths that
  * only need the FK target (e.g. saving a forked component), not the full
@@ -42,8 +39,8 @@ export async function ensureAccount(
     await db.insert(subscriptions).values({
       userId,
       status: "active", // free tier is usable immediately
-      plan: FREE_PLAN.plan,
-      renderQuota: FREE_PLAN.renderQuota,
+      plan: PLANS.free.plan,
+      renderQuota: PLANS.free.renderQuota,
     });
   }
 }

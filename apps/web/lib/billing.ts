@@ -4,7 +4,7 @@ import { Webhook } from "standardwebhooks";
 /** Plan tiers. `free` is provisioned on first sign-in; `pro` is granted by a
  *  Dodo subscription webhook. */
 export const PLANS = {
-  free: { plan: "free", renderQuota: 3 },
+  free: { plan: "free", renderQuota: 10 },
   pro: { plan: "pro", renderQuota: 500 },
 } as const;
 

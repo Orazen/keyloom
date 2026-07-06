@@ -3,7 +3,7 @@
 import { Mesh, Program, Renderer, Triangle } from "ogl";
 import type React from "react";
 import { useEffect, useRef } from "react";
-import "./Grainient.css";
+import "./grainient.css";
 
 interface GrainientProps {
   timeSpeed?: number;

@@ -2,7 +2,7 @@ import { Github01Icon, NewTwitterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
-import Grainient from "@/components/Grainient";
+import Grainient from "@/components/grainient";
 
 type FooterLink = { label: string; href: string; external?: boolean };
 

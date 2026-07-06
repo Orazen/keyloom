@@ -9,7 +9,7 @@ import React, {
   useState,
 } from "react";
 
-import "./GradualBlur.css";
+import "./gradual-blur.css";
 
 type GradualBlurProps = {
   position?: "top" | "bottom" | "left" | "right";

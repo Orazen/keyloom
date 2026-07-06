@@ -1,11 +1,27 @@
+import { withAuth } from "@workos-inc/authkit-nextjs";
 import { Progress } from "@workspace/ui/components/progress";
 import Link from "next/link";
+import { getSubscription } from "@/lib/account";
 
 export type RenderUsage = {
   plan: string;
   rendersUsed: number;
   renderQuota: number;
 };
+
+/**
+ * Async server component meant to be rendered inside <Suspense> so the
+ * subscription query streams in without blocking navigation.
+ */
+export async function SidebarUsage() {
+  const { user } = await withAuth();
+  if (!user) return null;
+
+  const subscription = await getSubscription(user.id);
+  if (!subscription) return null;
+
+  return <UsageCard usage={subscription} />;
+}
 
 export function UsageCard({ usage }: { usage: RenderUsage }) {
   const percentUsed =

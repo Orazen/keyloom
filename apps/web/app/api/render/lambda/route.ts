@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import type { ExportOptions } from "@/features/studio/lib/export-options";
 import { prepareProjectForExport } from "@/features/studio/lib/prepare-export-project";
 import { rewriteExternalImageUrls } from "@/features/studio/lib/proxy-external-images";
+import { claimRender } from "@/lib/render-guard";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -222,6 +223,11 @@ function proxyBaseUrl(request: Request): string {
 }
 
 export async function POST(request: Request) {
+  const claim = await claimRender();
+  if (!claim.ok) {
+    return NextResponse.json({ error: claim.reason }, { status: claim.status });
+  }
+
   try {
     const body = (await request.json()) as {
       project?: unknown;
