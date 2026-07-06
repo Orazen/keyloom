@@ -8,6 +8,11 @@ const nextConfig = {
     // bottleneck for this large composition graph). Dev caching is already on
     // by default in Next 16; this opts the production build in too.
     turbopackFileSystemCacheForBuild: true,
+    // @hugeicons/core-free-icons is a 59MB package whose barrel re-exports
+    // ~13k icons; almost every component imports a couple of icons through it,
+    // which drags the whole barrel into each module's compile. This rewrites
+    // those imports to the per-icon files.
+    optimizePackageImports: ["@hugeicons/core-free-icons"],
   },
   serverExternalPackages: [
     "@remotion/bundler",

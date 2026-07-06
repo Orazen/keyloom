@@ -3,10 +3,17 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
-@source "../../../../apps/**/*.{ts,tsx}";
-@source "../../../../apps/**/*.mdx";
+/* Scan only real source dirs — a bare apps/** glob also crawls .next output,
+   node_modules and build artifacts, which slows every CSS rebuild in dev. */
+@source "../../../../apps/web/app/**/*.{ts,tsx}";
+@source "../../../../apps/web/components/**/*.{ts,tsx}";
+@source "../../../../apps/web/features/**/*.{ts,tsx}";
+@source "../../../../apps/web/hooks/**/*.{ts,tsx}";
+@source "../../../../apps/web/lib/**/*.{ts,tsx}";
+@source "../../../../apps/web/templates/**/*.{ts,tsx}";
+@source "../../../../apps/remotion/src/**/*.{ts,tsx}";
 @source "../../../../apps/web/node_modules/streamdown/dist/*.js";
-@source "../../../../packages/**/*.{ts,tsx}";
+@source "../../../../packages/ui/src/**/*.{ts,tsx}";
 /* @heygaia/chat-ui inlines Tailwind utility classes inside its bundled
    JS — Tailwind v4 in lyon won't scan node_modules .js by default, so
    GaiaScenario.tsx ships a small <style> tag for the few rules that
