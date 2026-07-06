@@ -25,7 +25,7 @@ const STAR_FILLED = "#e3b341";
 const THEME = {
   light: {
     bg: "#ffffff",
-    pageBg: "#ffffff",
+    pageBg: "#f6f8fa",
     border: "#d1d9e0",
     btnBg: "#f6f8fa",
     btnBgActive: "#eef0f3",
@@ -53,11 +53,11 @@ const THEME = {
 } as const;
 
 const STAR_BURST = 26;
-
-// Scale everything off this — the original button copied straight from
-// github.com is tiny in a 1920x1080 frame, so we 3x its native size.
 const SCALE = 3;
 const px = (n: number) => Math.round(n * SCALE);
+
+const D_BREADCRUMB = 3;
+const D_BUTTON = 9;
 
 export const GitHubStarButton: React.FC<GitHubStarButtonProps> = ({
   owner,
@@ -72,7 +72,7 @@ export const GitHubStarButton: React.FC<GitHubStarButtonProps> = ({
   const t = THEME[theme];
 
   const s = resolveClipStyle(clipStyle, {
-    background: theme === "dark" ? "#010409" : "#ffffff",
+    background: t.pageBg,
     color: t.text,
     fontFamily:
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif",
@@ -128,98 +128,134 @@ export const GitHubStarButton: React.FC<GitHubStarButtonProps> = ({
         justifyContent: "center",
         fontFamily: s.fontFamily,
         color: s.color,
-        padding: 80,
+        padding: "8%",
       }}
     >
       <div
         style={{
+          maxWidth: "100%",
           background: t.bg,
           border: `${px(1)}px solid ${t.border}`,
-          borderRadius: px(14),
-          padding: `${px(26)}px ${px(28)}px`,
-          opacity: enter,
-          transform: `translate3d(0, ${snap((1 - enter) * 14)}px, 0)`,
+          borderRadius: px(12),
+          padding: `${px(24)}px ${px(28)}px`,
           boxShadow: t.cardShadow,
+          display: "flex",
+          flexDirection: "column",
+          gap: px(20),
+          transform: `translate3d(0, ${snap((1 - enter) * 16)}px, 0) scale(${0.98 + enter * 0.02})`,
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: px(8),
-            fontSize: px(22),
-            fontWeight: 600,
-            marginBottom: px(22),
-          }}
-        >
-          <RepoIcon color={t.muted} />
-          <span style={{ color: t.repoLink }}>{owner}</span>
-          <span style={{ color: t.muted }}>/</span>
-          <span style={{ color: t.repoLink, fontWeight: 700 }}>{repo}</span>
-          <span
-            style={{
-              marginLeft: px(8),
-              fontSize: px(12),
-              fontWeight: 500,
-              padding: `${px(2)}px ${px(10)}px`,
-              borderRadius: 999,
-              border: `${px(1)}px solid ${t.border}`,
-              color: t.muted,
-            }}
-          >
-            Public
-          </span>
-        </div>
-
-        <div style={{ display: "inline-flex", alignItems: "stretch" }}>
+        <RevealItem frame={frame - D_BREADCRUMB} fps={fps}>
           <div
             style={{
-              display: "inline-flex",
+              display: "flex",
               alignItems: "center",
               gap: px(8),
-              padding: `${px(8)}px ${px(16)}px`,
-              border: `${px(1)}px solid ${t.btnBorder}`,
-              borderRight: "none",
-              borderRadius: `${px(8)}px 0 0 ${px(8)}px`,
-              fontSize: px(16),
-              fontWeight: 500,
-              background: mixHover(t.btnBg, t.btnBgActive, hoverProgress),
-              color: t.text,
-              transform: `scale(${1 - clickProgress * 0.02})`,
-              position: "relative",
+              fontSize: px(22),
+              minWidth: 0,
             }}
           >
-            <StarSvg
-              fillProgress={starFill}
-              scale={starScale}
-              muted={t.muted}
-              accent={s.accent}
-            />
-            <span>Star</span>
-            <BurstParticles
-              age={burstAge}
-              active={burstAge > 0 && burstAge < STAR_BURST + 14}
-              accent={s.accent}
-            />
+            <RepoIcon color={t.muted} />
+            <span
+              style={{
+                color: t.repoLink,
+                fontWeight: 400,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                minWidth: 0,
+              }}
+            >
+              {owner}
+            </span>
+            <span style={{ color: t.muted, flexShrink: 0 }}>/</span>
+            <span
+              style={{
+                color: t.repoLink,
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+            >
+              {repo}
+            </span>
+            <span
+              style={{
+                marginLeft: px(8),
+                fontSize: px(12),
+                fontWeight: 500,
+                padding: `${px(2)}px ${px(10)}px`,
+                borderRadius: 999,
+                border: `${px(1)}px solid ${t.border}`,
+                color: t.muted,
+                flexShrink: 0,
+              }}
+            >
+              Public
+            </span>
           </div>
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              minWidth: px(72),
-              padding: `${px(8)}px ${px(18)}px`,
-              border: `${px(1)}px solid ${t.btnBorder}`,
-              borderRadius: `0 ${px(8)}px ${px(8)}px 0`,
-              fontSize: px(16),
-              fontWeight: 600,
-              background: t.countBg,
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            {count.toLocaleString()}
-          </span>
-        </div>
+        </RevealItem>
+
+        <RevealItem frame={frame - D_BUTTON} fps={fps}>
+          <div style={{ display: "flex" }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "stretch",
+                transform: `scale(${1 - clickProgress * 0.03})`,
+                transformOrigin: "center",
+              }}
+            >
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: px(8),
+                  padding: `${px(7)}px ${px(14)}px`,
+                  border: `${px(1)}px solid ${t.btnBorder}`,
+                  borderRight: "none",
+                  borderRadius: `${px(6)}px 0 0 ${px(6)}px`,
+                  fontSize: px(14),
+                  fontWeight: 500,
+                  background: mixHover(t.btnBg, t.btnBgActive, hoverProgress),
+                  color: t.text,
+                  position: "relative",
+                }}
+              >
+                <StarSvg
+                  fillProgress={starFill}
+                  scale={starScale}
+                  muted={t.muted}
+                  accent={s.accent}
+                />
+                <span>Star</span>
+                <BurstParticles
+                  age={burstAge}
+                  active={burstAge > 0 && burstAge < STAR_BURST + 14}
+                  accent={s.accent}
+                />
+              </div>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: px(56),
+                  padding: `${px(7)}px ${px(14)}px`,
+                  border: `${px(1)}px solid ${t.btnBorder}`,
+                  borderRadius: `0 ${px(6)}px ${px(6)}px 0`,
+                  fontSize: px(14),
+                  fontWeight: 600,
+                  background: t.countBg,
+                  color: t.text,
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {count.toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </RevealItem>
       </div>
     </AbsoluteFill>
   );
@@ -232,6 +268,7 @@ function RepoIcon({ color }: { color: string }) {
       height={px(20)}
       viewBox="0 0 16 16"
       fill={color}
+      style={{ flexShrink: 0 }}
       aria-hidden
     >
       <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z" />
@@ -252,8 +289,8 @@ function StarSvg({
 }) {
   return (
     <svg
-      width={px(18)}
-      height={px(18)}
+      width={px(16)}
+      height={px(16)}
       viewBox="0 0 16 16"
       style={{ transform: `scale(${scale})`, transformOrigin: "center" }}
       aria-hidden
@@ -284,7 +321,7 @@ function BurstParticles({
     <span
       style={{
         position: "absolute",
-        left: px(14),
+        left: px(22),
         top: "50%",
         width: 1,
         height: 1,
@@ -319,4 +356,31 @@ function mixHover(a: string, b: string, t: number): string {
   if (t <= 0) return a;
   if (t >= 1) return b;
   return `color-mix(in srgb, ${a} ${(1 - t) * 100}%, ${b} ${t * 100}%)`;
+}
+
+function RevealItem({
+  frame,
+  fps,
+  children,
+}: {
+  frame: number;
+  fps: number;
+  children: React.ReactNode;
+}) {
+  const reveal = spring({
+    frame,
+    fps,
+    config: { damping: 16, stiffness: 150, mass: 0.7 },
+  });
+  return (
+    <div
+      style={{
+        opacity: reveal,
+        transform: `translate3d(0, ${snap((1 - reveal) * 12)}px, 0)`,
+        minWidth: 0,
+      }}
+    >
+      {children}
+    </div>
+  );
 }

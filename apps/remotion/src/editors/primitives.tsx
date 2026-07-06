@@ -21,10 +21,6 @@ import { Switch } from "@workspace/ui/components/switch";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { cn } from "@workspace/ui/lib/utils";
 import { useRef, useState } from "react";
-import {
-  ICON_PRESETS,
-  type IconPreset,
-} from "../compositions/MessagePopup/icon-presets";
 import type { PrimitiveField } from "../schema";
 
 // Shared control styling for the editor panels. We KEEP the app's pill radius
@@ -41,7 +37,7 @@ type Props = {
   value: unknown;
   onChange: (v: unknown) => void;
   /**
-   * Some primitive fields (currently `iconPreset`) edit two keys at
+   * Some primitive fields (currently `audio`) edit two keys at
    * once. Callers that want to render those fields must pass through
    * the sibling key's current value and a setter for it.
    */
@@ -154,7 +150,7 @@ export function PrimitiveControl({
       );
 
     case "audio": {
-      // Like iconPreset, audio writes two keys atomically — audioUrl and
+      // Audio writes two keys atomically — audioUrl and
       // the words array — by funneling both through onChange wrapped in a
       // sentinel object that FieldsRenderer destructures.
       const audioUrl = (value as string) ?? "";
@@ -200,44 +196,6 @@ export function PrimitiveControl({
               ))}
             </SelectContent>
           </Select>
-        </Wrapper>
-      );
-    }
-
-    case "iconPreset": {
-      // Both the preset key and the custom-upload URL live on the same
-      // clip's props object. The parent's setter dispatches
-      // UPDATE_CLIP_PROPS, which REPLACES props wholesale — so two
-      // back-to-back single-key dispatches each spread a stale snapshot
-      // and the second one clobbers the first. Write both keys in a
-      // single dispatch instead. See FieldsRenderer for the combined
-      // setter wiring.
-      const presetKey = (value as string) ?? "";
-      const customSrc = (extraValue as string) ?? "";
-      const setBoth = (preset: string, custom: string) => {
-        // We piggy-back through the existing single-key onChange/onExtraChange
-        // by encoding "write both at once" in a single combined call. The
-        // FieldsRenderer special-cases iconPreset and treats onChange as the
-        // primary writer for the preset; the iconCustom side is set inside
-        // the same React update via the queued onExtraChange.
-        // To make this atomic with the current reducer (which replaces all
-        // props), we route through a single passed-down combined writer.
-        // The FieldsRenderer must implement `onChange` for iconPreset so
-        // that it writes BOTH keys in one set call.
-        // Here we just call onChange with a tuple-style object and let the
-        // renderer destructure it.
-        onChange({ __iconPresetBoth: true, preset, custom });
-      };
-      void onExtraChange; // kept for type compat; not used for iconPreset.
-      return (
-        <Wrapper htmlFor={field.key} label={field.label}>
-          <IconPresetControl
-            presetKey={presetKey}
-            customSrc={customSrc}
-            onPresetChange={(v) => setBoth(v, "")}
-            onCustomChange={(v) => setBoth("", v)}
-            onReset={() => setBoth("", "")}
-          />
         </Wrapper>
       );
     }
@@ -479,148 +437,6 @@ function AudioControl({
       </div>
       {error ? <p className="text-[11px] text-destructive">{error}</p> : null}
     </div>
-  );
-}
-
-const ICON_PRESET_MAX_BYTES = 5 * 1024 * 1024;
-const ICON_PRESET_ACCEPT = "image/png,image/jpeg,image/jpg,image/webp";
-
-function IconPresetControl({
-  presetKey,
-  customSrc,
-  onPresetChange,
-  onCustomChange,
-  onReset,
-}: {
-  presetKey: string;
-  customSrc: string;
-  onPresetChange: (v: string) => void;
-  onCustomChange: (v: string) => void;
-  onReset: () => void;
-}) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const hasSelection = presetKey.length > 0 || customSrc.length > 0;
-
-  function handleFile(file: File | null) {
-    if (!file) return;
-    if (file.size > ICON_PRESET_MAX_BYTES) {
-      // Browser-side guardrail — a 5 MB cap matches the Inspector contract
-      // and avoids stuffing huge data URLs into project state.
-      console.warn(
-        `Icon upload rejected: ${file.size} bytes exceeds 5 MB limit.`,
-      );
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    onCustomChange(url);
-  }
-
-  return (
-    <div className="space-y-2.5">
-      <div className="grid grid-cols-4 gap-1.5">
-        {ICON_PRESETS.map((preset) => (
-          <IconPresetTile
-            key={preset.key}
-            preset={preset}
-            active={preset.key === presetKey && customSrc.length === 0}
-            onSelect={() => onPresetChange(preset.key)}
-          />
-        ))}
-      </div>
-
-      <div className="flex items-center gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="flex-1 gap-1.5"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <HugeiconsIcon icon={Upload04Icon} className="size-3.5" />
-          {customSrc ? "Replace custom" : "Upload custom"}
-        </Button>
-        {hasSelection && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="gap-1.5 text-muted-foreground"
-            onClick={onReset}
-            title="Reset to default"
-          >
-            <HugeiconsIcon icon={RefreshIcon} className="size-3.5" />
-            Reset
-          </Button>
-        )}
-      </div>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept={ICON_PRESET_ACCEPT}
-        className="hidden"
-        onChange={(e) => {
-          handleFile(e.target.files?.[0] ?? null);
-          // Reset so re-selecting the same file fires onChange again.
-          e.target.value = "";
-        }}
-      />
-
-      {customSrc ? (
-        <div className="flex items-center gap-2 rounded-md border border-border bg-muted/30 px-2 py-1.5">
-          {/* eslint-disable-next-line @next/next/no-img-element -- blob/data URL preview, not a deployed asset */}
-          <img
-            src={customSrc}
-            alt="Custom icon preview"
-            className="size-10 shrink-0 rounded-md object-cover"
-          />
-          <p className="min-w-0 flex-1 truncate text-[11px] text-muted-foreground">
-            Custom upload
-          </p>
-          <button
-            type="button"
-            onClick={() => onCustomChange("")}
-            aria-label="Remove custom icon"
-            className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-          >
-            <HugeiconsIcon icon={Cancel01Icon} className="size-3.5" />
-          </button>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function IconPresetTile({
-  preset,
-  active,
-  onSelect,
-}: {
-  preset: IconPreset;
-  active: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      title={preset.label}
-      aria-label={preset.label}
-      aria-pressed={active}
-      className={cn(
-        "group flex aspect-square items-center justify-center overflow-hidden rounded-lg border bg-background transition-all hover:bg-muted/50",
-        active
-          ? "border-foreground ring-2 ring-foreground/30"
-          : "border-border/60",
-      )}
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element -- inspector thumbnail, served from web public dir */}
-      <img
-        src={`/${preset.path}`}
-        alt=""
-        className="size-10 object-contain"
-        draggable={false}
-      />
-    </button>
   );
 }
 

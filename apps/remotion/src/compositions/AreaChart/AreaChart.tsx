@@ -1,4 +1,5 @@
 "use client";
+import { useId } from "react";
 import { AbsoluteFill } from "remotion";
 import { type ClipStyle, resolveClipStyle } from "../../clip-style";
 import { useDesignFrame } from "../../use-design-frame";
@@ -20,6 +21,9 @@ export type AreaChartProps = {
   clipStyle?: ClipStyle;
 };
 
+const GRID_FRACTIONS = [0.25, 0.5, 0.75, 1];
+const TICK_FRACTIONS = [0, 0.25, 0.5, 0.75, 1];
+
 export const AreaChart: React.FC<AreaChartProps> = ({
   title,
   caption,
@@ -30,8 +34,11 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   clipStyle,
 }) => {
   const frame = useDesignFrame();
+  const uid = useId().replace(/[^a-zA-Z0-9-]/g, "");
+  const gradientId = `area-grad-${uid}`;
+  const clipId = `area-clip-${uid}`;
   const s = resolveClipStyle(clipStyle, {
-    background: "#000000",
+    background: "#0b0c10",
     color: "#ffffff",
     fontFamily:
       "-apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, sans-serif",
@@ -39,36 +46,38 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   });
 
   const data = parseSeriesString(values);
-  const lbls = parseLabels(labels);
+  const lbls = parseLabels(labels).slice(0, data.length);
   const max = niceMax(Math.max(1, ...data));
+  const latest = data[data.length - 1] ?? 0;
+  const latestLabel = lbls[data.length - 1];
 
   const W = 1640;
-  const H = 700;
-  const padX = 80;
-  const padTop = 40;
-  const padBottom = 80;
-  const innerW = W - padX * 2;
+  const H = 620;
+  const padLeft = 96;
+  const padRight = 48;
+  const padTop = 28;
+  const padBottom = 56;
+  const innerW = W - padLeft - padRight;
   const innerH = H - padTop - padBottom;
+  const baselineY = padTop + innerH;
   const stepX = innerW / Math.max(1, data.length - 1);
 
-  const reveal = chartReveal(frame, 16, 60);
   const points = data.map((v, i) => ({
-    x: padX + i * stepX,
-    y: padTop + innerH - (v / max) * innerH * reveal,
+    x: padLeft + i * stepX,
+    y: baselineY - (v / max) * innerH,
   }));
-
-  const headerProgress = chartReveal(frame, 0, 18);
   const linePath = smoothPath(points);
-  const lastPoint = points[points.length - 1];
   const firstPoint = points[0];
+  const endpoint = points[points.length - 1];
   const areaPath =
-    lastPoint && firstPoint
-      ? `${linePath} L ${lastPoint.x} ${padTop + innerH} L ${firstPoint.x} ${padTop + innerH} Z`
+    firstPoint && endpoint
+      ? `${linePath} L ${endpoint.x} ${baselineY} L ${firstPoint.x} ${baselineY} Z`
       : "";
 
-  const muted = "rgba(255,255,255,0.55)";
-  const gridColor = "rgba(255,255,255,0.08)";
-  const gradId = "area-grad";
+  const drawProgress = chartReveal(frame, 8, 60);
+  const revealX = padLeft + innerW * drawProgress;
+  const endpointReveal = chartReveal(frame, 60, 14);
+  const counter = Math.round(latest * drawProgress);
 
   return (
     <AbsoluteFill
@@ -76,65 +85,134 @@ export const AreaChart: React.FC<AreaChartProps> = ({
         background: s.background,
         color: s.color,
         fontFamily: s.fontFamily,
-        padding: 96,
+        padding: "96px 128px",
         display: "flex",
         flexDirection: "column",
       }}
     >
-      <div style={{ marginBottom: 12, opacity: headerProgress }}>
-        <div
-          style={{ fontSize: 38, fontWeight: 600, letterSpacing: "-0.02em" }}
-        >
-          {title}
-        </div>
-        {caption && (
-          <div style={{ fontSize: 18, color: muted, marginTop: 4 }}>
-            {caption}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: 32,
+        }}
+      >
+        <div>
+          <div
+            style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.01em" }}
+          >
+            {title}
           </div>
-        )}
+          {caption && (
+            <div style={{ fontSize: 19, marginTop: 6, opacity: 0.6 }}>
+              {caption}
+            </div>
+          )}
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div
+            style={{
+              fontSize: 56,
+              fontWeight: 650,
+              letterSpacing: "-0.02em",
+              lineHeight: 1,
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {counter.toLocaleString()}
+          </div>
+          {latestLabel && (
+            <div style={{ fontSize: 16, marginTop: 8, opacity: 0.4 }}>
+              {latestLabel}
+            </div>
+          )}
+        </div>
       </div>
+
       <div style={{ flex: 1, minHeight: 0 }}>
         <svg
           viewBox={`0 0 ${W} ${H}`}
           style={{ width: "100%", height: "100%" }}
         >
           <defs>
-            <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={s.accent} stopOpacity={0.55} />
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={s.accent} stopOpacity={0.3} />
               <stop offset="100%" stopColor={s.accent} stopOpacity={0} />
             </linearGradient>
+            <clipPath id={clipId}>
+              <rect x={0} y={0} width={revealX + 6} height={H} />
+            </clipPath>
           </defs>
+
           {showGrid &&
-            [0.25, 0.5, 0.75, 1].map((t) => (
+            GRID_FRACTIONS.map((t) => (
               <line
                 key={t}
-                x1={padX}
-                x2={W - padX}
+                x1={padLeft}
+                x2={W - padRight}
                 y1={padTop + innerH * (1 - t)}
                 y2={padTop + innerH * (1 - t)}
-                stroke={gridColor}
+                stroke={s.color}
+                strokeOpacity={0.08}
                 strokeWidth={1}
-                strokeDasharray="4 6"
               />
             ))}
+
           {showAxes && (
-            <line
-              x1={padX}
-              x2={W - padX}
-              y1={padTop + innerH}
-              y2={padTop + innerH}
-              stroke={muted}
-              strokeWidth={1}
-            />
+            <>
+              <line
+                x1={padLeft}
+                x2={W - padRight}
+                y1={baselineY}
+                y2={baselineY}
+                stroke={s.color}
+                strokeOpacity={0.15}
+                strokeWidth={1}
+              />
+              {TICK_FRACTIONS.map((t) => (
+                <text
+                  key={t}
+                  x={padLeft - 18}
+                  y={padTop + innerH * (1 - t)}
+                  fontSize={15}
+                  fill={s.color}
+                  fillOpacity={0.45}
+                  textAnchor="end"
+                  dominantBaseline="middle"
+                  style={{ fontVariantNumeric: "tabular-nums" }}
+                >
+                  {Math.round(max * t).toLocaleString()}
+                </text>
+              ))}
+            </>
           )}
-          <path d={areaPath} fill={`url(#${gradId})`} />
-          <path
-            d={linePath}
-            stroke={s.accent}
-            strokeWidth={3}
-            fill="none"
-            strokeLinecap="round"
-          />
+
+          <g clipPath={`url(#${clipId})`}>
+            <path d={areaPath} fill={`url(#${gradientId})`} />
+            <path
+              d={linePath}
+              stroke={s.accent}
+              strokeWidth={3}
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </g>
+
+          {endpoint && (
+            <g opacity={endpointReveal}>
+              <circle
+                cx={endpoint.x}
+                cy={endpoint.y}
+                r={22}
+                fill={s.accent}
+                fillOpacity={0.15}
+              />
+              <circle cx={endpoint.x} cy={endpoint.y} r={7} fill={s.accent} />
+            </g>
+          )}
+
           {lbls.map((label, i) => {
             const p = points[i];
             if (!p) return null;
@@ -142,9 +220,10 @@ export const AreaChart: React.FC<AreaChartProps> = ({
               <text
                 key={i}
                 x={p.x}
-                y={padTop + innerH + 28}
+                y={baselineY + 34}
                 fontSize={16}
-                fill={muted}
+                fill={s.color}
+                fillOpacity={0.6}
                 textAnchor="middle"
               >
                 {label}

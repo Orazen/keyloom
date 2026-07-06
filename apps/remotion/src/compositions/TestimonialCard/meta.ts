@@ -23,7 +23,7 @@ export const testimonialCardInfo: CompositionInfo<TestimonialCardProps> = {
     "Use for social-proof beats. Avatar + quote + author. Best for B2B/SaaS launches after the demo. Quote should be 1–2 sentences, ideally <20 words. Don't invent fake testimonials — use generic phrasing like 'Game-changer for our team' when the brief lacks specifics.",
   title: "Testimonial Card",
   description:
-    "A polished testimonial — quote with scaling quote mark, avatar, name, role, and company.",
+    "A polished testimonial — five stars, a large centered quote with an accent quote mark, avatar, name, role, and company.",
   durationInFrames: TESTIMONIAL_CARD_DURATION,
   fps: TESTIMONIAL_CARD_FPS,
   width: TESTIMONIAL_CARD_WIDTH,

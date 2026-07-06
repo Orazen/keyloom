@@ -43,10 +43,7 @@ export type TerminalProps = {
 
 const APPLE_EASE = Easing.bezier(0.16, 1, 0.3, 1);
 
-// The terminal window keeps its own dark surface regardless of the scene
-// backdrop — same as TypingSearch's pill always being white. The universal
-// "Background" control drives the scene behind the window, not the window fill.
-const WINDOW_BG = "#0b0b0f";
+const WINDOW_BG = "#0c1016";
 
 export const Terminal: React.FC<TerminalProps> = ({
   title,
@@ -70,12 +67,8 @@ export const Terminal: React.FC<TerminalProps> = ({
   const frame = useDesignFrame();
   const { fps } = useVideoConfig();
   const { vw, vh, vmin } = useCanvasLayout();
-  // Design canvas was 1920×1080 (min side 1080). Convert authored px → relative
-  // so the terminal window reflows to any aspect instead of uniformly shrinking.
   const r = (px: number) => vmin((px / 1080) * 100);
   const s = resolveClipStyle(clipStyle, {
-    // Scene backdrop (behind the window). White by default to preserve the
-    // current look; now user-controllable via the universal Background control.
     background: "#ffffff",
     color: "#f5f5f7",
     fontFamily:
@@ -100,6 +93,12 @@ export const Terminal: React.FC<TerminalProps> = ({
       line.kind === "command" ? line.text.length * framesPerChar : 6;
     cursorFrame += advance + 8;
   }
+  const idleStart = cursorFrame + 4;
+  const idleFade = interpolate(frame, [idleStart, idleStart + 8], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: APPLE_EASE,
+  });
 
   const windowReveal = spring({
     frame,
@@ -107,10 +106,7 @@ export const Terminal: React.FC<TerminalProps> = ({
     config: { damping: 18, stiffness: 130, mass: 0.7 },
   });
 
-  // The window was width:100% capped at `maxWidth` inside a 96px gutter. Size it
-  // relative to the canvas (capped at the scaled maxWidth) and center it so it
-  // fits portrait AND landscape without overflowing.
-  const windowWidth = Math.min(vw(88), vh(160), r(maxWidth));
+  const windowWidth = Math.min(vw(84), vh(160), r(maxWidth));
 
   return (
     <AbsoluteFill
@@ -123,16 +119,23 @@ export const Terminal: React.FC<TerminalProps> = ({
         fontFamily: s.fontFamily,
       }}
     >
+      <AbsoluteFill
+        style={{
+          background:
+            "radial-gradient(120% 95% at 50% 38%, rgba(10,14,20,0) 52%, rgba(10,14,20,0.16) 100%)",
+        }}
+      />
       <div
         style={{
           width: windowWidth,
           borderRadius: r(cornerRadius),
           background: WINDOW_BG,
           boxShadow: showShadow
-            ? "0 30px 80px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.06) inset"
+            ? "0 2px 6px rgba(0,0,0,0.16), 0 14px 34px rgba(0,0,0,0.24), 0 44px 110px rgba(0,0,0,0.38), 0 1px 0 rgba(255,255,255,0.07) inset"
             : "none",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: "1px solid rgba(255,255,255,0.09)",
           overflow: "hidden",
+          position: "relative",
           opacity: windowReveal,
           transform: `translate3d(0, ${snap((1 - windowReveal) * 24)}px, 0) scale(${0.97 + windowReveal * 0.03})`,
         }}
@@ -144,7 +147,7 @@ export const Terminal: React.FC<TerminalProps> = ({
             fontSize: r(fontSize),
             lineHeight: 1.55,
             color: s.color,
-            minHeight: r(320),
+            minHeight: r(340),
           }}
         >
           {lines.map((line, i) => (
@@ -162,6 +165,21 @@ export const Terminal: React.FC<TerminalProps> = ({
               r={r}
             />
           ))}
+          {frame >= idleStart && (
+            <div
+              style={{
+                display: "flex",
+                gap: r(14),
+                alignItems: "baseline",
+                opacity: idleFade,
+              }}
+            >
+              <span style={{ color: s.accent, flexShrink: 0 }}>{prompt}</span>
+              <span style={{ color: s.color }}>
+                <Cursor kind={cursorStyle} />
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </AbsoluteFill>
@@ -181,13 +199,13 @@ function TerminalChrome({
   return (
     <div
       style={{
-        height: r(44),
+        height: r(52),
         display: "flex",
         alignItems: "center",
-        padding: `0 ${r(16)}px`,
+        padding: `0 ${r(20)}px`,
         background:
-          "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
-        borderBottom: "1px solid rgba(255,255,255,0.06)",
+          "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+        borderBottom: "1px solid rgba(255,255,255,0.07)",
         position: "relative",
       }}
     >
@@ -199,7 +217,7 @@ function TerminalChrome({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: r(14),
+          fontSize: r(16),
           fontFamily:
             "-apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, sans-serif",
           fontWeight: 500,
@@ -223,7 +241,7 @@ function ChromeButtons({
 }) {
   if (style === "mac") {
     return (
-      <div style={{ display: "flex", gap: r(8) }}>
+      <div style={{ display: "flex", gap: r(9) }}>
         <Dot color="#ff5f57" r={r} />
         <Dot color="#febc2e" r={r} />
         <Dot color="#28c840" r={r} />
@@ -232,14 +250,13 @@ function ChromeButtons({
   }
   if (style === "linux") {
     return (
-      <div style={{ display: "flex", gap: r(8) }}>
+      <div style={{ display: "flex", gap: r(9) }}>
         <Dot color="#888" r={r} />
         <Dot color="#aaa" r={r} />
         <Dot color="#ccc" r={r} />
       </div>
     );
   }
-  // windows — three SVG glyphs on the right rendered as small text
   return (
     <div
       style={{
@@ -248,7 +265,7 @@ function ChromeButtons({
         gap: r(12),
         color: "rgba(245,245,247,0.55)",
         fontFamily: "Segoe UI, sans-serif",
-        fontSize: r(14),
+        fontSize: r(15),
       }}
     >
       <span>—</span>
@@ -262,8 +279,8 @@ function Dot({ color, r }: { color: string; r: (px: number) => number }) {
   return (
     <span
       style={{
-        width: r(13),
-        height: r(13),
+        width: r(15),
+        height: r(15),
         borderRadius: "50%",
         background: color,
         boxShadow: "inset 0 0 0 0.5px rgba(0,0,0,0.18)",

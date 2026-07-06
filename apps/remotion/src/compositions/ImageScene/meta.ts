@@ -7,7 +7,7 @@ export const IMAGE_SCENE_WIDTH = 1920;
 export const IMAGE_SCENE_HEIGHT = 1080;
 
 export const imageSceneDefaultProps: ImageSceneProps = {
-  src: "",
+  src: "backgrounds/beach.jpg",
   caption: "",
 };
 
@@ -16,7 +16,7 @@ export const imageSceneInfo: CompositionInfo<ImageSceneProps> = {
   category: "media",
   title: "Image Scene",
   description:
-    "A single centered image with an optional caption beneath. Good for QR codes, logos, screenshots that need to be focal.",
+    "A full-bleed image that settles with a slow cinematic zoom, with an optional caption overlaid at the bottom.",
   durationInFrames: IMAGE_SCENE_DURATION,
   fps: IMAGE_SCENE_FPS,
   width: IMAGE_SCENE_WIDTH,

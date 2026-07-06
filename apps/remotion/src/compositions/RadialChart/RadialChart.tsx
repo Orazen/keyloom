@@ -25,25 +25,25 @@ export const RadialChart: React.FC<RadialChartProps> = ({
 }) => {
   const frame = useDesignFrame();
   const s = resolveClipStyle(clipStyle, {
-    background: "#000000",
+    background: "#0b0c10",
     color: "#ffffff",
     fontFamily:
       "-apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, sans-serif",
     accent: CHART_PALETTE[0]!,
   });
 
-  const headerProgress = chartReveal(frame, 0, 18);
-  const arcProgress = chartReveal(frame, 16, 90);
+  const arcProgress = chartReveal(frame, 8, 84);
   const ratio = Math.max(0, Math.min(1, value / Math.max(1, max)));
 
-  const r = 220;
-  const stroke = 36;
+  const r = 225;
+  const stroke = 30;
   const circumference = 2 * Math.PI * r;
-  const targetDash = circumference * ratio;
-  const dash = targetDash * arcProgress;
+  const dash = circumference * ratio * arcProgress;
 
   const counter = Math.round(value * arcProgress);
-  const muted = "rgba(255,255,255,0.55)";
+  const valueText = `${counter.toLocaleString()}${unit}`;
+  const finalLength = `${Math.round(value).toLocaleString()}${unit}`.length;
+  const valueFontSize = Math.min(150, 620 / Math.max(3, finalLength));
 
   return (
     <AbsoluteFill
@@ -51,23 +51,24 @@ export const RadialChart: React.FC<RadialChartProps> = ({
         background: s.background,
         color: s.color,
         fontFamily: s.fontFamily,
-        padding: 96,
+        padding: "96px 128px",
         display: "flex",
         flexDirection: "column",
       }}
     >
-      <div style={{ opacity: headerProgress, marginBottom: 12 }}>
+      <div style={{ marginBottom: 24 }}>
         <div
-          style={{ fontSize: 38, fontWeight: 600, letterSpacing: "-0.02em" }}
+          style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.01em" }}
         >
           {title}
         </div>
         {caption && (
-          <div style={{ fontSize: 18, color: muted, marginTop: 4 }}>
+          <div style={{ fontSize: 19, marginTop: 6, opacity: 0.6 }}>
             {caption}
           </div>
         )}
       </div>
+
       <div
         style={{
           flex: 1,
@@ -83,39 +84,55 @@ export const RadialChart: React.FC<RadialChartProps> = ({
             cy={0}
             r={r}
             fill="none"
-            stroke="rgba(255,255,255,0.08)"
+            stroke={s.color}
+            strokeOpacity={0.12}
             strokeWidth={stroke}
           />
-          <circle
-            cx={0}
-            cy={0}
-            r={r}
-            fill="none"
-            stroke={s.accent}
-            strokeWidth={stroke}
-            strokeLinecap="round"
-            strokeDasharray={`${dash} ${circumference}`}
-            transform="rotate(-90)"
-          />
+          {dash > 0 && (
+            <g transform="rotate(-90)">
+              <circle
+                cx={0}
+                cy={0}
+                r={r}
+                fill="none"
+                stroke={s.accent}
+                strokeOpacity={0.14}
+                strokeWidth={stroke + 22}
+                strokeLinecap="round"
+                strokeDasharray={`${dash} ${circumference}`}
+              />
+              <circle
+                cx={0}
+                cy={0}
+                r={r}
+                fill="none"
+                stroke={s.accent}
+                strokeWidth={stroke}
+                strokeLinecap="round"
+                strokeDasharray={`${dash} ${circumference}`}
+              />
+            </g>
+          )}
           <text
             x={0}
-            y={-4}
-            fontSize={104}
+            y={-18}
+            fontSize={valueFontSize}
             fontWeight={700}
-            letterSpacing="-0.04em"
+            letterSpacing="-0.03em"
             fill={s.color}
             textAnchor="middle"
-            dominantBaseline="middle"
+            dominantBaseline="central"
+            style={{ fontVariantNumeric: "tabular-nums" }}
           >
-            {counter.toLocaleString()}
-            {unit}
+            {valueText}
           </text>
           <text
             x={0}
-            y={60}
-            fontSize={22}
+            y={valueFontSize * 0.5 + 20}
+            fontSize={24}
             fontWeight={500}
-            fill={muted}
+            fill={s.color}
+            fillOpacity={0.4}
             textAnchor="middle"
             dominantBaseline="middle"
           >

@@ -15,38 +15,18 @@ import {
   parsePhrases,
 } from "./timing";
 
-/**
- * Kinetic-typography MAGIC MOVE. Feed it a list of phrases (one per line); it
- * cycles through them and, at each hand-off, the *shared* words physically
- * travel from their old position to their new one (Keynote "Magic Move").
- * Words unique to the outgoing phrase blur up and out; words unique to the
- * incoming phrase blur in from below. Nothing hard-cuts — that continuous
- * motion across the seam is the whole illusion.
- *
- * This is distinct from the sibling `TextMorph` (a gooey blur-threshold melt
- * of single words). Use this one for multi-word headlines that share words
- * ("Motion makes it real" → "Motion makes it yours").
- *
- * Robust in the Player AND the export: layout is computed deterministically
- * with `measureText()` (no fragile live-DOM measurement), and every animated
- * property is `transform` / `opacity` / `filter: blur` — all of which the
- * in-browser export rasterizes correctly. No shaders, no Chrome flags, no SVG
- * filter refs.
- */
-
 const APPLE_EASE = Easing.bezier(0.16, 1, 0.3, 1);
 
 const FONT_WEIGHT = 700;
 const LETTER_SPACING = "-0.02em";
-const SPACE_EM = 0.3; // gap between words, in em
-const SHIFT = 18; // px a unique word rises/drops as it fades
-const INTRO_SHIFT = 40; // px the first phrase rises on entrance
+const SPACE_EM = 0.3;
+const LINE_STEP_EM = 1.18;
+const SHIFT = 18;
+const INTRO_SHIFT = 40;
 
 export type TextMagicMoveProps = {
-  /** One phrase per line. The clip morphs from each line to the next. */
   phrases: string;
   fontSize: number;
-  /** Playback rate. 1 = normal, 2 = twice as fast, 0.5 = half speed. */
   speed: number;
   clipStyle?: ClipStyle;
 };
@@ -54,15 +34,9 @@ export type TextMagicMoveProps = {
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-type Layout = { boxes: { text: string; cx: number }[] };
+type WordBox = { text: string; cx: number; cy: number };
+type Layout = { boxes: WordBox[]; widestLine: number };
 
-/**
- * Word width. `measureText()` throws outside a browser (no canvas), which
- * happens during Next's SSR/prerender of the docs preview. Fall back to a
- * cheap glyph-count estimate there; the real measurement runs once the
- * component renders in a real DOM (Player, export, and post-hydration), and
- * `useFontSettled` triggers a re-measure so the layout self-corrects.
- */
 function measureWordWidth(
   text: string,
   fontFamily: string,
@@ -80,35 +54,50 @@ function measureWordWidth(
   }).width;
 }
 
-/** Lay a phrase out as one centered line; cx is each word's center x. */
 function layoutPhrase(
   words: string[],
   fontFamily: string,
   fontSize: number,
+  maxLineWidth: number,
 ): Layout {
   const measured = words.map((text) => ({
     text,
     width: measureWordWidth(text, fontFamily, fontSize),
   }));
   const space = fontSize * SPACE_EM;
-  const total =
-    measured.reduce((a, m) => a + m.width, 0) +
-    space * Math.max(0, words.length - 1);
-  let cursor = -total / 2;
-  const boxes = measured.map((m) => {
-    const cx = cursor + m.width / 2;
-    cursor += m.width + space;
-    return { text: m.text, cx };
+  const lineWidth = (ws: { width: number }[]) =>
+    ws.reduce((a, m) => a + m.width, 0) + space * Math.max(0, ws.length - 1);
+
+  let lines = [measured];
+  if (lineWidth(measured) > maxLineWidth && measured.length > 1) {
+    let bestSplit = 1;
+    let bestScore = Number.POSITIVE_INFINITY;
+    for (let k = 1; k < measured.length; k++) {
+      const score = Math.max(
+        lineWidth(measured.slice(0, k)),
+        lineWidth(measured.slice(k)),
+      );
+      if (score < bestScore) {
+        bestScore = score;
+        bestSplit = k;
+      }
+    }
+    lines = [measured.slice(0, bestSplit), measured.slice(bestSplit)];
+  }
+
+  const lineStep = fontSize * LINE_STEP_EM;
+  const boxes: WordBox[] = [];
+  lines.forEach((line, li) => {
+    const cy = (li - (lines.length - 1) / 2) * lineStep;
+    let cursor = -lineWidth(line) / 2;
+    for (const m of line) {
+      boxes.push({ text: m.text, cx: cursor + m.width / 2, cy });
+      cursor += m.width + space;
+    }
   });
-  return { boxes };
+  return { boxes, widestLine: Math.max(...lines.map(lineWidth)) };
 }
 
-/**
- * Match words of phrase A to phrase B by text (case-insensitive), pairing the
- * k-th occurrence of a repeated word in A with the k-th in B. Returns, per
- * A-word, the B-index it maps to (null = exiting) and which B-indices got
- * matched (the rest are entering).
- */
 function matchWords(a: string[], b: string[]) {
   const bByWord = new Map<string, number[]>();
   b.forEach((w, j) => {
@@ -130,11 +119,6 @@ function matchWords(a: string[], b: string[]) {
   return { aToB, bMatched };
 }
 
-/**
- * Re-render once webfonts settle so `measureText` reflects real metrics, not
- * the fallback. In headless export, `useFontReady` already holds frame capture
- * until the font loads, so the corrected measurement is what rasterizes.
- */
 function useFontSettled(fontFamily: string): boolean {
   const [ready, setReady] = useState(false);
   useEffect(() => {
@@ -153,16 +137,17 @@ function useFontSettled(fontFamily: string): boolean {
   return ready;
 }
 
-/** A single absolutely-positioned word. */
 function Word({
   text,
   cx,
+  cy,
   dy = 0,
   opacity = 1,
   blur = 0,
 }: {
   text: string;
   cx: number;
+  cy: number;
   dy?: number;
   opacity?: number;
   blur?: number;
@@ -175,7 +160,7 @@ function Word({
         left: "50%",
         top: "50%",
         whiteSpace: "nowrap",
-        transform: `translate(-50%, -50%) translate3d(${snap(cx)}px, ${snap(dy)}px, 0)`,
+        transform: `translate(-50%, -50%) translate3d(${snap(cx)}px, ${snap(cy + dy)}px, 0)`,
         opacity,
         filter: b === 0 ? undefined : `blur(${b}px)`,
         willChange: "transform, opacity, filter",
@@ -192,14 +177,10 @@ export const TextMagicMove: React.FC<TextMagicMoveProps> = ({
   speed,
   clipStyle,
 }) => {
-  // Scale the timeline by `speed`: a higher rate makes the same motion play
-  // out over fewer frames. meta's duration divides by the same factor so the
-  // clip length tracks it.
   const frame = useDesignFrame() * normalizeSpeed(speed);
-  const { vmin } = useCanvasLayout();
-  // The authored `fontSize` was a px value against a 1080-min-side design;
-  // reflow it relative to the actual canvas so the line scales per orientation.
-  const fontSize = vmin((fontSizeProp / 1080) * 100);
+  const { vw, vmin } = useCanvasLayout();
+  const baseFontSize = vmin((fontSizeProp / 1080) * 100);
+  const safeWidth = vw(84);
   const shift = vmin((SHIFT / 1080) * 100);
   const introShift = vmin((INTRO_SHIFT / 1080) * 100);
   const s = resolveTitleStyle(clipStyle);
@@ -208,13 +189,24 @@ export const TextMagicMove: React.FC<TextMagicMoveProps> = ({
 
   const phraseWords = useMemo(() => parsePhrases(phrases), [phrases]);
 
-  // Deterministic per-phrase layouts, re-measured once the font settles so
-  // measured widths match the rasterized glyphs.
-  const layouts = useMemo(
-    () => phraseWords.map((w) => layoutPhrase(w, s.fontFamily, fontSize)),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [phraseWords, s.fontFamily, fontSize, fontSettled],
-  );
+  const { layouts, fontSize } = useMemo(() => {
+    void fontSettled;
+    const raw = phraseWords.map((w) =>
+      layoutPhrase(w, s.fontFamily, baseFontSize, safeWidth),
+    );
+    const widest = Math.max(1, ...raw.map((l) => l.widestLine));
+    const fit = Math.min(1, safeWidth / widest);
+    return {
+      fontSize: baseFontSize * fit,
+      layouts: raw.map((l) => ({
+        boxes: l.boxes.map((b) => ({
+          text: b.text,
+          cx: b.cx * fit,
+          cy: b.cy * fit,
+        })),
+      })),
+    };
+  }, [phraseWords, s.fontFamily, baseFontSize, safeWidth, fontSettled]);
 
   const n = phraseWords.length;
   const segLen = MAGIC_HOLD + MAGIC_MORPH;
@@ -225,7 +217,6 @@ export const TextMagicMove: React.FC<TextMagicMoveProps> = ({
   let words: React.ReactNode[];
 
   if (morphing) {
-    // idx < n-1 guarantees both layouts exist; assert past noUncheckedIndexedAccess.
     const A = layouts[idx]!;
     const B = layouts[idx + 1]!;
     const { aToB, bMatched } = matchWords(
@@ -234,8 +225,6 @@ export const TextMagicMove: React.FC<TextMagicMoveProps> = ({
     );
     const pRaw = clamp01((local - MAGIC_HOLD) / MAGIC_MORPH);
     const p = APPLE_EASE(pRaw);
-    // Exits resolve in the first 60%, entrances arrive in the last 60%, so
-    // they overlap in the middle and the line is never empty.
     const exit = APPLE_EASE(clamp01(pRaw / 0.6));
     const enter = APPLE_EASE(clamp01((pRaw - 0.4) / 0.6));
 
@@ -243,21 +232,21 @@ export const TextMagicMove: React.FC<TextMagicMoveProps> = ({
     A.boxes.forEach((box, i) => {
       const j = aToB[i];
       if (j != null) {
-        // Shared word — glide from old position to new. This is the morph.
         out.push(
           <Word
             key={`m-${i}`}
             text={box.text}
             cx={lerp(box.cx, B.boxes[j]!.cx, p)}
+            cy={lerp(box.cy, B.boxes[j]!.cy, p)}
           />,
         );
       } else {
-        // Outgoing-only word — blur up and out.
         out.push(
           <Word
             key={`x-${i}`}
             text={box.text}
             cx={box.cx}
+            cy={box.cy}
             dy={-exit * shift}
             opacity={1 - exit}
             blur={exit * 8}
@@ -267,12 +256,12 @@ export const TextMagicMove: React.FC<TextMagicMoveProps> = ({
     });
     B.boxes.forEach((box, j) => {
       if (bMatched[j]) return;
-      // Incoming-only word — blur in from below.
       out.push(
         <Word
           key={`e-${j}`}
           text={box.text}
           cx={box.cx}
+          cy={box.cy}
           dy={(1 - enter) * shift}
           opacity={enter}
           blur={(1 - enter) * 8}
@@ -281,12 +270,11 @@ export const TextMagicMove: React.FC<TextMagicMoveProps> = ({
     });
     words = out;
   } else {
-    // Static hold — or the first phrase's lightly-staggered entrance.
     const layout = layouts[idx]!;
     const isIntro = idx === 0;
     words = layout.boxes.map((box, i) => {
       if (!isIntro) {
-        return <Word key={`s-${i}`} text={box.text} cx={box.cx} />;
+        return <Word key={`s-${i}`} text={box.text} cx={box.cx} cy={box.cy} />;
       }
       const start = i * 4;
       const introP = APPLE_EASE(clamp01((frame - start) / MAGIC_ENTER));
@@ -295,6 +283,7 @@ export const TextMagicMove: React.FC<TextMagicMoveProps> = ({
           key={`s-${i}`}
           text={box.text}
           cx={box.cx}
+          cy={box.cy}
           dy={(1 - introP) * introShift}
           opacity={introP}
           blur={(1 - introP) * 6}
@@ -312,7 +301,8 @@ export const TextMagicMove: React.FC<TextMagicMoveProps> = ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: `0 ${vmin(7.4)}px`,
+        padding: `0 ${vw(8)}px`,
+        overflow: "hidden",
       }}
     >
       <div

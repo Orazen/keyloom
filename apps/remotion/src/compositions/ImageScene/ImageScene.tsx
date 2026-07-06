@@ -1,11 +1,5 @@
 "use client";
-import {
-  AbsoluteFill,
-  Img,
-  spring,
-  staticFile,
-  useVideoConfig,
-} from "remotion";
+import { AbsoluteFill, Easing, Img, interpolate, staticFile } from "remotion";
 import { type ClipStyle, resolveClipStyle } from "../../clip-style";
 import { proxyExternalImg } from "../../proxy-image";
 import { snap } from "../../snap";
@@ -18,15 +12,8 @@ export type ImageSceneProps = {
   clipStyle?: ClipStyle;
 };
 
-/**
- * Resolve an image src to a renderable URL:
- *   - empty → undefined (lets the component render a placeholder)
- *   - data:/blob: → pass through
- *   - http(s) → route through `/api/img/<encoded>` so the export canvas
- *     stays untainted
- *   - bare paths → `staticFile()` so the Remotion bundle server serves
- *     them in both studio + CLI render
- */
+const APPLE_EASE = Easing.bezier(0.16, 1, 0.3, 1);
+
 function resolveAsset(src: string | undefined): string | undefined {
   if (!src) return undefined;
   if (/^(data:|blob:)/i.test(src)) return src;
@@ -40,28 +27,28 @@ export const ImageScene: React.FC<ImageSceneProps> = ({
   clipStyle,
 }) => {
   const frame = useDesignFrame();
-  const { fps } = useVideoConfig();
-  const { vw, vh, vmin } = useCanvasLayout();
+  const { vmin } = useCanvasLayout();
   const s = resolveClipStyle(clipStyle, {
-    background: "#ffffff",
-    color: "#0f1014",
+    background: "#0f1014",
+    color: "#ffffff",
     fontFamily:
       "-apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, sans-serif",
     accent: "#0a84ff",
   });
 
-  const enter = spring({
-    frame,
-    fps,
-    config: { damping: 14, stiffness: 110, mass: 0.85 },
+  const zoom = interpolate(frame, [0, 170], [1.04, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: APPLE_EASE,
+  });
+  const captionReveal = interpolate(frame, [8, 30], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: APPLE_EASE,
   });
 
   const resolved = resolveAsset(src);
   const trimmedCaption = caption.trim();
-
-  // Cap the image so it fills the canvas without overflowing in any aspect
-  // ratio; the caption sits below it in a centered flex column.
-  const imgMax = Math.min(vw(70), vh(70));
 
   return (
     <AbsoluteFill
@@ -69,51 +56,57 @@ export const ImageScene: React.FC<ImageSceneProps> = ({
         background: s.background,
         color: s.color,
         fontFamily: s.fontFamily,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: vmin(7.4),
+        overflow: "hidden",
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: vmin(2.6),
-          opacity: enter,
-          transform: `translate3d(0, ${snap((1 - enter) * vmin(2.2))}px, 0) scale(${0.92 + enter * 0.08})`,
-        }}
-      >
-        {resolved ? (
-          <Img
-            src={resolved}
-            crossOrigin="anonymous"
-            style={{
-              maxWidth: imgMax,
-              maxHeight: imgMax,
-              width: "auto",
-              height: "auto",
-              objectFit: "contain",
-              display: "block",
-            }}
-          />
-        ) : null}
-        {trimmedCaption ? (
+      {resolved ? (
+        <Img
+          src={resolved}
+          crossOrigin="anonymous"
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            transform: `scale(${zoom})`,
+            transformOrigin: "50% 50%",
+          }}
+        />
+      ) : null}
+      {trimmedCaption ? (
+        <>
           <div
             style={{
-              fontSize: vmin(2.8),
-              fontWeight: 500,
-              letterSpacing: "-0.01em",
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: "30%",
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 100%)",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              left: vmin(7),
+              right: vmin(7),
+              bottom: vmin(6),
               textAlign: "center",
+              fontSize: vmin(3.2),
+              fontWeight: 600,
+              letterSpacing: "-0.01em",
               color: s.color,
-              maxWidth: vw(85),
+              textShadow: "0 1px 14px rgba(0,0,0,0.35)",
+              opacity: captionReveal,
+              transform: `translate3d(0, ${snap((1 - captionReveal) * vmin(1.2))}px, 0)`,
             }}
           >
             {trimmedCaption}
           </div>
-        ) : null}
-      </div>
+        </>
+      ) : null}
     </AbsoluteFill>
   );
 };

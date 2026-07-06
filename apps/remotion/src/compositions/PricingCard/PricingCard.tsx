@@ -15,12 +15,15 @@ export type PricingCardProps = {
   clipStyle?: ClipStyle;
 };
 
-const D_CARD = 0;
-const D_TIER = 8;
-const D_PRICE = 14;
-const D_FEATURES_START = 24;
-const FEATURE_STAGGER = 5;
-const D_CTA_AFTER_FEATURES = 8;
+const D_TIER = 2;
+const D_PRICE = 6;
+const D_FEATURES_START = 12;
+const FEATURE_STAGGER = 4;
+const D_CTA_AFTER_FEATURES = 6;
+const MAX_FEATURES = 4;
+
+const tint = (color: string, pct: number) =>
+  `color-mix(in srgb, ${color} ${pct}%, transparent)`;
 
 export const PricingCard: React.FC<PricingCardProps> = ({
   tier,
@@ -37,34 +40,26 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   const isDark = theme === "dark";
   const isHighlighted = highlighted === "yes";
   const s = resolveClipStyle(clipStyle, {
-    background: "#f7f7f9",
+    background: isDark ? "#0e0f13" : "#f4f4f6",
     color: isDark ? "#ffffff" : "#0f1014",
     fontFamily:
       "-apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, sans-serif",
-    accent: "#00bbff",
+    accent: "#6366f1",
   });
-  const accent = s.accent;
-  const bg = s.background;
-  const fontFamily = s.fontFamily;
 
-  const cardBg = isDark ? "#15161A" : "#ffffff";
-  const text = isDark ? "#ffffff" : "#0f1014";
-  const muted = isDark ? "rgba(255,255,255,0.55)" : "rgba(15,16,20,0.55)";
-  const border = isHighlighted
-    ? accent
-    : isDark
-      ? "rgba(255,255,255,0.1)"
-      : "rgba(15,16,20,0.1)";
+  const cardBg = isDark ? "#17181d" : "#ffffff";
+  const muted = tint(s.color, 55);
 
   const featureList = features
     .split("\n")
     .map((f) => f.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .slice(0, MAX_FEATURES);
 
-  const cardPop = spring({
-    frame: frame - D_CARD,
+  const cardIn = spring({
+    frame,
     fps,
-    config: { damping: 16, stiffness: 110, mass: 0.8 },
+    config: { damping: 18, stiffness: 120, mass: 0.8 },
   });
 
   const ctaDelay =
@@ -75,62 +70,61 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   return (
     <AbsoluteFill
       style={{
-        background: bg,
+        background: s.background,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontFamily,
+        fontFamily: s.fontFamily,
+        padding: "8%",
       }}
     >
       <div
         style={{
-          width: 560,
+          width: 470,
           background: cardBg,
-          border: `${isHighlighted ? "2px" : "1px"} solid ${border}`,
-          borderRadius: 28,
-          padding: "44px 40px",
-          position: "relative",
-          boxShadow: isHighlighted
-            ? `0 30px 80px ${accent}33, 0 0 0 6px ${accent}1A`
-            : isDark
-              ? "0 30px 80px rgba(0,0,0,0.45)"
-              : "0 30px 80px rgba(15,16,20,0.08)",
-          opacity: cardPop,
-          transform: `translate3d(0, ${snap((1 - cardPop) * 24)}px, 0) scale(${0.95 + cardPop * 0.05})`,
+          borderRadius: 24,
+          padding: "40px 40px 36px",
+          boxShadow: isDark
+            ? "0 1px 2px rgba(0,0,0,0.4), 0 12px 28px rgba(0,0,0,0.35), 0 36px 80px rgba(0,0,0,0.45)"
+            : "0 1px 2px rgba(15,16,20,0.05), 0 10px 24px rgba(15,16,20,0.06), 0 32px 72px rgba(15,16,20,0.1)",
+          transform: `translate3d(0, ${snap((1 - cardIn) * 18)}px, 0) scale(${0.98 + cardIn * 0.02})`,
         }}
       >
-        {isHighlighted ? (
-          <div
-            style={{
-              position: "absolute",
-              top: -16,
-              left: "50%",
-              transform: "translateX(-50%)",
-              background: accent,
-              color: "#ffffff",
-              fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              padding: "6px 14px",
-              borderRadius: 999,
-            }}
-          >
-            Most popular
-          </div>
-        ) : null}
-
         <RevealItem frame={frame - D_TIER} fps={fps}>
           <div
             style={{
-              fontSize: 22,
-              fontWeight: 700,
-              color: isHighlighted ? accent : text,
-              letterSpacing: "-0.005em",
-              textTransform: "uppercase",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
             }}
           >
-            {tier}
+            <div
+              style={{
+                fontSize: 15,
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: muted,
+              }}
+            >
+              {tier}
+            </div>
+            {isHighlighted ? (
+              <div
+                style={{
+                  background: tint(s.accent, 12),
+                  color: s.accent,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  padding: "6px 12px",
+                  borderRadius: 999,
+                }}
+              >
+                Most popular
+              </div>
+            ) : null}
           </div>
         </RevealItem>
 
@@ -139,30 +133,24 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             style={{
               display: "flex",
               alignItems: "baseline",
-              gap: 6,
-              marginTop: 10,
-              marginBottom: 26,
+              gap: 10,
+              marginTop: 14,
             }}
           >
             <span
               style={{
-                fontSize: 64,
-                fontWeight: 800,
-                color: text,
-                letterSpacing: "-0.03em",
+                fontSize: 96,
+                fontWeight: 700,
+                color: s.color,
+                letterSpacing: "-0.04em",
                 lineHeight: 1,
+                fontVariantNumeric: "tabular-nums",
               }}
             >
               {price}
             </span>
             {period ? (
-              <span
-                style={{
-                  fontSize: 18,
-                  color: muted,
-                  fontWeight: 500,
-                }}
-              >
+              <span style={{ fontSize: 20, color: muted, fontWeight: 500 }}>
                 {period}
               </span>
             ) : null}
@@ -174,10 +162,10 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             listStyle: "none",
             padding: 0,
             margin: 0,
-            marginBottom: 28,
+            marginTop: 28,
             display: "flex",
             flexDirection: "column",
-            gap: 12,
+            gap: 14,
           }}
         >
           {featureList.map((f, i) => (
@@ -191,12 +179,13 @@ export const PricingCard: React.FC<PricingCardProps> = ({
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
-                  fontSize: 18,
-                  color: text,
-                  lineHeight: 1.4,
+                  fontSize: 17,
+                  fontWeight: 500,
+                  color: tint(s.color, 82),
+                  lineHeight: 1.3,
                 }}
               >
-                <CheckMark color={accent} />
+                <CheckMark accent={s.accent} />
                 <span>{f}</span>
               </li>
             </RevealItem>
@@ -206,16 +195,17 @@ export const PricingCard: React.FC<PricingCardProps> = ({
         <RevealItem frame={frame - ctaDelay} fps={fps}>
           <div
             style={{
+              marginTop: 30,
               width: "100%",
               padding: "16px",
-              borderRadius: 14,
-              background: isHighlighted ? accent : "transparent",
-              color: isHighlighted ? "#ffffff" : text,
-              border: isHighlighted ? "none" : `1px solid ${border}`,
-              fontSize: 18,
-              fontWeight: 700,
+              borderRadius: 999,
+              background: s.accent,
+              color: "#ffffff",
+              fontSize: 17,
+              fontWeight: 600,
               textAlign: "center",
-              letterSpacing: "-0.005em",
+              letterSpacing: "-0.01em",
+              boxShadow: `0 10px 24px ${tint(s.accent, 35)}`,
             }}
           >
             {cta}
@@ -226,25 +216,24 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   );
 };
 
-function CheckMark({ color }: { color: string }) {
+function CheckMark({ accent }: { accent: string }) {
   return (
     <span
       style={{
-        width: 22,
-        height: 22,
+        width: 24,
+        height: 24,
         borderRadius: "50%",
-        background: `${color}22`,
-        color,
+        background: tint(accent, 12),
         flexShrink: 0,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
       }}
     >
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
         <path
           d="M2 6.5l2.5 2.5L10 3"
-          stroke="currentColor"
+          stroke={accent}
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -266,13 +255,13 @@ function RevealItem({
   const reveal = spring({
     frame,
     fps,
-    config: { damping: 14, stiffness: 150, mass: 0.7 },
+    config: { damping: 16, stiffness: 150, mass: 0.7 },
   });
   return (
     <div
       style={{
         opacity: reveal,
-        transform: `translate3d(0, ${snap((1 - reveal) * 12)}px, 0)`,
+        transform: `translate3d(0, ${snap((1 - reveal) * 14)}px, 0)`,
       }}
     >
       {children}

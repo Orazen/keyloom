@@ -11,7 +11,7 @@ export const pricingCardDefaultProps: PricingCardProps = {
   price: "$24",
   period: "/ month",
   features:
-    "Unlimited projects\nUnlimited renders\n4K exports\nPriority support\nCustom branding",
+    "Unlimited projects\nUnlimited renders\n4K exports\nPriority support",
   cta: "Start free trial",
   highlighted: "yes",
   theme: "light",
@@ -21,7 +21,7 @@ export const pricingCardInfo: CompositionInfo<PricingCardProps> = {
   id: "PricingCard",
   category: "marketing",
   agentNotes:
-    "Use ONLY when the brief is explicitly about pricing or plans. Three-tier card with price + bullets. Don't pick for general launches — it implies commerce. Keep bullet points to 3–5 short items.",
+    "Use ONLY when the brief is explicitly about pricing or plans. Single-tier card with price + bullets. Don't pick for general launches — it implies commerce. Keep bullet points to 3–4 short items; only the first 4 render.",
   title: "Pricing Card",
   description:
     "A pricing tier card with title, big price, feature list with checkmarks, and CTA — supports a 'most popular' highlighted variant.",

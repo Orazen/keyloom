@@ -1,7 +1,7 @@
 "use client";
+import { useId } from "react";
 import { AbsoluteFill } from "remotion";
 import { type ClipStyle, resolveClipStyle } from "../../clip-style";
-import { snap } from "../../snap";
 import { useDesignFrame } from "../../use-design-frame";
 import {
   CHART_PALETTE,
@@ -22,6 +22,9 @@ export type LineChartProps = {
   clipStyle?: ClipStyle;
 };
 
+const GRID_FRACTIONS = [0.25, 0.5, 0.75, 1];
+const TICK_FRACTIONS = [0, 0.25, 0.5, 0.75, 1];
+
 export const LineChart: React.FC<LineChartProps> = ({
   title,
   caption,
@@ -33,8 +36,11 @@ export const LineChart: React.FC<LineChartProps> = ({
   clipStyle,
 }) => {
   const frame = useDesignFrame();
+  const uid = useId().replace(/[^a-zA-Z0-9-]/g, "");
+  const gradientId = `line-grad-${uid}`;
+  const clipId = `line-clip-${uid}`;
   const s = resolveClipStyle(clipStyle, {
-    background: "#000000",
+    background: "#0b0c10",
     color: "#ffffff",
     fontFamily:
       "-apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, sans-serif",
@@ -42,33 +48,38 @@ export const LineChart: React.FC<LineChartProps> = ({
   });
 
   const data = parseSeriesString(values);
-  const lbls = parseLabels(labels);
+  const lbls = parseLabels(labels).slice(0, data.length);
   const max = niceMax(Math.max(1, ...data));
+  const latest = data[data.length - 1] ?? 0;
+  const latestLabel = lbls[data.length - 1];
 
   const W = 1640;
-  const H = 700;
-  const padX = 80;
-  const padTop = 40;
-  const padBottom = 80;
-  const innerW = W - padX * 2;
+  const H = 620;
+  const padLeft = 96;
+  const padRight = 48;
+  const padTop = 28;
+  const padBottom = 56;
+  const innerW = W - padLeft - padRight;
   const innerH = H - padTop - padBottom;
+  const baselineY = padTop + innerH;
   const stepX = innerW / Math.max(1, data.length - 1);
 
   const points = data.map((v, i) => ({
-    x: padX + i * stepX,
-    y: padTop + innerH - (v / max) * innerH,
+    x: padLeft + i * stepX,
+    y: baselineY - (v / max) * innerH,
   }));
+  const linePath = smoothPath(points);
+  const firstPoint = points[0];
+  const endpoint = points[points.length - 1];
+  const areaPath =
+    firstPoint && endpoint
+      ? `${linePath} L ${endpoint.x} ${baselineY} L ${firstPoint.x} ${baselineY} Z`
+      : "";
 
-  const path = pathFromPoints(points);
-  const drawProgress = chartReveal(frame, 18, 70);
-  const headerProgress = chartReveal(frame, 0, 18);
-
-  const muted = isHexLight(s.background)
-    ? "rgba(15,16,20,0.55)"
-    : "rgba(255,255,255,0.55)";
-  const gridColor = isHexLight(s.background)
-    ? "rgba(15,16,20,0.08)"
-    : "rgba(255,255,255,0.08)";
+  const drawProgress = chartReveal(frame, 8, 64);
+  const revealX = padLeft + innerW * drawProgress;
+  const endpointReveal = chartReveal(frame, 64, 14);
+  const counter = Math.round(latest * drawProgress);
 
   return (
     <AbsoluteFill
@@ -76,128 +87,183 @@ export const LineChart: React.FC<LineChartProps> = ({
         background: s.background,
         color: s.color,
         fontFamily: s.fontFamily,
-        padding: 96,
+        padding: "96px 128px",
         display: "flex",
         flexDirection: "column",
       }}
     >
       <div
         style={{
-          marginBottom: 12,
-          opacity: headerProgress,
-          transform: `translate3d(0, ${snap((1 - headerProgress) * 8)}px, 0)`,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: 32,
         }}
       >
-        <div
-          style={{ fontSize: 38, fontWeight: 600, letterSpacing: "-0.02em" }}
-        >
-          {title}
-        </div>
-        {caption && (
-          <div style={{ fontSize: 18, color: muted, marginTop: 4 }}>
-            {caption}
+        <div>
+          <div
+            style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.01em" }}
+          >
+            {title}
           </div>
-        )}
+          {caption && (
+            <div style={{ fontSize: 19, marginTop: 6, opacity: 0.6 }}>
+              {caption}
+            </div>
+          )}
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div
+            style={{
+              fontSize: 56,
+              fontWeight: 650,
+              letterSpacing: "-0.02em",
+              lineHeight: 1,
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {counter.toLocaleString()}
+          </div>
+          {latestLabel && (
+            <div style={{ fontSize: 16, marginTop: 8, opacity: 0.4 }}>
+              {latestLabel}
+            </div>
+          )}
+        </div>
       </div>
+
       <div style={{ flex: 1, minHeight: 0 }}>
         <svg
           viewBox={`0 0 ${W} ${H}`}
           style={{ width: "100%", height: "100%" }}
         >
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={s.accent} stopOpacity={0.25} />
+              <stop offset="100%" stopColor={s.accent} stopOpacity={0} />
+            </linearGradient>
+            <clipPath id={clipId}>
+              <rect x={0} y={0} width={revealX + 6} height={H} />
+            </clipPath>
+          </defs>
+
           {showGrid &&
-            [0.25, 0.5, 0.75, 1].map((t) => (
+            GRID_FRACTIONS.map((t) => (
               <line
                 key={t}
-                x1={padX}
-                x2={W - padX}
+                x1={padLeft}
+                x2={W - padRight}
                 y1={padTop + innerH * (1 - t)}
                 y2={padTop + innerH * (1 - t)}
-                stroke={gridColor}
+                stroke={s.color}
+                strokeOpacity={0.08}
                 strokeWidth={1}
-                strokeDasharray="4 6"
               />
             ))}
 
           {showAxes && (
-            <line
-              x1={padX}
-              x2={W - padX}
-              y1={padTop + innerH}
-              y2={padTop + innerH}
-              stroke={muted}
-              strokeWidth={1}
-            />
+            <>
+              <line
+                x1={padLeft}
+                x2={W - padRight}
+                y1={baselineY}
+                y2={baselineY}
+                stroke={s.color}
+                strokeOpacity={0.15}
+                strokeWidth={1}
+              />
+              {TICK_FRACTIONS.map((t) => (
+                <text
+                  key={t}
+                  x={padLeft - 18}
+                  y={padTop + innerH * (1 - t)}
+                  fontSize={15}
+                  fill={s.color}
+                  fillOpacity={0.45}
+                  textAnchor="end"
+                  dominantBaseline="middle"
+                  style={{ fontVariantNumeric: "tabular-nums" }}
+                >
+                  {Math.round(max * t).toLocaleString()}
+                </text>
+              ))}
+            </>
           )}
 
-          <path
-            d={path}
-            stroke={s.accent}
-            strokeWidth={4}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-            pathLength={1}
-            strokeDasharray={1}
-            strokeDashoffset={1 - drawProgress}
-          />
+          <g clipPath={`url(#${clipId})`}>
+            <path d={areaPath} fill={`url(#${gradientId})`} />
+            <path
+              d={linePath}
+              stroke={s.accent}
+              strokeWidth={3}
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </g>
 
           {showDots &&
-            points.map((p, i) => {
-              const dotAt = 18 + (i / Math.max(1, points.length - 1)) * 70;
-              const reveal = chartReveal(frame, dotAt + 6, 12);
+            points.slice(0, -1).map((p, i) => {
+              const dotAt = 8 + (i / Math.max(1, points.length - 1)) * 64;
+              const reveal = chartReveal(frame, dotAt, 10);
               return (
-                <g key={i}>
-                  <circle
-                    cx={p.x}
-                    cy={p.y}
-                    r={8 * reveal}
-                    fill={s.background}
-                    stroke={s.accent}
-                    strokeWidth={3}
-                  />
-                  {lbls[i] && (
-                    <text
-                      x={p.x}
-                      y={padTop + innerH + 28}
-                      fontSize={16}
-                      fill={muted}
-                      textAnchor="middle"
-                    >
-                      {lbls[i]}
-                    </text>
-                  )}
-                </g>
+                <circle
+                  key={i}
+                  cx={p.x}
+                  cy={p.y}
+                  r={5.5 * reveal}
+                  fill={s.background}
+                  stroke={s.accent}
+                  strokeWidth={2.5}
+                />
               );
             })}
+
+          {endpoint && (
+            <g opacity={endpointReveal}>
+              <circle
+                cx={endpoint.x}
+                cy={endpoint.y}
+                r={22}
+                fill={s.accent}
+                fillOpacity={0.15}
+              />
+              <circle cx={endpoint.x} cy={endpoint.y} r={7} fill={s.accent} />
+            </g>
+          )}
+
+          {lbls.map((label, i) => {
+            const p = points[i];
+            if (!p) return null;
+            return (
+              <text
+                key={i}
+                x={p.x}
+                y={baselineY + 34}
+                fontSize={16}
+                fill={s.color}
+                fillOpacity={0.6}
+                textAnchor="middle"
+              >
+                {label}
+              </text>
+            );
+          })}
         </svg>
       </div>
     </AbsoluteFill>
   );
 };
 
-function pathFromPoints(points: { x: number; y: number }[]): string {
+function smoothPath(points: { x: number; y: number }[]): string {
   if (points.length === 0) return "";
   let d = `M ${points[0]!.x} ${points[0]!.y}`;
   for (let i = 1; i < points.length; i++) {
     const prev = points[i - 1]!;
     const curr = points[i]!;
     const cp1x = prev.x + (curr.x - prev.x) / 3;
-    const cp1y = prev.y;
     const cp2x = prev.x + ((curr.x - prev.x) * 2) / 3;
-    const cp2y = curr.y;
-    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`;
+    d += ` C ${cp1x} ${prev.y}, ${cp2x} ${curr.y}, ${curr.x} ${curr.y}`;
   }
   return d;
-}
-
-function isHexLight(color: string): boolean {
-  const c = color.trim().toLowerCase();
-  if (c === "white" || c === "#fff" || c === "#ffffff") return true;
-  if (c.startsWith("#") && c.length === 7) {
-    const r = parseInt(c.slice(1, 3), 16);
-    const g = parseInt(c.slice(3, 5), 16);
-    const b = parseInt(c.slice(5, 7), 16);
-    return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.6;
-  }
-  return false;
 }

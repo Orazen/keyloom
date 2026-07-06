@@ -20,18 +20,18 @@ export const terminalDefaultProps: TerminalProps = {
     { kind: "output", text: "created my-video/" },
   ],
   charactersPerSecond: 28,
-  lineGap: 6,
+  lineGap: 8,
   chromeStyle: "mac",
   cursorStyle: "block",
-  fontSize: 26,
-  paddingX: 32,
-  paddingY: 28,
+  fontSize: 30,
+  paddingX: 44,
+  paddingY: 36,
   cornerRadius: 16,
   successColor: "#34d399",
   outputOpacity: 0.62,
   commentOpacity: 0.38,
   showShadow: true,
-  maxWidth: 1280,
+  maxWidth: 1600,
 };
 
 export const terminalInfo: CompositionInfo<TerminalProps> = {

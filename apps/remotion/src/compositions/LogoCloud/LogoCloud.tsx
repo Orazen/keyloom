@@ -19,8 +19,11 @@ export type LogoCloudProps = {
 };
 
 const D_HEADLINE = 0;
-const D_LOGOS_START = 12;
+const D_LOGOS_START = 8;
 const STAGGER = 4;
+
+const tint = (color: string, pct: number) =>
+  `color-mix(in srgb, ${color} ${pct}%, transparent)`;
 
 export const LogoCloud: React.FC<LogoCloudProps> = ({
   headline,
@@ -30,54 +33,47 @@ export const LogoCloud: React.FC<LogoCloudProps> = ({
 }) => {
   const frame = useDesignFrame();
   const { fps } = useVideoConfig();
-  const { vw, vh, vmin, isPortrait } = useCanvasLayout();
+  const { vw, vmin, isPortrait } = useCanvasLayout();
   const isDark = theme === "dark";
   const s = resolveClipStyle(clipStyle, {
-    background: "#f7f7f9",
+    background: isDark ? "#0f1014" : "#f7f7f9",
     color: isDark ? "#ffffff" : "#0f1014",
     fontFamily:
       "-apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, sans-serif",
     accent: "#6366f1",
   });
-  const bg = s.background;
-  const fontFamily = s.fontFamily;
 
-  const text = isDark ? "#ffffff" : "#0f1014";
-  const muted = isDark ? "rgba(255,255,255,0.55)" : "rgba(15,16,20,0.55)";
-
-  const headlinePop = spring({
+  const headlineIn = spring({
     frame: frame - D_HEADLINE,
     fps,
-    config: { damping: 16, stiffness: 130, mass: 0.7 },
+    config: { damping: 16, stiffness: 140, mass: 0.7 },
   });
 
-  // Reflow the grid: a wide row of logos in landscape/square, a narrower
-  // multi-row stack in portrait so logos stay legible instead of crushing.
-  const maxCols = isPortrait ? 2 : 5;
+  const maxCols = isPortrait ? 2 : logos.length > 5 ? 3 : 5;
   const cols = Math.max(1, Math.min(logos.length, maxCols));
 
   return (
     <AbsoluteFill
       style={{
-        background: bg,
+        background: s.background,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: `0 ${vmin(11)}px`,
-        fontFamily,
+        padding: `${vmin(8)}px ${vw(8)}px`,
+        fontFamily: s.fontFamily,
       }}
     >
       <div
         style={{
-          fontSize: vmin(3),
-          letterSpacing: "0.18em",
-          color: muted,
-          fontWeight: 600,
+          fontSize: vmin(2.6),
+          letterSpacing: "0.22em",
           textTransform: "uppercase",
-          marginBottom: vmin(7.8),
-          opacity: headlinePop,
-          transform: `translate3d(0, ${snap((1 - headlinePop) * vmin(1.7))}px, 0)`,
+          fontWeight: 600,
+          color: tint(s.color, 50),
+          marginBottom: vmin(9),
+          opacity: headlineIn,
+          transform: `translate3d(0, ${snap((1 - headlineIn) * vmin(1.8))}px, 0)`,
         }}
       >
         {headline}
@@ -87,11 +83,12 @@ export const LogoCloud: React.FC<LogoCloudProps> = ({
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-          gap: vmin(7.8),
+          columnGap: vw(4),
+          rowGap: vmin(7),
           alignItems: "center",
           justifyItems: "center",
           width: "100%",
-          maxWidth: vw(86),
+          maxWidth: vw(84),
         }}
       >
         {logos.map((logo, i) => (
@@ -100,10 +97,11 @@ export const LogoCloud: React.FC<LogoCloudProps> = ({
             logo={logo}
             frame={frame - (D_LOGOS_START + i * STAGGER)}
             fps={fps}
-            color={text}
-            maxW={Math.min(vw(14), vh(25))}
-            maxH={vmin(8.3)}
-            fontSize={vmin(3.9)}
+            color={s.color}
+            isDark={isDark}
+            boxHeight={vmin(9)}
+            maxW={Math.min(vw(13), vmin(26))}
+            fontSize={vmin(4)}
           />
         ))}
       </div>
@@ -116,51 +114,66 @@ function LogoItemView({
   frame,
   fps,
   color,
+  isDark,
+  boxHeight,
   maxW,
-  maxH,
   fontSize,
 }: {
   logo: LogoItem;
   frame: number;
   fps: number;
   color: string;
+  isDark: boolean;
+  boxHeight: number;
   maxW: number;
-  maxH: number;
   fontSize: number;
 }) {
   const reveal = spring({
     frame,
     fps,
-    config: { damping: 14, stiffness: 150, mass: 0.7 },
+    config: { damping: 15, stiffness: 150, mass: 0.7 },
   });
+  const rise = `translate3d(0, ${snap((1 - reveal) * 14)}px, 0)`;
 
   if (logo.url) {
     return (
-      <Img
-        src={proxyExternalImg(logo.url)}
-        crossOrigin="anonymous"
-        alt={logo.name}
+      <div
         style={{
-          maxWidth: maxW,
-          maxHeight: maxH,
-          objectFit: "contain",
-          opacity: reveal * 0.85,
-          transform: `translate3d(0, ${snap((1 - reveal) * 14)}px, 0) scale(${0.94 + reveal * 0.06})`,
-          filter: "grayscale(40%)",
+          height: boxHeight,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: reveal * 0.55,
+          transform: rise,
         }}
-      />
+      >
+        <Img
+          src={proxyExternalImg(logo.url)}
+          crossOrigin="anonymous"
+          alt={logo.name}
+          style={{
+            maxHeight: "100%",
+            maxWidth: maxW,
+            objectFit: "contain",
+            filter: isDark ? "grayscale(100%) invert(1)" : "grayscale(100%)",
+          }}
+        />
+      </div>
     );
   }
 
   return (
     <div
       style={{
+        height: boxHeight,
+        display: "flex",
+        alignItems: "center",
         fontSize,
-        fontWeight: 700,
-        color,
+        fontWeight: 600,
+        color: tint(color, 55),
         letterSpacing: "-0.01em",
-        opacity: reveal * 0.85,
-        transform: `translate3d(0, ${snap((1 - reveal) * 14)}px, 0)`,
+        opacity: reveal,
+        transform: rise,
       }}
     >
       {logo.name}

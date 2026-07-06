@@ -17,8 +17,6 @@ export const previewLoaders: Record<
     import("@workspace/compositions/compositions/BrowserWindow/BrowserWindow"),
   "CaptionTrack/CaptionTrack": () =>
     import("@workspace/compositions/compositions/CaptionTrack/CaptionTrack"),
-  "CardReveal/CardReveal": () =>
-    import("@workspace/compositions/compositions/CardReveal/CardReveal"),
   "CursorWalkthrough/CursorWalkthrough": () =>
     import("@workspace/compositions/compositions/CursorWalkthrough/CursorWalkthrough"),
   "DiscordMessages/DiscordMessages": () =>
@@ -45,10 +43,6 @@ export const previewLoaders: Record<
     import("@workspace/compositions/compositions/LogoCloud/LogoCloud"),
   "MessageBubbles/MessageBubbles": () =>
     import("@workspace/compositions/compositions/MessageBubbles/MessageBubbles"),
-  "MessagePopup/MessagePopup": () =>
-    import("@workspace/compositions/compositions/MessagePopup/MessagePopup"),
-  "PerspectiveMarquee/PerspectiveMarquee": () =>
-    import("@workspace/compositions/compositions/PerspectiveMarquee/PerspectiveMarquee"),
   "PhoneFrame/PhoneFrame": () =>
     import("@workspace/compositions/compositions/PhoneFrame/PhoneFrame"),
   "PieChart/PieChart": () =>
@@ -145,8 +139,6 @@ export const previewLoaders: Record<
     import("@workspace/compositions/compositions/TweetCard/TweetCard"),
   "TweetPost/TweetPost": () =>
     import("@workspace/compositions/compositions/TweetPost/TweetPost"),
-  "TwitterFollow/TwitterFollow": () =>
-    import("@workspace/compositions/compositions/TwitterFollow/TwitterFollow"),
   "TypingComposer/TypingComposer": () =>
     import("@workspace/compositions/compositions/TypingComposer/TypingComposer"),
   "TypingSearch/TypingSearch": () =>

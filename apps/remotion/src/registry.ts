@@ -8,7 +8,6 @@ import { futuristicArchInfo } from "./compositions/backgrounds/FuturisticArch/me
 import { liquidChromeInfo } from "./compositions/backgrounds/LiquidChrome/meta";
 import { whiteRadialBurstInfo } from "./compositions/backgrounds/WhiteRadialBurst/meta";
 import { captionTrackInfo } from "./compositions/CaptionTrack/meta";
-import { cardRevealInfo } from "./compositions/CardReveal/meta";
 import { cursorWalkthroughInfo } from "./compositions/CursorWalkthrough/meta";
 import { discordMessagesInfo } from "./compositions/DiscordMessages/meta";
 import { gaiaScenarioInfo } from "./compositions/GaiaScenario/meta";
@@ -21,8 +20,6 @@ import { lineChartInfo } from "./compositions/LineChart/meta";
 import { lockScreenMessageInfo } from "./compositions/LockScreenMessage/meta";
 import { logoCloudInfo } from "./compositions/LogoCloud/meta";
 import { messageBubblesInfo } from "./compositions/MessageBubbles/meta";
-import { messagePopupInfo } from "./compositions/MessagePopup/meta";
-import { perspectiveMarqueeInfo } from "./compositions/PerspectiveMarquee/meta";
 import { pieChartInfo } from "./compositions/PieChart/meta";
 import { pricingCardInfo } from "./compositions/PricingCard/meta";
 import { qrCodeInfo } from "./compositions/QrCode/meta";
@@ -41,7 +38,6 @@ import { textMorphInfo } from "./compositions/TextMorph/meta";
 import { tikTokCaptionInfo } from "./compositions/TikTokCaption/meta";
 import { tweetCardInfo } from "./compositions/TweetCard/meta";
 import { tweetPostInfo } from "./compositions/TweetPost/meta";
-import { twitterFollowInfo } from "./compositions/TwitterFollow/meta";
 import { typingComposerInfo } from "./compositions/TypingComposer/meta";
 import { typingSearchInfo } from "./compositions/TypingSearch/meta";
 import { whatsappMessagesInfo } from "./compositions/WhatsAppMessages/meta";
@@ -59,7 +55,6 @@ export const compositions: AnyCompositionInfo[] = [
   spotifyPlayerInfo,
   tweetCardInfo,
   tweetPostInfo,
-  twitterFollowInfo,
   instagramPostInfo,
   messageBubblesInfo,
   lockScreenMessageInfo,
@@ -68,13 +63,11 @@ export const compositions: AnyCompositionInfo[] = [
   slackMessagesInfo,
   discordMessagesInfo,
   instagramMessagesInfo,
-  messagePopupInfo,
   textInfo,
   textMagicMoveInfo,
   textMorphInfo,
   testimonialCardInfo,
   logoCloudInfo,
-  cardRevealInfo,
   pricingCardInfo,
   terminalInfo,
   githubStarButtonInfo,
@@ -82,7 +75,6 @@ export const compositions: AnyCompositionInfo[] = [
   kenBurnsInfo,
   bounceCardsInfo,
   qrCodeInfo,
-  perspectiveMarqueeInfo,
   barChartInfo,
   lineChartInfo,
   areaChartInfo,

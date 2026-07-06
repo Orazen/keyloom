@@ -31,25 +31,6 @@ export type PrimitiveField =
       key: string;
       label: string;
       options: { value: string; label: string }[];
-    }
-  | {
-      /**
-       * Curated icon picker with a custom-upload fallback. Stores the
-       * selected preset key under `key` and the uploaded/pasted URL
-       * under `customKey` on the same props object. Render priority is
-       * always custom > preset > composition default — selecting a
-       * preset clears `customKey`, uploading clears `key`.
-       *
-       * `presetSet` identifies which preset bundle to draw thumbnails
-       * from (today only "macos" is implemented). The inspector reads
-       * the actual list from the composition module, so additions to
-       * the icon-presets file flow through automatically.
-       */
-      kind: "iconPreset";
-      key: string;
-      customKey: string;
-      label: string;
-      presetSet: "macos";
     };
 
 export type ShapeField =

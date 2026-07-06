@@ -10,7 +10,6 @@ import { FuturisticArch } from "./compositions/backgrounds/FuturisticArch/Futuri
 import { LiquidChrome } from "./compositions/backgrounds/LiquidChrome/LiquidChrome";
 import { WhiteRadialBurst } from "./compositions/backgrounds/WhiteRadialBurst/WhiteRadialBurst";
 import { CaptionTrack } from "./compositions/CaptionTrack/CaptionTrack";
-import { CardReveal } from "./compositions/CardReveal/CardReveal";
 import { CursorWalkthrough } from "./compositions/CursorWalkthrough/CursorWalkthrough";
 import { DiscordMessages } from "./compositions/DiscordMessages/DiscordMessages";
 import { GaiaScenario } from "./compositions/GaiaScenario/GaiaScenario";
@@ -23,8 +22,6 @@ import { LineChart } from "./compositions/LineChart/LineChart";
 import { LockScreenMessage } from "./compositions/LockScreenMessage/LockScreenMessage";
 import { LogoCloud } from "./compositions/LogoCloud/LogoCloud";
 import { MessageBubbles } from "./compositions/MessageBubbles/MessageBubbles";
-import { MessagePopup } from "./compositions/MessagePopup/MessagePopup";
-import { PerspectiveMarquee } from "./compositions/PerspectiveMarquee/PerspectiveMarquee";
 import { PieChart } from "./compositions/PieChart/PieChart";
 import { PricingCard } from "./compositions/PricingCard/PricingCard";
 import { QrCode } from "./compositions/QrCode/QrCode";
@@ -42,7 +39,6 @@ import { TextMorph } from "./compositions/TextMorph/TextMorph";
 import { TikTokCaption } from "./compositions/TikTokCaption/TikTokCaption";
 import { TweetCard } from "./compositions/TweetCard/TweetCard";
 import { TweetPost } from "./compositions/TweetPost/TweetPost";
-import { TwitterFollow } from "./compositions/TwitterFollow/TwitterFollow";
 import { TypingComposer } from "./compositions/TypingComposer/TypingComposer";
 import { TypingSearch } from "./compositions/TypingSearch/TypingSearch";
 import { WhatsAppMessages } from "./compositions/WhatsAppMessages/WhatsAppMessages";
@@ -53,7 +49,6 @@ import { WhatsAppMessages } from "./compositions/WhatsAppMessages/WhatsAppMessag
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const componentsByIdBase: Record<string, ComponentType<any>> = {
   GaiaScenario,
-  MessagePopup,
   MessageBubbles,
   LockScreenMessage,
   TypingSearch,
@@ -66,7 +61,6 @@ export const componentsByIdBase: Record<string, ComponentType<any>> = {
   BrowserWindow,
   CaptionTrack,
   TikTokCaption,
-  TwitterFollow,
   WhatsAppMessages,
   InstagramMessages,
   InstagramPost,
@@ -78,7 +72,6 @@ export const componentsByIdBase: Record<string, ComponentType<any>> = {
   TextMorph,
   TestimonialCard,
   LogoCloud,
-  CardReveal,
   PricingCard,
   Terminal,
   GitHubStarButton,
@@ -86,7 +79,6 @@ export const componentsByIdBase: Record<string, ComponentType<any>> = {
   KenBurns,
   BounceCards,
   QrCode,
-  PerspectiveMarquee,
   BarChart,
   LineChart,
   AreaChart,

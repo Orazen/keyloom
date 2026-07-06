@@ -23,7 +23,7 @@ const LivePreview = dynamic(
 const SHOWCASE_IDS = [
   "TweetCard",
   "WhatsAppMessages",
-  "MessagePopup",
+  "LockScreenMessage",
   "TypingSearch",
   "Terminal",
 ];

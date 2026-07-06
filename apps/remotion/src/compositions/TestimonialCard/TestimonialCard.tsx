@@ -16,10 +16,12 @@ export type TestimonialCardProps = {
   clipStyle?: ClipStyle;
 };
 
-const D_CARD = 0;
-const D_QUOTE_MARK = 4;
-const D_QUOTE = 12;
-const D_AVATAR = 24;
+const D_STARS = 0;
+const D_QUOTE = 5;
+const D_AUTHOR = 16;
+
+const tint = (color: string, pct: number) =>
+  `color-mix(in srgb, ${color} ${pct}%, transparent)`;
 
 export const TestimonialCard: React.FC<TestimonialCardProps> = ({
   quote,
@@ -32,151 +34,139 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
 }) => {
   const frame = useDesignFrame();
   const { fps } = useVideoConfig();
-  const { vw, vh, vmin } = useCanvasLayout();
-  // Design canvas was 1280×720 (min side 720). Convert authored px → relative
-  // so the card reflows to any aspect instead of uniformly shrinking.
+  const { vw, vmin } = useCanvasLayout();
   const r = (px: number) => vmin((px / 720) * 100);
   const isDark = theme === "dark";
   const s = resolveClipStyle(clipStyle, {
-    background: "#f7f7f9",
+    background: isDark ? "#0f1014" : "#f7f7f9",
     color: isDark ? "#ffffff" : "#0f1014",
     fontFamily:
       "-apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, sans-serif",
     accent: "#6366f1",
   });
-  const accent = s.accent;
-  const bg = s.background;
-  const fontFamily = s.fontFamily;
+  const muted = tint(s.color, 55);
 
-  const cardBg = isDark ? "#15161A" : "#ffffff";
-  const text = isDark ? "#ffffff" : "#0f1014";
-  const muted = isDark ? "rgba(255,255,255,0.55)" : "rgba(15,16,20,0.55)";
-  const border = isDark ? "rgba(255,255,255,0.08)" : "rgba(15,16,20,0.08)";
-
-  const cardPop = spring({
-    frame: frame - D_CARD,
-    fps,
-    config: { damping: 16, stiffness: 110, mass: 0.8 },
-  });
-
-  const markPop = spring({
-    frame: frame - D_QUOTE_MARK,
-    fps,
-    config: { damping: 12, stiffness: 160, mass: 0.6 },
-  });
-
-  // The card was a fixed 880px box centered on the 1280-wide design. Size it
-  // relative to the canvas and cap it, so it fits portrait and landscape.
-  const cardWidth = Math.min(vw(88), vh(110), r(880));
-  const padX = r(56);
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
     <AbsoluteFill
       style={{
-        background: bg,
+        background: s.background,
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        fontFamily,
-        padding: vmin(5),
+        fontFamily: s.fontFamily,
+        padding: "8%",
       }}
     >
       <div
         style={{
-          width: cardWidth,
-          background: cardBg,
-          border: `1px solid ${border}`,
-          borderRadius: r(32),
-          padding: `${r(56)}px ${padX}px ${r(48)}px`,
-          position: "relative",
-          boxShadow: isDark
-            ? "0 30px 80px rgba(0,0,0,0.45)"
-            : "0 30px 80px rgba(15,16,20,0.08)",
-          opacity: cardPop,
-          transform: `translate3d(0, ${snap((1 - cardPop) * 24)}px, 0) scale(${0.95 + cardPop * 0.05})`,
+          width: "100%",
+          maxWidth: Math.max(vw(65), r(720)),
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            top: r(14),
-            left: r(36),
-            fontSize: r(180),
-            lineHeight: 1,
-            color: accent,
-            fontFamily: "Georgia, serif",
-            fontWeight: 800,
-            opacity: markPop * 0.18,
-            transform: `scale(${0.4 + markPop * 0.6})`,
-            transformOrigin: "top left",
-          }}
-        >
-          “
-        </div>
+        <RevealItem frame={frame - D_STARS} fps={fps}>
+          <div style={{ display: "flex", gap: r(8), marginBottom: r(30) }}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star key={i} size={r(20)} color={s.accent} />
+            ))}
+          </div>
+        </RevealItem>
 
         <RevealItem frame={frame - D_QUOTE} fps={fps}>
           <p
             style={{
-              fontSize: r(30),
-              color: text,
+              fontSize: r(42),
               fontWeight: 500,
-              lineHeight: 1.4,
-              letterSpacing: "-0.01em",
+              lineHeight: 1.35,
+              letterSpacing: "-0.015em",
+              color: s.color,
               margin: 0,
-              marginTop: r(24),
-              position: "relative",
-              zIndex: 1,
+              maxWidth: r(900),
             }}
           >
+            <span
+              style={{
+                color: s.accent,
+                fontFamily: "Georgia, 'Times New Roman', serif",
+                fontSize: "1.4em",
+                lineHeight: 0,
+                verticalAlign: "-0.08em",
+                marginRight: "0.06em",
+              }}
+            >
+              &ldquo;
+            </span>
             {quote}
           </p>
         </RevealItem>
 
-        <RevealItem frame={frame - D_AVATAR} fps={fps}>
+        <RevealItem frame={frame - D_AUTHOR} fps={fps}>
           <div
             style={{
               display: "flex",
               alignItems: "center",
               gap: r(16),
-              marginTop: r(36),
+              marginTop: r(44),
             }}
           >
-            <Img
-              src={proxyExternalImg(avatarUrl)}
-              crossOrigin="anonymous"
-              alt={name}
-              style={{
-                width: r(68),
-                height: r(68),
-                borderRadius: "50%",
-                objectFit: "cover",
-                border: `2px solid ${border}`,
-                flexShrink: 0,
-              }}
-            />
-            <div>
+            {avatarUrl ? (
+              <Img
+                src={proxyExternalImg(avatarUrl)}
+                crossOrigin="anonymous"
+                alt={name}
+                style={{
+                  width: r(56),
+                  height: r(56),
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  flexShrink: 0,
+                }}
+              />
+            ) : (
               <div
                 style={{
-                  fontSize: r(22),
-                  fontWeight: 700,
-                  color: text,
+                  width: r(56),
+                  height: r(56),
+                  borderRadius: "50%",
+                  background: tint(s.accent, 15),
+                  color: s.accent,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: r(20),
+                  fontWeight: 600,
+                  flexShrink: 0,
+                }}
+              >
+                {initials}
+              </div>
+            )}
+            <div style={{ textAlign: "left" }}>
+              <div
+                style={{
+                  fontSize: r(21),
+                  fontWeight: 600,
+                  color: s.color,
                   letterSpacing: "-0.005em",
                 }}
               >
                 {name}
               </div>
-              <div
-                style={{
-                  fontSize: r(18),
-                  color: muted,
-                  fontWeight: 400,
-                  marginTop: r(2),
-                }}
-              >
+              <div style={{ fontSize: r(17), color: muted, marginTop: r(3) }}>
                 {role}
-                {company ? (
-                  <span style={{ color: accent }}> · {company}</span>
-                ) : null}
+                {company ? ` · ${company}` : ""}
               </div>
             </div>
           </div>
@@ -185,6 +175,14 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
     </AbsoluteFill>
   );
 };
+
+function Star({ size, color }: { size: number; color: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill={color}>
+      <path d="M8 .5l2.2 4.55 5 .73-3.6 3.52.85 5-4.45-2.35L3.55 14.3l.85-5L.8 5.78l5-.73z" />
+    </svg>
+  );
+}
 
 function RevealItem({
   frame,
@@ -198,13 +196,13 @@ function RevealItem({
   const reveal = spring({
     frame,
     fps,
-    config: { damping: 14, stiffness: 150, mass: 0.7 },
+    config: { damping: 16, stiffness: 150, mass: 0.7 },
   });
   return (
     <div
       style={{
         opacity: reveal,
-        transform: `translate3d(0, ${snap((1 - reveal) * 14)}px, 0)`,
+        transform: `translate3d(0, ${snap((1 - reveal) * 16)}px, 0)`,
       }}
     >
       {children}

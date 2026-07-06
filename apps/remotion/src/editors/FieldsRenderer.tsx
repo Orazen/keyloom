@@ -164,41 +164,6 @@ export function FieldsRenderer({
                 />
               );
             }
-            if (field.kind === "iconPreset") {
-              return (
-                <PrimitiveControl
-                  key={field.key}
-                  field={field}
-                  value={value[field.key]}
-                  // iconPreset writes BOTH `key` and `customKey` in one
-                  // dispatch. The primitive control wraps both writes in a
-                  // sentinel object so we can update both keys atomically
-                  // here — UPDATE_CLIP_PROPS replaces props wholesale, so
-                  // two single-key dispatches would clobber each other.
-                  onChange={(v) => {
-                    if (
-                      v &&
-                      typeof v === "object" &&
-                      (v as { __iconPresetBoth?: boolean }).__iconPresetBoth
-                    ) {
-                      const { preset, custom } = v as {
-                        preset: string;
-                        custom: string;
-                      };
-                      onChange({
-                        ...value,
-                        [field.key]: preset,
-                        [field.customKey]: custom,
-                      });
-                    } else {
-                      set(field.key, v);
-                    }
-                  }}
-                  extraValue={value[field.customKey]}
-                  onExtraChange={(v) => set(field.customKey, v)}
-                />
-              );
-            }
             return (
               <PrimitiveControl
                 key={field.key}
@@ -277,16 +242,6 @@ export function FieldsRenderer({
                           field={subField}
                           value={value[subField.key]}
                           onChange={(v) => set(subField.key, v)}
-                          extraValue={
-                            subField.kind === "iconPreset"
-                              ? value[subField.customKey]
-                              : undefined
-                          }
-                          onExtraChange={
-                            subField.kind === "iconPreset"
-                              ? (v) => set(subField.customKey, v)
-                              : undefined
-                          }
                         />
                       ))}
                     </AccordionContent>
@@ -347,16 +302,6 @@ function ScenarioWithSectionsTabs({
                 field={subField}
                 value={value[subField.key]}
                 onChange={(v) => set(subField.key, v)}
-                extraValue={
-                  subField.kind === "iconPreset"
-                    ? value[subField.customKey]
-                    : undefined
-                }
-                onExtraChange={
-                  subField.kind === "iconPreset"
-                    ? (v) => set(subField.customKey, v)
-                    : undefined
-                }
               />
             ))}
           </TabsContent>
