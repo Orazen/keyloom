@@ -1,14 +1,19 @@
+import { withAuth } from "@workos-inc/authkit-nextjs";
 import { compositions } from "@workspace/compositions/registry";
 import {
   SidebarInset,
   SidebarProvider,
 } from "@workspace/ui/components/sidebar";
+import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
 import { DashboardTopbar } from "@/components/dashboard-topbar";
 import { GalleryMount } from "@/components/gallery/gallery-mount";
 import { SiteFooter } from "@/components/site-footer";
 
-export default function LandingPage() {
+export default async function DashboardPage() {
+  const { user } = await withAuth();
+  if (!user) redirect("/api/auth/signin");
+
   const sceneCount = compositions.filter(
     (c) => c.category !== "background",
   ).length;
