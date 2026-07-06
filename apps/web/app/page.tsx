@@ -18,7 +18,7 @@ export default function LandingPage() {
       <NavbarMenuFull />
 
       <main className="flex flex-col items-center px-5 pb-20 pt-20 text-center sm:pt-28">
-        <h1 className="max-w-3xl text-balance text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
+        <h1 className="max-w-3xl text-balance font-heading text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
           Ship marketing reels for your product.
         </h1>
         <p className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
