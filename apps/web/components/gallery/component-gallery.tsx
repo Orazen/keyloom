@@ -17,6 +17,9 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import * as React from "react";
 
+// The ONE component gallery — used by both the landing page and the dashboard.
+// Clicking a card opens it in the editor (/component/[id]/edit).
+
 const LivePreview = dynamic(
   () => import("./live-preview").then((m) => m.LivePreview),
   { ssr: false },
@@ -33,7 +36,6 @@ const CATEGORY_LABELS: Record<CompositionCategory, string> = {
   media: "Media",
   background: "Backgrounds",
 };
-
 const CATEGORY_ORDER = Object.keys(CATEGORY_LABELS) as CompositionCategory[];
 
 const CATEGORY_DOTS: Record<CompositionCategory, string> = {
@@ -50,30 +52,44 @@ const CATEGORY_DOTS: Record<CompositionCategory, string> = {
 
 type Filter = "all" | CompositionCategory;
 
-const VISIBLE_COMPOSITIONS = compositions.filter(
-  (c) => c.category !== "background",
+const VISIBLE = compositions.filter(
+  (c) => !c.hideFromAgent && c.category !== "background",
 );
 
-const DROP_SIZE = 6;
-const NEWEST = VISIBLE_COMPOSITIONS.slice(-DROP_SIZE).reverse();
-
-const PRESENT_CATEGORIES = CATEGORY_ORDER.filter((c) =>
-  VISIBLE_COMPOSITIONS.some((comp) => comp.category === c),
-);
-
-const COUNT_BY_CATEGORY = VISIBLE_COMPOSITIONS.reduce((counts, c) => {
+const COUNT_BY_CATEGORY = VISIBLE.reduce((counts, c) => {
   counts.set(c.category, (counts.get(c.category) ?? 0) + 1);
   return counts;
 }, new Map<CompositionCategory, number>());
 
-export function GalleryBrowser() {
+function formatTimecode(frames: number, fps: number): string {
+  const totalSeconds = Math.round(frames / fps);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+// Tall 4:5 portrait preview frame — responsive components reflow to fill it.
+const PREVIEW_W = 1080;
+const PREVIEW_H = 1350;
+
+export function ComponentGallery({
+  stickyOffsetClass = "top-0",
+}: {
+  /** Tailwind top-* offset so the sticky filter bar sits under the page header. */
+  stickyOffsetClass?: string;
+}) {
   const [filter, setFilter] = React.useState<Filter>("all");
   const [query, setQuery] = React.useState("");
   const [searchOpen, setSearchOpen] = React.useState(false);
 
+  const presentCategories = React.useMemo(() => {
+    const seen = new Set(VISIBLE.map((c) => c.category));
+    return CATEGORY_ORDER.filter((c) => seen.has(c));
+  }, []);
+
   const items = React.useMemo(() => {
     const q = query.trim().toLowerCase();
-    return VISIBLE_COMPOSITIONS.filter((c) => {
+    return VISIBLE.filter((c) => {
       if (filter !== "all" && c.category !== filter) return false;
       if (!q) return true;
       return (
@@ -84,9 +100,13 @@ export function GalleryBrowser() {
   }, [filter, query]);
 
   return (
-    <div className="space-y-6">
-      <DropBanner />
-      <div className="sticky top-14 z-30 -mx-5 border-b border-dashed border-border bg-background/95 px-5 py-2.5 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:-mx-8 sm:px-8 lg:-mx-10 lg:px-10">
+    <div>
+      <div
+        className={cn(
+          "sticky z-20 mx-1 mb-8 mt-3 rounded-full border border-border bg-background/80 px-2.5 py-2 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/70",
+          stickyOffsetClass,
+        )}
+      >
         <div className="flex items-center gap-2">
           {searchOpen ? (
             <div className="flex flex-1 items-center gap-2">
@@ -131,11 +151,11 @@ export function GalleryBrowser() {
               <nav className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <CategoryTab
                   label="All"
-                  count={VISIBLE_COMPOSITIONS.length}
+                  count={VISIBLE.length}
                   active={filter === "all"}
                   onClick={() => setFilter("all")}
                 />
-                {PRESENT_CATEGORIES.map((c) => (
+                {presentCategories.map((c) => (
                   <CategoryTab
                     key={c}
                     label={CATEGORY_LABELS[c]}
@@ -156,7 +176,7 @@ export function GalleryBrowser() {
           No components match “{query}”.
         </p>
       ) : (
-        <div className="grid grid-cols-1 items-start gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-2 items-start gap-x-5 gap-y-8 lg:grid-cols-3 xl:grid-cols-4">
           {items.map((info) => (
             <GalleryCard key={info.id} info={info} />
           ))}
@@ -210,69 +230,6 @@ function CategoryTab({
   );
 }
 
-function DropBanner() {
-  const featured = NEWEST[0];
-  if (!featured) return null;
-
-  const names = NEWEST.slice(0, 3)
-    .map((c) => c.title)
-    .join(", ");
-  const aspect = featured.width / featured.height;
-  const previewHeight = aspect >= 1 ? 168 : 220;
-
-  return (
-    <section className="flex items-center justify-between gap-8 overflow-hidden rounded-2xl bg-[#0e0e12] p-6 text-white sm:p-8">
-      <div className="min-w-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/50">
-          Latest drop
-        </p>
-        <h2 className="mt-2 text-pretty font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
-          {NEWEST.length} new scenes just landed.
-        </h2>
-        <p className="mt-2 max-w-md text-pretty text-sm leading-relaxed text-white/60">
-          {names} and more — fresh off the loom.
-        </p>
-        <Button asChild size="sm" className="mt-5">
-          <Link href={`/studio?component=${featured.id}`} prefetch={false}>
-            Open in Studio
-          </Link>
-        </Button>
-      </div>
-
-      <div
-        className="hidden shrink-0 overflow-hidden rounded-xl ring-1 ring-white/10 md:block"
-        style={{ height: previewHeight, aspectRatio: `${aspect}` }}
-      >
-        <LivePreview
-          modulePath={compositionModulePath(featured)}
-          id={featured.id}
-          defaultProps={featured.defaultProps}
-          durationInFrames={featured.durationInFrames}
-          fps={featured.fps}
-          width={featured.width}
-          height={featured.height}
-        />
-      </div>
-    </section>
-  );
-}
-
-function formatAspect(width: number, height: number): string {
-  const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
-  const g = gcd(width, height);
-  const rw = width / g;
-  const rh = height / g;
-  if (rw > 32 || rh > 32) return `${width}×${height}`;
-  return `${rw}:${rh}`;
-}
-
-function formatTimecode(frames: number, fps: number): string {
-  const totalSeconds = Math.round(frames / fps);
-  const m = Math.floor(totalSeconds / 60);
-  const s = totalSeconds % 60;
-  return `${m}:${String(s).padStart(2, "0")}`;
-}
-
 function GalleryCard({ info }: { info: AnyCompositionInfo }) {
   const ref = React.useRef<HTMLAnchorElement | null>(null);
   const [visible, setVisible] = React.useState(false);
@@ -292,29 +249,24 @@ function GalleryCard({ info }: { info: AnyCompositionInfo }) {
     return () => io.disconnect();
   }, []);
 
-  const compAspect = info.width / info.height;
-
   return (
     <Link
       ref={ref}
-      href={`/studio?component=${info.id}`}
+      href={`/component/${info.id}/edit`}
       prefetch={false}
       className="group block"
     >
-      <div
-        className="relative overflow-hidden rounded-2xl bg-muted/40 ring-1 ring-border/50 transition-all duration-200 group-hover:ring-border group-hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.25)]"
-        style={{ aspectRatio: `${compAspect}` }}
-      >
+      <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-muted/40 ring-1 ring-border/50 transition-all duration-200 group-hover:ring-border group-hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.25)]">
         <div className="absolute inset-0">
           {visible ? (
             <LivePreview
               modulePath={compositionModulePath(info)}
               id={info.id}
-              defaultProps={info.defaultProps}
+              defaultProps={info.defaultProps as Record<string, unknown>}
               durationInFrames={info.durationInFrames}
               fps={info.fps}
-              width={info.width}
-              height={info.height}
+              width={PREVIEW_W}
+              height={PREVIEW_H}
             />
           ) : (
             <div className="h-full w-full bg-muted/40" />
@@ -324,12 +276,12 @@ function GalleryCard({ info }: { info: AnyCompositionInfo }) {
           {formatTimecode(info.durationInFrames, info.fps)}
         </span>
       </div>
+
       <div className="px-0.5 pt-3">
         <h3 className="truncate text-[15px] font-semibold leading-tight text-foreground">
           {info.title}
         </h3>
-        <p className="mt-1.5 truncate font-mono text-[11px] text-muted-foreground">
-          {formatAspect(info.width, info.height)} ·{" "}
+        <p className="mt-1 truncate font-mono text-[11px] text-muted-foreground">
           {CATEGORY_LABELS[info.category]}
         </p>
       </div>

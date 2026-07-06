@@ -1,9 +1,4 @@
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@workspace/ui/components/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
-import { DashboardTopbar } from "@/components/dashboard-topbar";
+import { DocsHeader } from "@/components/docs-header";
 import { SiteFooter } from "@/components/site-footer";
 
 export default function ShellLayout({
@@ -12,13 +7,10 @@ export default function ShellLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset className="min-w-0">
-        <DashboardTopbar />
-        <main className="min-w-0 flex-1">{children}</main>
-        <SiteFooter />
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="mx-auto flex max-w-[1600px] min-h-screen flex-col border-x border-dashed border-border">
+      <DocsHeader />
+      <main className="flex-1 min-w-0">{children}</main>
+      <SiteFooter />
+    </div>
   );
 }
