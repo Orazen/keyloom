@@ -3,7 +3,7 @@
 import { SparklesIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@workspace/ui/components/button";
-import type { MemeTemplate } from "@/lib/memes";
+import type { MemeTemplate } from "@/features/memes/lib/memes";
 
 export function MemeBanner({
   templates,

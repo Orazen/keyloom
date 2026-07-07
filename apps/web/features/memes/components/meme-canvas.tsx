@@ -27,7 +27,7 @@ import {
   OUTPUT_WIDTH,
   type Selected,
   type TextAttrs,
-} from "./meme-layout";
+} from "../lib/meme-layout";
 
 const overlayBtn =
   "flex size-9 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70 disabled:opacity-50";

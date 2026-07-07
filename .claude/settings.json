@@ -106,7 +106,12 @@
       "Bash(echo \"EXIT_GREP=$?\")",
       "Bash(curl -s -A \"Mozilla/5.0\" \"https://fonts.googleapis.com/css2?family=TikTok+Sans:wght@400;700;800;900&display=swap\")",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -A \"Mozilla/5.0\" \"https://fonts.googleapis.com/css2?family=TikTok+Sans:wght@400;700;800;900&display=swap\")",
-      "Bash(echo \"commit A exit $?\")"
+      "Bash(echo \"commit A exit $?\")",
+      "Bash(sed -i 's#@/lib/memes#@/features/memes/lib/memes#g' *.tsx)",
+      "Bash(sed -i 's#\"\\\\./meme-fonts\"#\"../lib/meme-fonts\"#g' *.tsx)",
+      "Bash(sed -i 's#\"\\\\./meme-layout\"#\"../lib/meme-layout\"#g' *.tsx)",
+      "Bash(sed -i 's#\"\\\\./meme-export\"#\"../lib/meme-export\"#g' *.tsx)",
+      "Bash(sed -i 's#@/components/memes/meme-studio#@/features/memes/components/meme-studio#g' app/memes/page.tsx)"
     ],
     "additionalDirectories": [
       "/home/sanku/work/aesthetic/.claude/skills/apple-human-interface-skills/skills/components/packages/ui/src/components",

@@ -3,8 +3,12 @@
 import { useQuery } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { type MemeTemplate, memeAsset, memeTemplates } from "@/lib/memes";
-import { loadMemeFonts } from "./meme-fonts";
+import {
+  type MemeTemplate,
+  memeAsset,
+  memeTemplates,
+} from "@/features/memes/lib/memes";
+import { loadMemeFonts } from "../lib/meme-fonts";
 import { MemeGallery } from "./meme-gallery";
 import { EditorSkeleton, GallerySkeleton } from "./meme-skeletons";
 

@@ -66,10 +66,8 @@ export const memeTemplates: MemeTemplate[] = [
  */
 export const memeBackgrounds: MemeBackground[] = [
   { id: "grocery", title: "Grocery", src: "/backgrounds/grocery.jpg" },
-  { id: "beach", title: "Beach", src: "/backgrounds/beach.jpg" },
   { id: "park", title: "Park", src: "/backgrounds/park.jpg" },
   { id: "kitchen", title: "Kitchen", src: "/backgrounds/kitchen.jpg" },
-  { id: "gym", title: "Gym", src: "/backgrounds/gym.jpg" },
   { id: "office", title: "Office", src: "/backgrounds/bg1.jpg" },
   { id: "studio", title: "Studio", src: "/backgrounds/bg2.jpg" },
   { id: "classroom", title: "Classroom", src: "/backgrounds/bg3.jpg" },

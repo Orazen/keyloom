@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { MemeTemplate } from "@/lib/memes";
+import type { MemeTemplate } from "@/features/memes/lib/memes";
 import { MemeThumbnail } from "./meme-thumbnail";
 
 /**

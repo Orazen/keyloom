@@ -10,8 +10,7 @@ import {
   type MemeBackground,
   type MemeTemplate,
   memeBackgrounds,
-} from "@/lib/memes";
-import { MemeCanvas } from "./meme-canvas";
+} from "@/features/memes/lib/memes";
 import {
   downloadBlob,
   encodePlaythroughToMp4,
@@ -20,9 +19,8 @@ import {
   muxAudioFromSource,
   recordCanvas,
   webmToMp4,
-} from "./meme-export";
-import { loadMemeFonts } from "./meme-fonts";
-import { MemeInspector } from "./meme-inspector";
+} from "../lib/meme-export";
+import { loadMemeFonts } from "../lib/meme-fonts";
 import {
   type Caption,
   DEFAULT_CAPTION,
@@ -34,7 +32,9 @@ import {
   OUTPUT_WIDTH,
   type Selected,
   type TextAttrs,
-} from "./meme-layout";
+} from "../lib/meme-layout";
+import { MemeCanvas } from "./meme-canvas";
+import { MemeInspector } from "./meme-inspector";
 import { MemePublishDialog } from "./meme-publish-dialog";
 
 // Force the canvas to be exactly 1080x1920 — no devicePixelRatio doubling. Set

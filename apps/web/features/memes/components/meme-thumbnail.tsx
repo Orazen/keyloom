@@ -2,7 +2,10 @@
 
 import { cn } from "@workspace/ui/lib/utils";
 import { useEffect, useRef } from "react";
-import { backgroundForTemplate, type MemeTemplate } from "@/lib/memes";
+import {
+  backgroundForTemplate,
+  type MemeTemplate,
+} from "@/features/memes/lib/memes";
 
 const PASTELS = [
   "#fde7ef",

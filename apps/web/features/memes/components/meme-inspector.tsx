@@ -16,9 +16,12 @@ import { Slider } from "@workspace/ui/components/slider";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { cn } from "@workspace/ui/lib/utils";
 import type { ChangeEvent, RefObject } from "react";
-import { type MemeBackground, memeBackgrounds } from "@/lib/memes";
-import { FONTS, WEIGHTS } from "./meme-fonts";
-import type { Caption } from "./meme-layout";
+import {
+  type MemeBackground,
+  memeBackgrounds,
+} from "@/features/memes/lib/memes";
+import { FONTS, WEIGHTS } from "../lib/meme-fonts";
+import type { Caption } from "../lib/meme-layout";
 
 type MemeInspectorProps = {
   background: MemeBackground | null;

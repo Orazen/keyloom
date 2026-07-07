@@ -10,7 +10,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { cn } from "@workspace/ui/lib/utils";
 import { useMemo, useState } from "react";
-import type { MemeTemplate } from "@/lib/memes";
+import type { MemeTemplate } from "@/features/memes/lib/memes";
 import { MemeBanner } from "./meme-banner";
 import { MemeReel } from "./meme-reel";
 import { MemeThumbnail } from "./meme-thumbnail";
