@@ -7,6 +7,7 @@ import {
   StarIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@workspace/ui/components/button";
 import {
   DropdownMenu,
@@ -47,18 +48,19 @@ function formatStars(count: number): string {
 }
 
 function GitHubButton() {
-  const [stars, setStars] = React.useState<number | null>(null);
-
-  React.useEffect(() => {
-    fetch("https://api.github.com/repos/theexperiencecompany/motion-studio")
-      .then((r) => r.json())
-      .then((data: { stargazers_count?: number }) => {
-        if (typeof data.stargazers_count === "number") {
-          setStars(data.stargazers_count);
-        }
-      })
-      .catch(() => {});
-  }, []);
+  const { data: stars } = useQuery({
+    queryKey: ["github-stars", "theexperiencecompany/motion-studio"],
+    queryFn: async () => {
+      const res = await fetch(
+        "https://api.github.com/repos/theexperiencecompany/motion-studio",
+      );
+      const data = (await res.json()) as { stargazers_count?: number };
+      return typeof data.stargazers_count === "number"
+        ? data.stargazers_count
+        : null;
+    },
+    staleTime: 30 * 60 * 1000,
+  });
 
   return (
     <Button variant="ghost" size="sm" className="gap-1.5 px-2" asChild>
@@ -68,7 +70,7 @@ function GitHubButton() {
         target="_blank"
         rel="noopener noreferrer"
       >
-        {stars !== null && (
+        {stars != null && (
           <>
             <HugeiconsIcon icon={StarIcon} className="size-4 text-yellow-400" />
             <span className="text-xs tabular-nums">{formatStars(stars)}</span>
