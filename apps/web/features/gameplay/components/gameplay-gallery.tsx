@@ -38,12 +38,12 @@ export function GameplayGallery() {
       </div>
 
       {isPending ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
             <Skeleton
               // biome-ignore lint/suspicious/noArrayIndexKey: fixed placeholders
               key={i}
-              className="aspect-video w-full rounded-xl"
+              className="aspect-[9/16] w-full rounded-xl"
             />
           ))}
         </div>
@@ -58,7 +58,7 @@ export function GameplayGallery() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {videos.map((v) => (
             <div
               key={v.id}
@@ -71,7 +71,7 @@ export function GameplayGallery() {
                 loop
                 playsInline
                 preload="metadata"
-                className="aspect-video w-full object-cover"
+                className="aspect-[9/16] w-full object-cover"
                 onMouseEnter={(e) => {
                   e.currentTarget.play().catch(() => {});
                 }}
@@ -85,7 +85,7 @@ export function GameplayGallery() {
                   {v.title}
                 </span>
                 <span className="shrink-0 font-mono text-[10px] text-muted-foreground">
-                  16:9
+                  9:16
                 </span>
               </div>
             </div>
