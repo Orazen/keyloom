@@ -82,12 +82,9 @@ export function GameplayGallery() {
                   e.currentTarget.currentTime = 0;
                 }}
               />
-              <div className="flex items-center justify-between gap-3 px-3 py-2.5">
-                <span className="truncate text-[13px] font-medium">
+              <div className="px-2.5 py-2">
+                <span className="block truncate text-[11px] font-medium">
                   {v.title}
-                </span>
-                <span className="shrink-0 font-mono text-[10px] text-muted-foreground">
-                  9:16
                 </span>
               </div>
             </button>
