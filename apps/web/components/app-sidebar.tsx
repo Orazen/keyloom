@@ -88,7 +88,12 @@ const SECTIONS: NavSection[] = [
   {
     label: "Integration",
     items: [
-      { label: "Integrations", href: "/integrations", icon: Share08Icon },
+      {
+        label: "Integrations",
+        href: "/integrations",
+        icon: Share08Icon,
+        badge: "Beta",
+      },
       { label: "MCP", href: "/mcp", icon: PlugSocketIcon },
     ],
   },

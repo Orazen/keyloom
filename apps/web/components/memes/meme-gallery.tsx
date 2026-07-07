@@ -11,6 +11,7 @@ import { Input } from "@workspace/ui/components/input";
 import { cn } from "@workspace/ui/lib/utils";
 import { useMemo, useState } from "react";
 import type { MemeTemplate } from "@/lib/memes";
+import { MemeBanner } from "./meme-banner";
 import { MemeReel } from "./meme-reel";
 import { MemeThumbnail } from "./meme-thumbnail";
 
@@ -134,6 +135,8 @@ export function MemeGallery({
           </div>
         </div>
       </div>
+
+      <MemeBanner templates={templates} onSelect={onSelect} />
 
       <div className="flex items-center gap-1.5">
         <nav className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

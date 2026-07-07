@@ -2,7 +2,7 @@
 
 import { cn } from "@workspace/ui/lib/utils";
 import { useEffect, useRef } from "react";
-import type { MemeTemplate } from "@/lib/memes";
+import { backgroundForTemplate, type MemeTemplate } from "@/lib/memes";
 
 const PASTELS = [
   "#fde7ef",
@@ -44,6 +44,7 @@ export function MemeThumbnail({
 }: MemeThumbnailProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const pack = isPack(template);
+  const bgSrc = pack ? undefined : backgroundForTemplate(template.id)?.src;
 
   useEffect(() => {
     if (mode !== "view") return;
@@ -76,7 +77,14 @@ export function MemeThumbnail({
         pack ? "bg-[#0e0e12]" : "bg-muted/40",
       )}
     >
-      {!pack ? (
+      {bgSrc ? (
+        // biome-ignore lint/performance/noImgElement: local static preview thumbnail
+        <img
+          src={bgSrc}
+          alt=""
+          className="absolute inset-0 size-full object-cover"
+        />
+      ) : !pack ? (
         <div
           aria-hidden
           className="absolute inset-0 dark:opacity-15"

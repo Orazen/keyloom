@@ -105,7 +105,8 @@
       "Bash(echo \"merge commit exit $?\")",
       "Bash(echo \"EXIT_GREP=$?\")",
       "Bash(curl -s -A \"Mozilla/5.0\" \"https://fonts.googleapis.com/css2?family=TikTok+Sans:wght@400;700;800;900&display=swap\")",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -A \"Mozilla/5.0\" \"https://fonts.googleapis.com/css2?family=TikTok+Sans:wght@400;700;800;900&display=swap\")"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -A \"Mozilla/5.0\" \"https://fonts.googleapis.com/css2?family=TikTok+Sans:wght@400;700;800;900&display=swap\")",
+      "Bash(echo \"commit A exit $?\")"
     ],
     "additionalDirectories": [
       "/home/sanku/work/aesthetic/.claude/skills/apple-human-interface-skills/skills/components/packages/ui/src/components",

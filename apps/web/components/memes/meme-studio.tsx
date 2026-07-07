@@ -1,11 +1,18 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { type MemeTemplate, memeAsset, memeTemplates } from "@/lib/memes";
-import { MemeEditor } from "./meme-editor";
 import { loadMemeFonts } from "./meme-fonts";
 import { MemeGallery } from "./meme-gallery";
+import { EditorSkeleton, GallerySkeleton } from "./meme-skeletons";
+
+// Lazy so the Konva-heavy editor bundle loads only when a template is opened.
+const MemeEditor = dynamic(
+  () => import("./meme-editor").then((m) => m.MemeEditor),
+  { ssr: false, loading: () => <EditorSkeleton /> },
+);
 
 type TemplateListItem = { id: string; title: string; key: string };
 
@@ -13,7 +20,7 @@ async function fetchMemeTemplates(): Promise<MemeTemplate[]> {
   const res = await fetch("/api/meme-templates");
   if (!res.ok) throw new Error(`Templates request failed: ${res.status}`);
   const data: { templates?: TemplateListItem[] } = await res.json();
-  if (!data.templates?.length) return memeTemplates; // R2 not configured → static
+  if (!data.templates?.length) return memeTemplates;
   return data.templates.map((t) => ({
     id: t.id,
     title: t.title,
@@ -24,28 +31,27 @@ async function fetchMemeTemplates(): Promise<MemeTemplate[]> {
   }));
 }
 
-/**
- * Two-step flow: browse the template gallery (fetched from R2 via React Query so
- * it's cached/deduped across mounts), then click one to open the editor for it.
- * Shows the static registry as placeholder data until the live list resolves.
- */
 export function MemeStudio() {
   const [selected, setSelected] = useState<MemeTemplate | null>(null);
 
-  // Load the meme fonts up front so gallery caption previews render correctly.
   useEffect(() => {
     loadMemeFonts();
   }, []);
 
-  const { data: templates = memeTemplates } = useQuery({
+  const { data: templates, isPending } = useQuery({
     queryKey: ["meme-templates"],
     queryFn: fetchMemeTemplates,
     staleTime: 5 * 60 * 1000,
-    placeholderData: memeTemplates,
   });
 
   if (selected) {
     return <MemeEditor template={selected} onBack={() => setSelected(null)} />;
   }
-  return <MemeGallery templates={templates} onSelect={setSelected} />;
+  if (isPending) return <GallerySkeleton />;
+  return (
+    <MemeGallery
+      templates={templates ?? memeTemplates}
+      onSelect={setSelected}
+    />
+  );
 }
