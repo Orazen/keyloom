@@ -1,7 +1,14 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@workspace/ui/components/dialog";
 import { Skeleton } from "@workspace/ui/components/skeleton";
+import { useState } from "react";
+import { GameplayBanner } from "@/features/gameplay/components/gameplay-banner";
 import { cdnAsset } from "@/lib/cdn";
 
 type GameplayVideo = { id: string; title: string; src: string };
@@ -19,6 +26,7 @@ async function fetchGameplay(): Promise<GameplayVideo[]> {
 }
 
 export function GameplayGallery() {
+  const [active, setActive] = useState<GameplayVideo | null>(null);
   const { data: videos = [], isPending } = useQuery({
     queryKey: ["gameplay"],
     queryFn: fetchGameplay,
@@ -26,20 +34,12 @@ export function GameplayGallery() {
   });
 
   return (
-    <div className="flex flex-col gap-5">
-      <div>
-        <h1 className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
-          Gameplay
-        </h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          Background gameplay clips — pair one under a meme for the split-screen
-          look.
-        </p>
-      </div>
+    <div className="flex flex-col gap-6">
+      <GameplayBanner count={videos.length} />
 
       {isPending ? (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+          {Array.from({ length: 12 }).map((_, i) => (
             <Skeleton
               // biome-ignore lint/suspicious/noArrayIndexKey: fixed placeholders
               key={i}
@@ -58,11 +58,13 @@ export function GameplayGallery() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
           {videos.map((v) => (
-            <div
+            <button
               key={v.id}
-              className="group overflow-hidden rounded-xl border border-border bg-muted/40"
+              type="button"
+              onClick={() => setActive(v)}
+              className="group overflow-hidden rounded-xl border border-border bg-muted/40 text-left transition-colors hover:border-foreground/25"
             >
               {/* biome-ignore lint/a11y/useMediaCaption: silent gameplay preview */}
               <video
@@ -88,10 +90,34 @@ export function GameplayGallery() {
                   9:16
                 </span>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       )}
+
+      <Dialog
+        open={active !== null}
+        onOpenChange={(o) => !o && setActive(null)}
+      >
+        <DialogContent className="w-auto max-w-[min(90vw,26rem)] overflow-hidden p-0">
+          {active ? (
+            <>
+              <DialogTitle className="px-4 pt-4 text-sm font-medium">
+                {active.title}
+              </DialogTitle>
+              {/* biome-ignore lint/a11y/useMediaCaption: gameplay clip preview */}
+              <video
+                src={active.src}
+                autoPlay
+                loop
+                controls
+                playsInline
+                className="aspect-[9/16] w-full bg-black object-contain"
+              />
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -2,7 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { parseAsString, useQueryState } from "nuqs";
+import { useEffect } from "react";
 import {
   type MemeTemplate,
   memeAsset,
@@ -36,7 +37,10 @@ async function fetchMemeTemplates(): Promise<MemeTemplate[]> {
 }
 
 export function MemeStudio() {
-  const [selected, setSelected] = useState<MemeTemplate | null>(null);
+  const [templateId, setTemplateId] = useQueryState(
+    "t",
+    parseAsString.withOptions({ history: "push" }),
+  );
 
   useEffect(() => {
     loadMemeFonts();
@@ -48,14 +52,17 @@ export function MemeStudio() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const list = templates ?? memeTemplates;
+  const selected = templateId
+    ? list.find((t) => t.id === templateId)
+    : undefined;
+
+  if (templateId && isPending) return <EditorSkeleton />;
   if (selected) {
-    return <MemeEditor template={selected} onBack={() => setSelected(null)} />;
+    return (
+      <MemeEditor template={selected} onBack={() => setTemplateId(null)} />
+    );
   }
   if (isPending) return <GallerySkeleton />;
-  return (
-    <MemeGallery
-      templates={templates ?? memeTemplates}
-      onSelect={setSelected}
-    />
-  );
+  return <MemeGallery templates={list} onSelect={(t) => setTemplateId(t.id)} />;
 }

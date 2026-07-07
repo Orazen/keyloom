@@ -9,13 +9,14 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { cn } from "@workspace/ui/lib/utils";
+import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import type { MemeTemplate } from "@/features/memes/lib/memes";
 import { MemeBanner } from "./meme-banner";
 import { MemeReel } from "./meme-reel";
 import { MemeThumbnail } from "./meme-thumbnail";
 
-type View = "grid" | "reel";
+const VIEWS = ["grid", "reel"] as const;
 
 const PAGE_SIZE = 20;
 
@@ -36,7 +37,9 @@ const TAGS = [
   { id: "packs", label: "Packs", test: /pack/i },
 ] as const;
 
-type Filter = "all" | (typeof TAGS)[number]["id"];
+const FILTERS = ["all", ...TAGS.map((t) => t.id)] as const;
+
+type Filter = (typeof FILTERS)[number];
 
 export function MemeGallery({
   templates,
@@ -45,9 +48,15 @@ export function MemeGallery({
   templates: MemeTemplate[];
   onSelect: (t: MemeTemplate) => void;
 }) {
-  const [view, setView] = useState<View>("grid");
-  const [filter, setFilter] = useState<Filter>("all");
-  const [query, setQuery] = useState("");
+  const [view, setView] = useQueryState(
+    "view",
+    parseAsStringLiteral(VIEWS).withDefault("grid"),
+  );
+  const [filter, setFilter] = useQueryState(
+    "tag",
+    parseAsStringLiteral(FILTERS).withDefault("all"),
+  );
+  const [query, setQuery] = useQueryState("q", parseAsString.withDefault(""));
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const presentTags = useMemo(

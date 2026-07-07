@@ -7,6 +7,7 @@ import {
   JetBrains_Mono,
 } from "next/font/google";
 import Script from "next/script";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import "@workspace/ui/globals.css";
 import "streamdown/styles.css";
@@ -59,7 +60,9 @@ export default function RootLayout({
         <ThemeProvider>
           <MotionConfig reducedMotion="user">
             <AuthKitProvider>
-              <QueryProvider>{children}</QueryProvider>
+              <NuqsAdapter>
+                <QueryProvider>{children}</QueryProvider>
+              </NuqsAdapter>
             </AuthKitProvider>
             <Toaster position="bottom-right" richColors />
           </MotionConfig>
