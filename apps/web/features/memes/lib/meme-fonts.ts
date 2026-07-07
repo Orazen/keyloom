@@ -25,8 +25,6 @@ export const WEIGHTS = [
   { value: "900", label: "Black" },
 ];
 
-// Google Fonts to fetch + the weights we render at. Single-weight display faces
-// (Anton, Bebas Neue, Archivo Black) only ship 400.
 const GOOGLE_FONTS: { family: string; weights: number[] }[] = [
   { family: "TikTok Sans", weights: [400, 700, 800, 900] },
   { family: "Poppins", weights: [400, 700, 800, 900] },

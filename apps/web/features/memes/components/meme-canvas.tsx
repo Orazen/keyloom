@@ -35,6 +35,8 @@ const overlayBtn =
 type MemeCanvasProps = {
   /** CSS scale that fits the 1080x1920 stage into the preview box. */
   displayScale: number;
+  /** Remounts the caption once the Google Fonts are loaded so Konva re-measures its wrap. */
+  fontsReady: boolean;
   bgImg: HTMLImageElement | null;
   videoEl: HTMLVideoElement | null;
   vsize: { w: number; h: number };
@@ -64,6 +66,7 @@ type MemeCanvasProps = {
 /** The 9:16 preview: background + subject clip + caption, with transport controls. */
 export function MemeCanvas({
   displayScale,
+  fontsReady,
   bgImg,
   videoEl,
   vsize,
@@ -101,7 +104,7 @@ export function MemeCanvas({
           : null;
     tr.nodes(node ? [node] : []);
     tr.getLayer()?.batchDraw();
-  }, [selected, videoEl, trRef, videoNodeRef, textNodeRef]);
+  }, [selected, videoEl, fontsReady, trRef, videoNodeRef, textNodeRef]);
 
   return (
     <div
@@ -206,6 +209,7 @@ export function MemeCanvas({
             )}
 
             <KonvaText
+              key={fontsReady ? "fonts-ready" : "fonts-pending"}
               ref={textNodeRef}
               text={caption.text}
               x={textAttrs.x}

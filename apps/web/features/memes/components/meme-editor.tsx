@@ -80,6 +80,7 @@ export function MemeEditor({
   const [exporting, setExporting] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [fontsReady, setFontsReady] = useState(false);
   const [displayScale, setDisplayScale] = useState(0.3);
 
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -91,11 +92,14 @@ export function MemeEditor({
 
   useEffect(() => setMounted(true), []);
 
-  // Load the meme Google Fonts, then redraw so the canvas picks them up.
+  // Load the meme Google Fonts. `fontsReady` remounts the caption node so
+  // Konva re-measures its line wrapping with the real font — a plain redraw
+  // keeps the wrap computed from fallback-font metrics and the text overflows
+  // its box (clipped at the frame edges).
   useEffect(() => {
     let cancelled = false;
     loadMemeFonts().then(() => {
-      if (!cancelled) layerRef.current?.draw();
+      if (!cancelled) setFontsReady(true);
     });
     return () => {
       cancelled = true;
@@ -361,6 +365,7 @@ export function MemeEditor({
           {mounted && (
             <MemeCanvas
               displayScale={displayScale}
+              fontsReady={fontsReady}
               bgImg={bgImg}
               videoEl={videoEl}
               vsize={vsize}

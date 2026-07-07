@@ -39,8 +39,6 @@ export const previewLoaders: Record<
     ),
   "InstagramPost/InstagramPost": () =>
     import("@workspace/compositions/compositions/InstagramPost/InstagramPost"),
-  "KenBurns/KenBurns": () =>
-    import("@workspace/compositions/compositions/KenBurns/KenBurns"),
   "LaptopFrame/LaptopFrame": () =>
     import("@workspace/compositions/compositions/LaptopFrame/LaptopFrame"),
   "LineChart/LineChart": () =>

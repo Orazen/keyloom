@@ -15,7 +15,6 @@ import { githubStarButtonInfo } from "./compositions/GitHubStarButton/meta";
 import { imageSceneInfo } from "./compositions/ImageScene/meta";
 import { instagramMessagesInfo } from "./compositions/InstagramMessages/meta";
 import { instagramPostInfo } from "./compositions/InstagramPost/meta";
-import { kenBurnsInfo } from "./compositions/KenBurns/meta";
 import { lineChartInfo } from "./compositions/LineChart/meta";
 import { lockScreenMessageInfo } from "./compositions/LockScreenMessage/meta";
 import { logoCloudInfo } from "./compositions/LogoCloud/meta";
@@ -72,7 +71,6 @@ export const compositions: AnyCompositionInfo[] = [
   terminalInfo,
   githubStarButtonInfo,
   imageSceneInfo,
-  kenBurnsInfo,
   bounceCardsInfo,
   qrCodeInfo,
   barChartInfo,

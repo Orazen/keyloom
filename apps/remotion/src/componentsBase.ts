@@ -17,7 +17,6 @@ import { GitHubStarButton } from "./compositions/GitHubStarButton/GitHubStarButt
 import { ImageScene } from "./compositions/ImageScene/ImageScene";
 import { InstagramMessages } from "./compositions/InstagramMessages/InstagramMessages";
 import { InstagramPost } from "./compositions/InstagramPost/InstagramPost";
-import { KenBurns } from "./compositions/KenBurns/KenBurns";
 import { LineChart } from "./compositions/LineChart/LineChart";
 import { LockScreenMessage } from "./compositions/LockScreenMessage/LockScreenMessage";
 import { LogoCloud } from "./compositions/LogoCloud/LogoCloud";
@@ -76,7 +75,6 @@ export const componentsByIdBase: Record<string, ComponentType<any>> = {
   Terminal,
   GitHubStarButton,
   ImageScene,
-  KenBurns,
   BounceCards,
   QrCode,
   BarChart,

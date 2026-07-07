@@ -1,31 +1,6 @@
-/**
- * Meme template + background registry.
- *
- * Assets are hosted on the Cloudflare CDN, not in `public/` — set the base in
- * `NEXT_PUBLIC_MEME_CDN` (e.g. https://cdn.yoursite.com). Templates are
- * **background-removed** clips (transparent WebM, VP9 `yuva420p`) so the editor
- * just stacks them over a chosen background — no runtime chroma keying.
- *
- * IMPORTANT: the CDN must send CORS headers (`Access-Control-Allow-Origin`)
- * for these files, otherwise the export canvas gets tainted and download fails.
- * The editor already loads every asset with `crossOrigin="anonymous"`.
- */
+import { cdnAsset } from "@/lib/cdn";
 
-const CDN = (
-  process.env.NEXT_PUBLIC_MEME_CDN ?? "https://cdn.yoursite.com"
-).replace(/\/$/, "");
-
-// By default we serve assets through our same-origin proxy (/api/meme-asset) so
-// the export canvas never taints — works even when the CDN sends no CORS headers
-// (e.g. the r2.dev managed URL). Once you serve the bucket from a custom domain
-// with a CORS policy, set NEXT_PUBLIC_MEME_DIRECT=1 to skip the proxy hop.
-const DIRECT = process.env.NEXT_PUBLIC_MEME_DIRECT === "1";
-
-/** Build the URL the browser loads for a meme asset at `path` (no leading /). */
-export function memeAsset(path: string): string {
-  const direct = `${CDN}/${path.replace(/^\//, "")}`;
-  return DIRECT ? direct : `/api/meme-asset?u=${encodeURIComponent(direct)}`;
-}
+export const memeAsset = cdnAsset;
 
 export type MemeTemplate = {
   id: string;

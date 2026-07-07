@@ -5,6 +5,7 @@ import {
   Film01Icon,
   Folder01Icon,
   FolderLibraryIcon,
+  GameController03Icon,
   Image02Icon,
   LibrariesIcon,
   Logout02Icon,
@@ -82,6 +83,7 @@ const SECTIONS: NavSection[] = [
     items: [
       { label: "Studio", href: "/studio", icon: VideoReplayIcon },
       { label: "Memes", href: "/memes", icon: Image02Icon },
+      { label: "Gameplay", href: "/gameplay", icon: GameController03Icon },
       { label: "Motions", href: "/motions", icon: Film01Icon },
     ],
   },
@@ -165,7 +167,7 @@ export function AppSidebar({ footer }: { footer?: React.ReactNode }) {
                         )}
                       </SidebarMenuButton>
                       {item.badge && (
-                        <SidebarMenuBadge className="rounded-full bg-muted px-1.5 text-[10px] font-medium tracking-wide text-muted-foreground">
+                        <SidebarMenuBadge className="rounded-full bg-blue-500/10 px-1.5 text-[10px] font-medium tracking-wide text-blue-500 peer-hover/menu-button:text-blue-500 peer-data-active/menu-button:text-blue-500">
                           {item.badge}
                         </SidebarMenuBadge>
                       )}
