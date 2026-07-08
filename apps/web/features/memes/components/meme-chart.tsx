@@ -229,12 +229,6 @@ function ChartHero({
         className="absolute inset-0 size-full object-contain"
       />
 
-      <span className="absolute left-4 top-1 font-heading text-7xl font-bold text-white [text-shadow:0_2px_16px_rgba(0,0,0,0.45)]">
-        {entry.rank}
-      </span>
-
-      <HeroBadge entry={entry} />
-
       <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pt-14">
         <div>
           <h2 className="text-lg font-semibold tracking-tight text-white">
@@ -245,7 +239,7 @@ function ChartHero({
           </p>
         </div>
         <Button
-          className="w-full rounded-full bg-pink-500 text-white hover:bg-pink-600"
+          className="w-full rounded-full"
           onClick={() => onSelect(entry.template)}
         >
           Use this template
@@ -253,31 +247,6 @@ function ChartHero({
         </Button>
       </div>
     </section>
-  );
-}
-
-function HeroBadge({ entry }: { entry: ChartEntry }) {
-  const label = entry.isNew
-    ? "New this week"
-    : entry.delta > 0
-      ? `▲${entry.delta} this week`
-      : entry.delta < 0
-        ? `▼${-entry.delta} this week`
-        : "Holding at #1";
-
-  return (
-    <span
-      className={cn(
-        "absolute right-3 top-3 rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white",
-        entry.isNew
-          ? "bg-pink-500"
-          : entry.delta < 0
-            ? "bg-black/50 backdrop-blur-sm"
-            : "bg-emerald-500",
-      )}
-    >
-      {label}
-    </span>
   );
 }
 
@@ -289,6 +258,7 @@ function ChartRow({
   onSelect: (t: MemeTemplate) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const bgSrc = backgroundForTemplate(entry.template.id)?.src;
 
   const play = () => {
     videoRef.current?.play().catch(() => {});
@@ -314,21 +284,28 @@ function ChartRow({
       <Movement entry={entry} />
 
       <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-xl bg-muted/40">
-        <div
-          aria-hidden
-          className="absolute inset-0 dark:opacity-20"
-          style={{
-            backgroundImage: `repeating-linear-gradient(135deg, ${pastelFor(entry.template.id)} 0 6px, transparent 6px 12px)`,
-          }}
-        />
+        {bgSrc ? (
+          // biome-ignore lint/performance/noImgElement: local static preview thumbnail
+          <img
+            src={bgSrc}
+            alt=""
+            className="absolute inset-0 size-full object-cover"
+          />
+        ) : (
+          <div
+            aria-hidden
+            className="absolute inset-0 dark:opacity-15"
+            style={{ backgroundColor: pastelFor(entry.template.id) }}
+          />
+        )}
         <video
           ref={videoRef}
           src={entry.template.src}
           muted
           loop
           playsInline
-          preload="none"
-          className="absolute inset-0 size-full object-contain opacity-0 transition-opacity group-hover:opacity-100"
+          preload="metadata"
+          className="absolute inset-0 size-full object-contain"
         />
       </div>
 
@@ -362,7 +339,7 @@ function ChartRow({
 function Movement({ entry }: { entry: ChartEntry }) {
   if (entry.isNew) {
     return (
-      <span className="w-8 shrink-0 text-center font-mono text-[9px] font-semibold uppercase tracking-[0.1em] text-pink-500">
+      <span className="w-8 shrink-0 text-center font-mono text-[9px] font-semibold uppercase tracking-[0.1em] text-primary">
         New
       </span>
     );
@@ -400,7 +377,7 @@ function Sparkline({ values }: { values: number[] }) {
           key={i}
           className={cn(
             "w-[3px] rounded-full",
-            i === values.length - 1 ? "bg-pink-500" : "bg-border",
+            i === values.length - 1 ? "bg-primary" : "bg-border",
           )}
           style={{ height: `${Math.round(v * 100)}%` }}
         />
