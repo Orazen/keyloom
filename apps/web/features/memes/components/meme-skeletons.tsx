@@ -2,34 +2,31 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 
 export function GallerySkeleton() {
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-2">
-          <Skeleton className="h-8 w-40" />
-          <Skeleton className="h-4 w-64" />
+          <Skeleton className="h-3 w-52" />
+          <Skeleton className="h-8 w-64" />
         </div>
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-8 w-48 rounded-full sm:w-56" />
-          <Skeleton className="h-9 w-40 rounded-full" />
+        <div className="flex items-center gap-1.5">
+          {["all", "a", "b"].map((k) => (
+            <Skeleton key={k} className="h-8 w-20 rounded-full" />
+          ))}
+          <Skeleton className="h-8 w-36 rounded-full sm:w-44" />
         </div>
       </div>
 
-      <Skeleton className="h-44 w-full rounded-2xl" />
-
-      <div className="flex items-center gap-2">
-        {["all", "a", "b", "c"].map((k) => (
-          <Skeleton key={k} className="h-7 w-20 rounded-full" />
-        ))}
-      </div>
-
-      <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <Skeleton
-            // biome-ignore lint/suspicious/noArrayIndexKey: fixed static placeholders
-            key={i}
-            className="aspect-[9/16] w-full rounded-xl"
-          />
-        ))}
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(280px,360px)_1fr]">
+        <Skeleton className="aspect-[9/15] w-full max-w-[360px] rounded-3xl" />
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: 7 }).map((_, i) => (
+            <Skeleton
+              // biome-ignore lint/suspicious/noArrayIndexKey: fixed static placeholders
+              key={i}
+              className="h-[76px] w-full rounded-2xl"
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

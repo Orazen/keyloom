@@ -10,7 +10,7 @@ import {
   memeTemplates,
 } from "@/features/memes/lib/memes";
 import { loadMemeFonts } from "../lib/meme-fonts";
-import { MemeGallery } from "./meme-gallery";
+import { MemeChart } from "./meme-chart";
 import { EditorSkeleton, GallerySkeleton } from "./meme-skeletons";
 
 // Lazy so the Konva-heavy editor bundle loads only when a template is opened.
@@ -64,5 +64,5 @@ export function MemeStudio() {
     );
   }
   if (isPending) return <GallerySkeleton />;
-  return <MemeGallery templates={list} onSelect={(t) => setTemplateId(t.id)} />;
+  return <MemeChart templates={list} onSelect={(t) => setTemplateId(t.id)} />;
 }
