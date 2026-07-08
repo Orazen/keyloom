@@ -17,6 +17,10 @@ export const previewLoaders: Record<
     import("@workspace/compositions/compositions/BrowserWindow/BrowserWindow"),
   "CaptionTrack/CaptionTrack": () =>
     import("@workspace/compositions/compositions/CaptionTrack/CaptionTrack"),
+  "CaptionedVideo/CaptionedVideo": () =>
+    import(
+      "@workspace/compositions/compositions/CaptionedVideo/CaptionedVideo"
+    ),
   "CursorWalkthrough/CursorWalkthrough": () =>
     import(
       "@workspace/compositions/compositions/CursorWalkthrough/CursorWalkthrough"

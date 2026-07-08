@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ClosedCaptionIcon,
   CreditCardIcon,
   Film01Icon,
   Folder01Icon,
@@ -84,6 +85,7 @@ const SECTIONS: NavSection[] = [
       { label: "Studio", href: "/studio", icon: VideoReplayIcon },
       { label: "Memes", href: "/memes", icon: Image02Icon },
       { label: "Gameplay", href: "/gameplay", icon: GameController03Icon },
+      { label: "Captions", href: "/captions", icon: ClosedCaptionIcon },
       { label: "Motions", href: "/motions", icon: Film01Icon },
     ],
   },

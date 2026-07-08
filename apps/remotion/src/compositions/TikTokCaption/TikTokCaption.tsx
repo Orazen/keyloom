@@ -19,6 +19,12 @@ export type TikTokCaptionProps = {
   // Multiplier on the base font size. 1 = medium, 0.7 small, 1.6 huge.
   fontScale?: number;
   clipStyle?: ClipStyle;
+  /**
+   * By default the last phrase lingers through silence (classic TikTok
+   * hold). Captioned-video flows with deletable segments set this so
+   * removed words leave a clean gap instead of holding the prior phrase.
+   */
+  hideWhenInactive?: boolean;
 };
 
 const BASE_FONT_SIZE = 132;
@@ -45,7 +51,7 @@ const HORIZ_TO_TEXT_ALIGN: Record<HAlign, "left" | "center" | "right"> = {
   right: "right",
 };
 
-function groupIntoPhrases(words: CaptionWord[]): CaptionWord[][] {
+export function groupIntoPhrases(words: CaptionWord[]): CaptionWord[][] {
   const phrases: CaptionWord[][] = [];
   let current: CaptionWord[] = [];
   for (const w of words) {
@@ -65,12 +71,15 @@ function groupIntoPhrases(words: CaptionWord[]): CaptionWord[][] {
 
 export type TikTokCaptionLayerProps = Omit<TikTokCaptionProps, "audioUrl">;
 
+const INACTIVE_HOLD_SECONDS = 0.2;
+
 export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
   words,
   captionVAlign = "center",
   captionHAlign = "center",
   fontScale = 1,
   clipStyle,
+  hideWhenInactive = false,
 }) => {
   // Real frame — word timestamps from Whisper are wall-clock seconds, so
   // they must be compared against real time, not the 60fps design frame.
@@ -108,10 +117,16 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
   }
 
   const phrases = groupIntoPhrases(words);
-  const activePhrase =
+  let activePhrase =
     activeIndex >= 0
       ? phrases.find((p) => p.some((w) => w === words[activeIndex]))
       : undefined;
+  if (hideWhenInactive && activePhrase) {
+    const phraseEnd = activePhrase[activePhrase.length - 1]?.end ?? 0;
+    if (timeSeconds > phraseEnd + INACTIVE_HOLD_SECONDS) {
+      activePhrase = undefined;
+    }
+  }
 
   const shortSide = Math.min(width, height);
   const baseSize = (BASE_FONT_SIZE * shortSide) / 1080;

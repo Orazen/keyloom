@@ -1,0 +1,195 @@
+"use client";
+
+import { TextFontIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  FONT_KEYS,
+  FONTS,
+  type FontKey,
+  H_ALIGNS,
+  type HAlign,
+  V_ALIGNS,
+  type VAlign,
+} from "@workspace/compositions/compositions/TikTokCaption/config";
+import { Button } from "@workspace/ui/components/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@workspace/ui/components/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@workspace/ui/components/tooltip";
+import { cn } from "@workspace/ui/lib/utils";
+import type { CaptionStyle } from "./caption-editor";
+
+const SIZE_OPTIONS: { label: string; value: number }[] = [
+  { label: "Small", value: 0.7 },
+  { label: "Medium", value: 1 },
+  { label: "Large", value: 1.3 },
+  { label: "Huge", value: 1.6 },
+];
+
+export function StyleToolbar({
+  style,
+  onStyle,
+}: {
+  style: CaptionStyle;
+  onStyle: (patch: Partial<CaptionStyle>) => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <Select
+        value={style.fontKey}
+        onValueChange={(v) => onStyle({ fontKey: v as FontKey })}
+      >
+        <SelectTrigger size="sm" className="w-40 gap-2">
+          <HugeiconsIcon
+            icon={TextFontIcon}
+            size={14}
+            className="text-muted-foreground"
+          />
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {FONT_KEYS.map((key) => (
+            <SelectItem key={key} value={key}>
+              <span style={{ fontFamily: FONTS[key].cssFamily }}>
+                {FONTS[key].label}
+              </span>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        value={String(style.fontScale)}
+        onValueChange={(v) => onStyle({ fontScale: Number(v) })}
+      >
+        <SelectTrigger size="sm" className="w-28">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {SIZE_OPTIONS.map((s) => (
+            <SelectItem key={s.value} value={String(s.value)}>
+              {s.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Popover>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8 px-2.5">
+                <PositionGlyph vAlign={style.vAlign} hAlign={style.hAlign} />
+              </Button>
+            </PopoverTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Caption position</TooltipContent>
+        </Tooltip>
+        <PopoverContent className="w-auto p-2" align="start">
+          <div className="grid grid-cols-3 gap-1">
+            {V_ALIGNS.map((v) =>
+              H_ALIGNS.map((h) => {
+                const active = style.vAlign === v && style.hAlign === h;
+                return (
+                  <button
+                    key={`${v}-${h}`}
+                    type="button"
+                    onClick={() => onStyle({ vAlign: v, hAlign: h })}
+                    aria-label={`Position ${v} ${h}`}
+                    className={cn(
+                      "flex size-9 items-center justify-center rounded-md border transition-colors",
+                      active
+                        ? "border-primary/50 bg-primary/10"
+                        : "border-transparent hover:bg-muted",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "block size-2 rounded-full",
+                        active ? "bg-primary" : "bg-muted-foreground/40",
+                      )}
+                    />
+                  </button>
+                );
+              }),
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
+
+      <ColorSwatch
+        label="Text color"
+        value={style.textColor}
+        onChange={(v) => onStyle({ textColor: v })}
+      />
+      <ColorSwatch
+        label="Highlight color"
+        value={style.accentColor}
+        onChange={(v) => onStyle({ accentColor: v })}
+      />
+    </div>
+  );
+}
+
+function PositionGlyph({ vAlign, hAlign }: { vAlign: VAlign; hAlign: HAlign }) {
+  const row = vAlign === "top" ? 0 : vAlign === "center" ? 1 : 2;
+  const col = hAlign === "left" ? 0 : hAlign === "center" ? 1 : 2;
+  return (
+    <span className="grid grid-cols-3 gap-[2px]">
+      {Array.from({ length: 9 }, (_, i) => (
+        <span
+          // biome-ignore lint/suspicious/noArrayIndexKey: static 3×3 glyph
+          key={i}
+          className={cn(
+            "size-1 rounded-full",
+            i === row * 3 + col ? "bg-foreground" : "bg-muted-foreground/30",
+          )}
+        />
+      ))}
+    </span>
+  );
+}
+
+function ColorSwatch({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <label className="relative flex size-8 cursor-pointer items-center justify-center rounded-md border border-input shadow-xs transition-colors hover:bg-accent">
+          <input
+            type="color"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="absolute inset-0 size-full cursor-pointer opacity-0"
+            aria-label={label}
+          />
+          <span
+            className="size-4 rounded-full border border-border/60"
+            style={{ backgroundColor: value }}
+          />
+        </label>
+      </TooltipTrigger>
+      <TooltipContent side="bottom">{label}</TooltipContent>
+    </Tooltip>
+  );
+}
