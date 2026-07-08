@@ -2,28 +2,32 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 
 export function GallerySkeleton() {
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="space-y-2">
-          <Skeleton className="h-3 w-52" />
-          <Skeleton className="h-8 w-64" />
+    <div className="px-3 pb-3">
+      <div className="flex min-h-[calc(100dvh-4.25rem)] flex-col rounded-3xl bg-[#0e0f13] px-5 py-5 sm:px-8 sm:py-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-72 bg-white/10" />
+            <Skeleton className="h-4 w-96 max-w-full bg-white/5" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            {["hot", "a", "b"].map((k) => (
+              <Skeleton key={k} className="h-8 w-20 rounded-full bg-white/10" />
+            ))}
+          </div>
         </div>
-        <div className="flex items-center gap-1.5">
-          {["all", "a", "b"].map((k) => (
-            <Skeleton key={k} className="h-8 w-20 rounded-full" />
-          ))}
-          <Skeleton className="h-8 w-36 rounded-full sm:w-44" />
-        </div>
-      </div>
 
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(280px,360px)_1fr]">
-        <Skeleton className="aspect-[9/15] w-full max-w-[360px] rounded-3xl" />
-        <div className="flex flex-col gap-2">
-          {Array.from({ length: 7 }).map((_, i) => (
+        <div className="flex flex-1 items-center justify-center gap-6 pb-16 pt-4">
+          <Skeleton className="hidden h-[min(42vh,380px)] rounded-3xl bg-white/5 [aspect-ratio:9/16] lg:block" />
+          <Skeleton className="h-[min(58vh,540px)] rounded-[1.75rem] bg-white/10 [aspect-ratio:9/16]" />
+          <Skeleton className="hidden h-[min(42vh,380px)] rounded-3xl bg-white/5 [aspect-ratio:9/16] lg:block" />
+        </div>
+
+        <div className="flex items-center justify-center gap-1.5">
+          {Array.from({ length: 8 }).map((_, i) => (
             <Skeleton
               // biome-ignore lint/suspicious/noArrayIndexKey: fixed static placeholders
               key={i}
-              className="h-[76px] w-full rounded-2xl"
+              className="h-14 w-9 rounded-lg bg-white/10"
             />
           ))}
         </div>

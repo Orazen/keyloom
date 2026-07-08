@@ -46,9 +46,11 @@ if (typeof window !== "undefined") {
 
 export function MemeEditor({
   template,
+  initialCaption,
   onBack,
 }: {
   template: MemeTemplate;
+  initialCaption?: string;
   onBack: () => void;
 }) {
   const [background, setBackground] = useState<MemeBackground | null>(
@@ -69,7 +71,11 @@ export function MemeEditor({
     rotation: 0,
   });
   const [textAttrs, setTextAttrs] = useState<TextAttrs>(DEFAULT_TEXT_ATTRS);
-  const [caption, setCaption] = useState<Caption>(DEFAULT_CAPTION);
+  const [caption, setCaption] = useState<Caption>(() =>
+    initialCaption?.trim()
+      ? { ...DEFAULT_CAPTION, text: initialCaption }
+      : DEFAULT_CAPTION,
+  );
 
   const [selected, setSelected] = useState<Selected>(null);
   const [playing, setPlaying] = useState(true);

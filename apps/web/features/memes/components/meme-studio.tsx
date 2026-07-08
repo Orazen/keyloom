@@ -3,15 +3,15 @@
 import { useQuery } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { parseAsString, useQueryState } from "nuqs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   type MemeTemplate,
   memeAsset,
   memeTemplates,
 } from "@/features/memes/lib/memes";
 import { loadMemeFonts } from "../lib/meme-fonts";
-import { MemeChart } from "./meme-chart";
 import { EditorSkeleton, GallerySkeleton } from "./meme-skeletons";
+import { MemeSurf } from "./meme-surf";
 
 // Lazy so the Konva-heavy editor bundle loads only when a template is opened.
 const MemeEditor = dynamic(
@@ -41,6 +41,7 @@ export function MemeStudio() {
     "t",
     parseAsString.withOptions({ history: "push" }),
   );
+  const [caption, setCaption] = useState("");
 
   useEffect(() => {
     loadMemeFonts();
@@ -57,12 +58,33 @@ export function MemeStudio() {
     ? list.find((t) => t.id === templateId)
     : undefined;
 
-  if (templateId && isPending) return <EditorSkeleton />;
+  if (templateId && isPending) {
+    return (
+      <div className="px-5 py-6 sm:px-8 lg:px-10">
+        <EditorSkeleton />
+      </div>
+    );
+  }
   if (selected) {
     return (
-      <MemeEditor template={selected} onBack={() => setTemplateId(null)} />
+      <div className="px-5 py-6 sm:px-8 lg:px-10">
+        <MemeEditor
+          template={selected}
+          initialCaption={caption}
+          onBack={() => setTemplateId(null)}
+        />
+      </div>
     );
   }
   if (isPending) return <GallerySkeleton />;
-  return <MemeChart templates={list} onSelect={(t) => setTemplateId(t.id)} />;
+  return (
+    <div className="px-3 pb-3">
+      <MemeSurf
+        templates={list}
+        caption={caption}
+        onCaptionChange={setCaption}
+        onSelect={(t) => setTemplateId(t.id)}
+      />
+    </div>
+  );
 }
