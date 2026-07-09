@@ -35,6 +35,11 @@ export type CaptionThemeDef = {
   phraseBackground?: string;
   /** Emphasize the spoken word with an accent-colored chip instead of recolor. */
   activeWordBackground?: boolean;
+  /**
+   * Public-folder image path masked into the glyphs via background-clip:
+   * text. Overrides text/accent coloring; pair with shadow "none".
+   */
+  textImage?: string;
 };
 
 export const CAPTION_THEME_LIST: CaptionThemeDef[] = [
@@ -201,6 +206,18 @@ export const CAPTION_THEME_LIST: CaptionThemeDef[] = [
     accentColor: "#f472b6",
     lowercase: true,
     shadow: "glow",
+  },
+  {
+    // Cinematic image-in-text: glyphs masked over ocean water.
+    // Photo: "Água do Mar" by Elvis Boaventura, CC BY 3.0, Wikimedia Commons.
+    id: "ocean",
+    label: "OCEAN",
+    fontKey: "poppins",
+    textColor: "#7dd3fc",
+    accentColor: "#e0f2fe",
+    uppercase: true,
+    shadow: "none",
+    textImage: "images/captions/ocean.jpg",
   },
   {
     // Indie vlog / interview typewriter subtitles.

@@ -211,6 +211,18 @@ function ThemePreviewText({ theme }: { theme: CaptionThemeDef }) {
                 padding: `${fs * 0.08}px ${fs * 0.26}px`,
               }
             : {}),
+        ...(theme.textImage
+          ? {
+              backgroundImage: `url(/${theme.textImage})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center 40%",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+              textShadow: undefined,
+              filter: "brightness(1.35) saturate(1.4)",
+            }
+          : {}),
       }}
     >
       {theme.label}

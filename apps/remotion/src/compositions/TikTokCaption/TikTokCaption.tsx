@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   AbsoluteFill,
+  staticFile,
   useCurrentFrame,
   useCurrentScale,
   useRemotionEnvironment,
@@ -527,10 +528,13 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
       ? ("lowercase" as const)
       : undefined;
 
+  const textImageUrl = theme.textImage ? staticFile(theme.textImage) : null;
+
   const wordStyle = (w: CaptionWord, inline: boolean): React.CSSProperties => {
     const isActive = w === words[activeIndex];
     const chipActive = Boolean(theme.activeWordBackground) && isActive;
     const hollowFill = Boolean(theme.hollow) && !isActive;
+    const imageFill = textImageUrl != null && !chipActive;
     return {
       display: inline ? "inline" : "inline-block",
       fontSize,
@@ -538,16 +542,17 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
       letterSpacing: "-0.01em",
       textTransform,
       fontStyle: theme.italic ? "italic" : undefined,
-      color: hollowFill
-        ? "transparent"
-        : isActive && !chipActive
-          ? s.accent
-          : s.color,
+      color:
+        imageFill || hollowFill
+          ? "transparent"
+          : isActive && !chipActive
+            ? s.accent
+            : s.color,
       WebkitTextStroke: theme.stroke
         ? `${strokeWidth}px ${theme.hollow ? s.color : "#000"}`
         : undefined,
       paintOrder: "stroke fill",
-      textShadow: shadowFor(theme.shadow),
+      textShadow: imageFill ? undefined : shadowFor(theme.shadow),
       // Padding + matching negative margin: the chip paints without
       // shifting word layout as the active word advances.
       ...(chipActive
@@ -556,6 +561,16 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
             borderRadius: fontSize * 0.16,
             padding: `${fontSize * 0.05}px ${fontSize * 0.12}px`,
             margin: `-${fontSize * 0.05}px -${fontSize * 0.12}px`,
+          }
+        : {}),
+      ...(imageFill
+        ? {
+            backgroundImage: `url(${textImageUrl})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center 40%",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            filter: "brightness(1.35) saturate(1.4)",
           }
         : {}),
     };
