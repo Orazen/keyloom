@@ -21,7 +21,7 @@ import { CAPTION_THEMES, DEFAULT_CAPTION_THEME } from "./themes";
 // Single-weight display faces (Anton, Bebas, Lilita) rely on the browser's
 // synthetic bold at 800 — the shipped Classic look. Multi-weight families
 // load a real heavy face instead.
-const WEIGHT_BY_FONT: Partial<Record<FontKey, number>> = {
+export const WEIGHT_BY_FONT: Partial<Record<FontKey, number>> = {
   poppins: 900,
   montserrat: 900,
   inter: 700,

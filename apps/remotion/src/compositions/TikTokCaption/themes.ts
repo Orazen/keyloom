@@ -149,6 +149,28 @@ export const CAPTION_THEME_LIST: CaptionThemeDef[] = [
     activeWordBackground: true,
   },
   {
+    // YouTube-Shorts auto-caption look: black caps in one white rounded box.
+    id: "shorts",
+    label: "SHORTS",
+    fontKey: "montserrat",
+    textColor: "#000000",
+    accentColor: "#dc2626",
+    uppercase: true,
+    shadow: "none",
+    phraseBackground: "#ffffff",
+  },
+  {
+    // Mint caps with a dark outline — the split-screen reaction-clip look.
+    id: "mint",
+    label: "MINT",
+    fontKey: "poppins",
+    textColor: "#4dfadc",
+    accentColor: "#ffffff",
+    uppercase: true,
+    stroke: true,
+    shadow: "soft",
+  },
+  {
     // The clean CapCut "documentary" look: heavy sentence-case type, no
     // stroke, just depth — luxury/self-improvement channels.
     id: "docu",

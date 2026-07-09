@@ -7,6 +7,7 @@ import {
   FONTS,
   type FontKey,
 } from "@workspace/compositions/compositions/TikTokCaption/config";
+import { WEIGHT_BY_FONT } from "@workspace/compositions/compositions/TikTokCaption/TikTokCaption";
 import {
   CAPTION_THEME_LIST,
   type CaptionThemeDef,
@@ -144,12 +145,12 @@ function ThemePicker({
                   })
                 }
                 className={cn(
-                  "flex h-12 items-center justify-center rounded-lg border transition-colors",
+                  "flex h-14 items-center justify-center overflow-hidden rounded-lg border transition-colors",
                   active
                     ? "border-primary/60 ring-1 ring-primary/40"
                     : "border-transparent hover:border-border",
                 )}
-                style={{ backgroundColor: "#3f3f46" }}
+                style={{ backgroundColor: "#1c1c21" }}
                 aria-label={`Theme ${t.label}`}
               >
                 <ThemePreviewText theme={t} />
@@ -162,38 +163,54 @@ function ThemePicker({
   );
 }
 
+// Mirrors TikTokCaption's word styling at thumbnail scale — same weight,
+// proportional stroke, the renderer's shadow formulas, and the accent chip /
+// line pill — so picking a theme gives exactly what the tile shows.
 function ThemePreviewText({ theme }: { theme: CaptionThemeDef }) {
-  const chipBackground = theme.phraseBackground ?? theme.lineBackground;
+  const fs = 15;
+  const chip = Boolean(theme.activeWordBackground);
+  const pill = theme.phraseBackground ?? theme.lineBackground;
+  const shadow =
+    theme.shadow === "none"
+      ? undefined
+      : theme.shadow === "glow"
+        ? `0 0 ${fs * 0.14}px ${theme.accentColor}, 0 0 ${fs * 0.4}px ${theme.accentColor}, 0 ${fs * 0.02}px ${fs * 0.05}px rgba(0,0,0,0.6)`
+        : theme.shadow === "heavy"
+          ? `0 ${fs * 0.05}px ${fs * 0.1}px rgba(0,0,0,0.85), 0 ${fs * 0.12}px ${fs * 0.3}px rgba(0,0,0,0.5)`
+          : `0 ${fs * 0.04}px ${fs * 0.1}px rgba(0,0,0,0.6)`;
   return (
     <span
-      className="px-1.5 text-[13px] leading-none"
       style={{
         fontFamily: FONTS[theme.fontKey].cssFamily,
-        fontWeight: 700,
-        color: theme.hollow ? "transparent" : theme.textColor,
-        WebkitTextStroke: theme.stroke
-          ? `1px ${theme.hollow ? theme.textColor : "#000"}`
-          : undefined,
-        paintOrder: "stroke fill",
+        fontWeight: WEIGHT_BY_FONT[theme.fontKey] ?? 800,
+        fontSize: fs,
+        lineHeight: 1.2,
+        letterSpacing: "-0.01em",
         textTransform: theme.uppercase
           ? "uppercase"
           : theme.lowercase
             ? "lowercase"
             : undefined,
         fontStyle: theme.italic ? "italic" : undefined,
-        textShadow:
-          theme.shadow === "glow"
-            ? `0 0 6px ${theme.accentColor}, 0 0 14px ${theme.accentColor}`
-            : theme.shadow === "none"
-              ? undefined
-              : "0 1px 3px rgba(0,0,0,0.7)",
-        ...(chipBackground
+        color: theme.hollow ? "transparent" : theme.textColor,
+        WebkitTextStroke: theme.stroke
+          ? `${Math.max(1, fs * 0.06)}px ${theme.hollow ? theme.textColor : "#000"}`
+          : undefined,
+        paintOrder: "stroke fill",
+        textShadow: shadow,
+        ...(chip
           ? {
-              background: chipBackground,
-              borderRadius: 5,
-              padding: "3px 8px",
+              background: theme.accentColor,
+              borderRadius: fs * 0.16,
+              padding: `${fs * 0.12}px ${fs * 0.3}px`,
             }
-          : {}),
+          : pill
+            ? {
+                background: pill,
+                borderRadius: fs * 0.22,
+                padding: `${fs * 0.08}px ${fs * 0.26}px`,
+              }
+            : {}),
       }}
     >
       {theme.label}
