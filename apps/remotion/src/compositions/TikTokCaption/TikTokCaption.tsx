@@ -444,21 +444,23 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
 
   const timeSeconds = frame / fps + TIMING_LEAD_SECONDS;
 
+  // Monotone "last word that started" selection. Testing frame time against
+  // each word's [start, end) window skips any word shorter than a frame
+  // (33ms at 30fps) whenever its window falls between two samples — fast
+  // speech loses words entirely. A word turns active at its start (up to
+  // EARLY_POP early, never before the previous word ends) and stays until
+  // the next one takes over, so every word renders for at least one frame.
   let activeIndex = -1;
   for (let i = 0; i < words.length; i++) {
     const w = words[i];
     if (!w) continue;
-    if (timeSeconds >= w.start && timeSeconds < w.end) {
-      activeIndex = i;
-      break;
-    }
-    if (timeSeconds < w.start) {
-      activeIndex = w.start - timeSeconds <= EARLY_POP_SECONDS ? i : i - 1;
-      break;
-    }
-    if (i === words.length - 1 && timeSeconds >= w.end) {
-      activeIndex = i;
-    }
+    const prevEnd = i > 0 ? (words[i - 1]?.end ?? w.start) : 0;
+    const switchAt = Math.max(
+      Math.min(w.start, prevEnd),
+      w.start - EARLY_POP_SECONDS,
+    );
+    if (timeSeconds < switchAt) break;
+    activeIndex = i;
   }
 
   const phrases = groupIntoPhrases(words, maxWordsPerPhrase);
