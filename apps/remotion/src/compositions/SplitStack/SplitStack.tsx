@@ -1,6 +1,6 @@
 "use client";
-import { Video } from "@remotion/media";
 import { AbsoluteFill } from "remotion";
+import { SmartVideo } from "../../smart-video";
 
 export type SplitStackProps = {
   userSrc: string;
@@ -18,7 +18,7 @@ export const SplitStack: React.FC<SplitStackProps> = ({
 }) => {
   const userPanel = (
     <div key="user" style={{ height: `${split * 100}%`, overflow: "hidden" }}>
-      <Video
+      <SmartVideo
         src={userSrc}
         objectFit="cover"
         style={{ width: "100%", height: "100%" }}
@@ -30,7 +30,7 @@ export const SplitStack: React.FC<SplitStackProps> = ({
       key="game"
       style={{ height: `${(1 - split) * 100}%`, overflow: "hidden" }}
     >
-      <Video
+      <SmartVideo
         src={gameSrc}
         muted
         loop

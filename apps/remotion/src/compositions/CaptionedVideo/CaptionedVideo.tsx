@@ -1,7 +1,7 @@
 "use client";
-import { Video } from "@remotion/media";
 import { AbsoluteFill, Sequence, useVideoConfig } from "remotion";
 import type { ClipStyle } from "../../clip-style";
+import { SmartVideo } from "../../smart-video";
 import type { CaptionPos, HAlign, VAlign } from "../TikTokCaption/config";
 import {
   type CaptionWord,
@@ -72,11 +72,12 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
     <AbsoluteFill style={{ backgroundColor: "#000" }}>
       {sequences.map((s) => (
         <Sequence key={s.key} from={s.from} durationInFrames={s.duration}>
-          <Video
+          <SmartVideo
             src={src}
             trimBefore={s.trimBefore}
             trimAfter={s.trimAfter}
-            style={{ width: "100%", height: "100%", objectFit: "contain" }}
+            objectFit="contain"
+            style={{ width: "100%", height: "100%" }}
           />
         </Sequence>
       ))}
