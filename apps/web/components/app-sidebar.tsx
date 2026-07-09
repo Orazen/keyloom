@@ -6,8 +6,9 @@ import {
   Film01Icon,
   Folder01Icon,
   FolderLibraryIcon,
-  GameController03Icon,
+  Home01Icon,
   Image02Icon,
+  LayoutTwoRowIcon,
   LibrariesIcon,
   Logout02Icon,
   Moon02Icon,
@@ -66,6 +67,7 @@ type NavSection = {
 const SECTIONS: NavSection[] = [
   {
     items: [
+      { label: "Home", href: "/home", icon: Home01Icon },
       { label: "Components", href: "/components", icon: LibrariesIcon },
       {
         label: "My Projects",
@@ -84,7 +86,7 @@ const SECTIONS: NavSection[] = [
     items: [
       { label: "Studio", href: "/studio", icon: VideoReplayIcon },
       { label: "Memes", href: "/memes", icon: Image02Icon },
-      { label: "Gameplay", href: "/gameplay", icon: GameController03Icon },
+      { label: "Split Screen", href: "/split", icon: LayoutTwoRowIcon },
       { label: "Captions", href: "/captions", icon: ClosedCaptionIcon },
       { label: "Motions", href: "/motions", icon: Film01Icon },
     ],
