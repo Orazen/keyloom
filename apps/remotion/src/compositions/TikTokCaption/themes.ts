@@ -1,13 +1,17 @@
 import type { FontKey } from "./config";
 
 /**
- * Curated caption looks. A theme bundles the structural traits the four
- * universal style controls can't express (uppercase, stroke, phrase
- * background, active-word chip) with starter values for the controls the
- * user can still tweak afterwards (font, text color, accent).
+ * Curated caption looks modeled on what's actually viral on TikTok:
+ * Hormozi/Dan Koe Montserrat-caps with a color-highlighted keyword,
+ * MrBeast-style heavy display type, native-TikTok per-line pills, CapCut
+ * karaoke word chips, Bebas neon for fitness/motivation, Inter minimal for
+ * design/aesthetic content, and the lowercase-serif "aesthetic" trend.
  *
- * Rendering sticks to plain fills, strokes and shadows so every theme
- * survives @remotion/web-renderer exports unchanged.
+ * A theme bundles the structural traits the four universal style controls
+ * can't express (case, stroke, pills, chips, glow) with starter values for
+ * the controls the user can still tweak afterwards (font, text color,
+ * accent). Rendering sticks to plain fills, strokes and shadows so every
+ * theme survives @remotion/web-renderer exports unchanged.
  */
 export type CaptionThemeDef = {
   id: string;
@@ -18,12 +22,15 @@ export type CaptionThemeDef = {
   accentColor: string;
   /** Structural traits, fixed per theme. */
   uppercase?: boolean;
+  lowercase?: boolean;
   italic?: boolean;
   /** Black outline around glyphs (the classic TikTok look). */
   stroke?: boolean;
   /** Outline-only: glyph fill goes transparent, stroke takes the text color. */
   hollow?: boolean;
-  shadow: "none" | "soft" | "heavy";
+  shadow: "none" | "soft" | "heavy" | "glow";
+  /** Rounded pill painted behind each caption LINE (native TikTok style). */
+  lineBackground?: string;
   /** Solid box painted behind the whole phrase. */
   phraseBackground?: string;
   /** Emphasize the spoken word with an accent-colored chip instead of recolor. */
@@ -41,9 +48,47 @@ export const CAPTION_THEME_LIST: CaptionThemeDef[] = [
     shadow: "soft",
   },
   {
+    id: "hormozi",
+    label: "Hormozi",
+    fontKey: "montserrat",
+    textColor: "#ffffff",
+    accentColor: "#4ade80",
+    uppercase: true,
+    stroke: true,
+    shadow: "heavy",
+  },
+  {
+    id: "beast",
+    label: "Beast",
+    fontKey: "lilitaOne",
+    textColor: "#ffffff",
+    accentColor: "#ffd900",
+    uppercase: true,
+    stroke: true,
+    shadow: "heavy",
+  },
+  {
+    id: "tiktok",
+    label: "TikTok",
+    fontKey: "poppins",
+    textColor: "#ffffff",
+    accentColor: "#25f4ee",
+    shadow: "none",
+    lineBackground: "rgba(0, 0, 0, 0.6)",
+  },
+  {
+    id: "sticker",
+    label: "Sticker",
+    fontKey: "montserrat",
+    textColor: "#111111",
+    accentColor: "#dc2626",
+    shadow: "none",
+    lineBackground: "#ffffff",
+  },
+  {
     id: "karaoke",
     label: "Karaoke",
-    fontKey: "anton",
+    fontKey: "poppins",
     textColor: "#ffffff",
     accentColor: "#22c55e",
     stroke: true,
@@ -51,59 +96,30 @@ export const CAPTION_THEME_LIST: CaptionThemeDef[] = [
     activeWordBackground: true,
   },
   {
-    id: "hormozi",
-    label: "Hormozi",
-    fontKey: "poppins",
+    id: "neon",
+    label: "Neon",
+    fontKey: "bebas",
     textColor: "#ffffff",
-    accentColor: "#4ade80",
+    accentColor: "#22d3ee",
     uppercase: true,
-    shadow: "heavy",
+    shadow: "glow",
   },
   {
-    id: "boxed",
-    label: "Boxed",
-    fontKey: "archivoBlack",
-    textColor: "#111111",
-    accentColor: "#dc2626",
-    shadow: "none",
-    phraseBackground: "#ffffff",
-  },
-  {
-    id: "highlight",
-    label: "Highlight",
-    fontKey: "anton",
-    textColor: "#111111",
-    accentColor: "#7c2d12",
-    shadow: "none",
-    phraseBackground: "#fde047",
-  },
-  {
-    id: "clean",
-    label: "Clean",
-    fontKey: "poppins",
+    id: "minimal",
+    label: "Minimal",
+    fontKey: "inter",
     textColor: "#ffffff",
-    accentColor: "#60a5fa",
+    accentColor: "#93c5fd",
     shadow: "soft",
   },
   {
-    id: "outline",
-    label: "Outline",
-    fontKey: "anton",
-    textColor: "#ffffff",
-    accentColor: "#facc15",
-    uppercase: true,
-    stroke: true,
-    hollow: true,
-    shadow: "none",
-  },
-  {
-    id: "retro",
-    label: "Retro",
-    fontKey: "bebas",
-    textColor: "#fef3c7",
-    accentColor: "#f97316",
+    id: "aesthetic",
+    label: "aesthetic",
+    fontKey: "playfair",
+    textColor: "#fff7ed",
+    accentColor: "#fda4af",
+    lowercase: true,
     italic: true,
-    stroke: true,
     shadow: "soft",
   },
 ];

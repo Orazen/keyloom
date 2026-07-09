@@ -228,25 +228,35 @@ function ThemePicker({
 }
 
 function ThemePreviewText({ theme }: { theme: CaptionThemeDef }) {
+  const chipBackground = theme.phraseBackground ?? theme.lineBackground;
   return (
     <span
       className="px-1.5 text-[13px] leading-none"
       style={{
         fontFamily: FONTS[theme.fontKey].cssFamily,
+        fontWeight: 700,
         color: theme.hollow ? "transparent" : theme.textColor,
         WebkitTextStroke: theme.stroke
           ? `1px ${theme.hollow ? theme.textColor : "#000"}`
           : undefined,
         paintOrder: "stroke fill",
-        textTransform: theme.uppercase ? "uppercase" : undefined,
+        textTransform: theme.uppercase
+          ? "uppercase"
+          : theme.lowercase
+            ? "lowercase"
+            : undefined,
         fontStyle: theme.italic ? "italic" : undefined,
         textShadow:
-          theme.shadow === "none" ? undefined : "0 1px 3px rgba(0,0,0,0.7)",
-        ...(theme.phraseBackground
+          theme.shadow === "glow"
+            ? `0 0 6px ${theme.accentColor}, 0 0 14px ${theme.accentColor}`
+            : theme.shadow === "none"
+              ? undefined
+              : "0 1px 3px rgba(0,0,0,0.7)",
+        ...(chipBackground
           ? {
-              background: theme.phraseBackground,
-              borderRadius: 4,
-              padding: "3px 7px",
+              background: chipBackground,
+              borderRadius: 5,
+              padding: "3px 8px",
             }
           : {}),
       }}
@@ -261,7 +271,8 @@ function ThemeSwatch({ theme }: { theme: CaptionThemeDef }) {
     <span
       className="flex h-4 w-6 items-center justify-center rounded-sm text-[8px] font-bold leading-none"
       style={{
-        backgroundColor: theme.phraseBackground ?? "#3f3f46",
+        backgroundColor:
+          theme.phraseBackground ?? theme.lineBackground ?? "#3f3f46",
         color: theme.hollow ? "transparent" : theme.textColor,
         WebkitTextStroke: theme.hollow ? `0.5px ${theme.textColor}` : undefined,
         fontFamily: FONTS[theme.fontKey].cssFamily,

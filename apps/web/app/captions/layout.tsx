@@ -1,5 +1,14 @@
 import type { Metadata } from "next";
-import { Anton, Archivo_Black, Bebas_Neue, Poppins } from "next/font/google";
+import {
+  Anton,
+  Archivo_Black,
+  Bebas_Neue,
+  Inter,
+  Lilita_One,
+  Montserrat,
+  Playfair_Display,
+  Poppins,
+} from "next/font/google";
 import { AppShell } from "@/components/app-shell";
 
 export const metadata: Metadata = {
@@ -35,6 +44,31 @@ const poppins = Poppins({
   display: "swap",
   variable: "--font-poppins",
 });
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: "900",
+  display: "swap",
+  variable: "--font-montserrat",
+});
+const lilitaOne = Lilita_One({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-lilita-one",
+});
+const inter = Inter({
+  subsets: ["latin"],
+  weight: "700",
+  display: "swap",
+  variable: "--font-inter-caption",
+});
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: "700",
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-playfair",
+});
 
 export default function CaptionsLayout({
   children,
@@ -42,7 +76,7 @@ export default function CaptionsLayout({
   return (
     <AppShell>
       <div
-        className={`${anton.variable} ${bebas.variable} ${archivoBlack.variable} ${poppins.variable} flex h-[calc(100svh-3rem)] flex-col`}
+        className={`${anton.variable} ${bebas.variable} ${archivoBlack.variable} ${poppins.variable} ${montserrat.variable} ${lilitaOne.variable} ${inter.variable} ${playfair.variable} flex h-[calc(100svh-3rem)] flex-col`}
       >
         {children}
       </div>

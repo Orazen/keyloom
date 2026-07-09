@@ -8,8 +8,25 @@ import {
 } from "remotion";
 import { type ClipStyle, resolveClipStyle } from "../../clip-style";
 import { useFontReady } from "../../use-font-ready";
-import { type CaptionPos, FONTS, type HAlign, type VAlign } from "./config";
+import {
+  type CaptionPos,
+  FONTS,
+  type FontKey,
+  fontKeyFromFamily,
+  type HAlign,
+  type VAlign,
+} from "./config";
 import { CAPTION_THEMES, DEFAULT_CAPTION_THEME } from "./themes";
+
+// Single-weight display faces (Anton, Bebas, Lilita) rely on the browser's
+// synthetic bold at 800 — the shipped Classic look. Multi-weight families
+// load a real heavy face instead.
+const WEIGHT_BY_FONT: Partial<Record<FontKey, number>> = {
+  poppins: 900,
+  montserrat: 900,
+  inter: 700,
+  playfair: 700,
+};
 
 export type CaptionWord = {
   start: number;
@@ -440,13 +457,19 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
   const baseSize = (BASE_FONT_SIZE * shortSide) / 1080;
   const fontSize = baseSize * fontScale;
   const strokeWidth = Math.max(2, fontSize * 0.06);
+  const fontWeight = WEIGHT_BY_FONT[fontKeyFromFamily(s.fontFamily)] ?? 800;
 
   const isTransparent = s.background === "transparent";
   const positioned = captionPos != null;
   const boxWidth = captionWidth != null ? captionWidth * width : null;
 
-  const shadowFor = (level: "none" | "soft" | "heavy"): string | undefined => {
+  const shadowFor = (
+    level: "none" | "soft" | "heavy" | "glow",
+  ): string | undefined => {
     if (level === "none") return undefined;
+    if (level === "glow") {
+      return `0 0 ${fontSize * 0.14}px ${s.accent}, 0 0 ${fontSize * 0.4}px ${s.accent}, 0 ${fontSize * 0.02}px ${fontSize * 0.05}px rgba(0,0,0,0.6)`;
+    }
     if (level === "heavy") {
       return `0 ${fontSize * 0.05}px ${fontSize * 0.1}px rgba(0,0,0,0.85), 0 ${fontSize * 0.12}px ${fontSize * 0.3}px rgba(0,0,0,0.5)`;
     }
@@ -455,67 +478,102 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
       : `0 ${fontSize * 0.02}px ${fontSize * 0.04}px rgba(0,0,0,0.5)`;
   };
 
+  const textTransform = theme.uppercase
+    ? ("uppercase" as const)
+    : theme.lowercase
+      ? ("lowercase" as const)
+      : undefined;
+
+  const wordStyle = (w: CaptionWord, inline: boolean): React.CSSProperties => {
+    const isActive = w === words[activeIndex];
+    const chipActive = Boolean(theme.activeWordBackground) && isActive;
+    const hollowFill = Boolean(theme.hollow) && !isActive;
+    return {
+      display: inline ? "inline" : "inline-block",
+      fontSize,
+      fontWeight,
+      letterSpacing: "-0.01em",
+      textTransform,
+      fontStyle: theme.italic ? "italic" : undefined,
+      color: hollowFill
+        ? "transparent"
+        : isActive && !chipActive
+          ? s.accent
+          : s.color,
+      WebkitTextStroke: theme.stroke
+        ? `${strokeWidth}px ${theme.hollow ? s.color : "#000"}`
+        : undefined,
+      paintOrder: "stroke fill",
+      textShadow: shadowFor(theme.shadow),
+      // Padding + matching negative margin: the chip paints without
+      // shifting word layout as the active word advances.
+      ...(chipActive
+        ? {
+            background: s.accent,
+            borderRadius: fontSize * 0.16,
+            padding: `${fontSize * 0.05}px ${fontSize * 0.12}px`,
+            margin: `-${fontSize * 0.05}px -${fontSize * 0.12}px`,
+          }
+        : {}),
+    };
+  };
+
+  // Native-TikTok pill mode: one continuous inline span wraps naturally and
+  // box-decoration-break: clone rounds every line fragment into its own pill.
   const phrase = activePhrase ? (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: `${fontSize * 0.12}px ${fontSize * 0.28}px`,
-        justifyContent: HORIZ_TO_ALIGN[captionHAlign],
-        textAlign: HORIZ_TO_TEXT_ALIGN[captionHAlign],
-        width: boxWidth ?? undefined,
-        maxWidth: boxWidth ?? width * 0.88,
-        lineHeight: 1.05,
-        ...(theme.phraseBackground
-          ? {
-              background: theme.phraseBackground,
-              padding: `${fontSize * 0.16}px ${fontSize * 0.3}px`,
-              borderRadius: fontSize * 0.2,
-            }
-          : {}),
-      }}
-    >
-      {activePhrase.map((w, i) => {
-        const isActive = w === words[activeIndex];
-        const chipActive = Boolean(theme.activeWordBackground) && isActive;
-        const hollowFill = Boolean(theme.hollow) && !isActive;
-        return (
-          <span
-            key={`${w.start}-${i}`}
-            style={{
-              display: "inline-block",
-              fontSize,
-              fontWeight: 800,
-              letterSpacing: "-0.01em",
-              textTransform: theme.uppercase ? "uppercase" : undefined,
-              fontStyle: theme.italic ? "italic" : undefined,
-              color: hollowFill
-                ? "transparent"
-                : isActive && !chipActive
-                  ? s.accent
-                  : s.color,
-              WebkitTextStroke: theme.stroke
-                ? `${strokeWidth}px ${theme.hollow ? s.color : "#000"}`
-                : undefined,
-              paintOrder: "stroke fill",
-              textShadow: shadowFor(theme.shadow),
-              // Padding + matching negative margin: the chip paints without
-              // shifting word layout as the active word advances.
-              ...(chipActive
-                ? {
-                    background: s.accent,
-                    borderRadius: fontSize * 0.16,
-                    padding: `${fontSize * 0.05}px ${fontSize * 0.12}px`,
-                    margin: `-${fontSize * 0.05}px -${fontSize * 0.12}px`,
-                  }
-                : {}),
-            }}
-          >
+    theme.lineBackground ? (
+      <div
+        style={{
+          textAlign: HORIZ_TO_TEXT_ALIGN[captionHAlign],
+          width: boxWidth ?? undefined,
+          maxWidth: boxWidth ?? width * 0.88,
+          lineHeight: 1.55,
+        }}
+      >
+        <span
+          style={{
+            background: theme.lineBackground,
+            WebkitBoxDecorationBreak: "clone",
+            boxDecorationBreak: "clone",
+            borderRadius: fontSize * 0.22,
+            padding: `${fontSize * 0.08}px ${fontSize * 0.26}px`,
+          }}
+        >
+          {activePhrase.map((w, i) => (
+            <span key={`${w.start}-${i}`} style={wordStyle(w, true)}>
+              {w.text}
+              {i < activePhrase.length - 1 ? " " : ""}
+            </span>
+          ))}
+        </span>
+      </div>
+    ) : (
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: `${fontSize * 0.12}px ${fontSize * 0.28}px`,
+          justifyContent: HORIZ_TO_ALIGN[captionHAlign],
+          textAlign: HORIZ_TO_TEXT_ALIGN[captionHAlign],
+          width: boxWidth ?? undefined,
+          maxWidth: boxWidth ?? width * 0.88,
+          lineHeight: 1.05,
+          ...(theme.phraseBackground
+            ? {
+                background: theme.phraseBackground,
+                padding: `${fontSize * 0.16}px ${fontSize * 0.3}px`,
+                borderRadius: fontSize * 0.2,
+              }
+            : {}),
+        }}
+      >
+        {activePhrase.map((w, i) => (
+          <span key={`${w.start}-${i}`} style={wordStyle(w, false)}>
             {w.text}
           </span>
-        );
-      })}
-    </div>
+        ))}
+      </div>
+    )
   ) : null;
 
   const content =
@@ -542,7 +600,7 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
       style={{
         background: isTransparent ? "transparent" : s.background,
         fontFamily: s.fontFamily,
-        fontWeight: 800,
+        fontWeight,
         pointerEvents: "none",
         ...(positioned
           ? {}

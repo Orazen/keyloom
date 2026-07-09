@@ -19,7 +19,15 @@ export type CaptionPos = { x: number; y: number };
 export const V_ALIGNS: VAlign[] = ["top", "center", "bottom"];
 export const H_ALIGNS: HAlign[] = ["left", "center", "right"];
 
-export type FontKey = "anton" | "bebas" | "archivoBlack" | "poppins";
+export type FontKey =
+  | "anton"
+  | "bebas"
+  | "archivoBlack"
+  | "poppins"
+  | "montserrat"
+  | "lilitaOne"
+  | "inter"
+  | "playfair";
 
 export const FONTS: Record<
   FontKey,
@@ -59,6 +67,34 @@ export const FONTS: Record<
     weight: 900,
     cssFamily: "'Poppins', Inter, sans-serif",
   },
+  montserrat: {
+    label: "Montserrat",
+    family: "Montserrat",
+    fallback: "Arial, sans-serif",
+    weight: 900,
+    cssFamily: "'Montserrat', Arial, sans-serif",
+  },
+  lilitaOne: {
+    label: "Lilita One",
+    family: "Lilita One",
+    fallback: "Impact, sans-serif",
+    weight: 400,
+    cssFamily: "'Lilita One', Impact, sans-serif",
+  },
+  inter: {
+    label: "Inter",
+    family: "Inter",
+    fallback: "system-ui, sans-serif",
+    weight: 700,
+    cssFamily: "'Inter', system-ui, sans-serif",
+  },
+  playfair: {
+    label: "Playfair Display",
+    family: "Playfair Display",
+    fallback: "Georgia, serif",
+    weight: 700,
+    cssFamily: "'Playfair Display', Georgia, serif",
+  },
 };
 
 export const FONT_KEYS: FontKey[] = [
@@ -66,6 +102,10 @@ export const FONT_KEYS: FontKey[] = [
   "bebas",
   "archivoBlack",
   "poppins",
+  "montserrat",
+  "lilitaOne",
+  "inter",
+  "playfair",
 ];
 export const DEFAULT_FONT_KEY: FontKey = "anton";
 
@@ -77,6 +117,10 @@ export function fontKeyFromFamily(family: string | undefined): FontKey {
   if (f.includes("bebas")) return "bebas";
   if (f.includes("archivo")) return "archivoBlack";
   if (f.includes("poppins")) return "poppins";
+  if (f.includes("montserrat")) return "montserrat";
+  if (f.includes("lilita")) return "lilitaOne";
+  if (f.includes("playfair")) return "playfair";
+  if (f.includes("inter")) return "inter";
   if (f.includes("anton")) return "anton";
   return DEFAULT_FONT_KEY;
 }

@@ -103,7 +103,9 @@ function ensureGoogleFontLink(family: string): void {
   if (injectedLinks.has(family)) return;
   injectedLinks.add(family);
   const encoded = encodeURIComponent(family).replace(/%20/g, "+");
-  const href = `https://fonts.googleapis.com/css2?family=${encoded}:wght@400;500;600;700&display=block`;
+  // The css2 API silently drops weights/styles a family doesn't ship, so a
+  // broad request is safe for single-weight display fonts like Anton.
+  const href = `https://fonts.googleapis.com/css2?family=${encoded}:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&display=block`;
   // Avoid double-injection if the host page already added it.
   const existing = document.querySelector<HTMLLinkElement>(
     `link[data-remotion-font="${family}"]`,
