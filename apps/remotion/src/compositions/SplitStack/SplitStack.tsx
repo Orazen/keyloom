@@ -31,6 +31,7 @@ export const SplitStack: React.FC<SplitStackProps> = ({
       style={{ height: `${(1 - split) * 100}%`, overflow: "hidden" }}
     >
       <SmartVideo
+        key={gameSrc}
         src={gameSrc}
         muted
         loop

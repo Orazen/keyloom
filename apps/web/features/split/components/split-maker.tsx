@@ -11,6 +11,7 @@ import { Player, type PlayerRef } from "@remotion/player";
 import { SplitStack } from "@workspace/compositions/compositions/SplitStack/SplitStack";
 import { Button } from "@workspace/ui/components/button";
 import { Slider } from "@workspace/ui/components/slider";
+import { WaveSpinner } from "@workspace/ui/components/wave-spinner";
 import { cn } from "@workspace/ui/lib/utils";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -217,6 +218,12 @@ function SplitPreview({
             clickToPlay={false}
             spaceKeyToPlayOrPause
             acknowledgeRemotionLicense
+            showPosterWhenBuffering
+            renderPoster={() => (
+              <div className="flex h-full w-full items-center justify-center bg-black/60">
+                <WaveSpinner />
+              </div>
+            )}
           />
         ) : (
           <p className="max-w-xs px-6 text-center text-sm text-muted-foreground">

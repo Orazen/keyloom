@@ -30,10 +30,6 @@ export function SmartVideo({ objectFit, style, ...props }: SmartVideoProps) {
     return <MediaVideo {...props} objectFit={objectFit} style={style} />;
   }
   return (
-    <Html5Video
-      pauseWhenBuffering={false}
-      {...props}
-      style={{ ...style, objectFit }}
-    />
+    <Html5Video pauseWhenBuffering {...props} style={{ ...style, objectFit }} />
   );
 }
