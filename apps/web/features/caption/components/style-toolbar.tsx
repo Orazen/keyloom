@@ -72,11 +72,15 @@ export function StyleToolbar({
       </Select>
 
       <Select
-        value={String(style.fontScale)}
+        value={
+          SIZE_OPTIONS.some((s) => s.value === style.fontScale)
+            ? String(style.fontScale)
+            : ""
+        }
         onValueChange={(v) => onStyle({ fontScale: Number(v) })}
       >
         <SelectTrigger size="sm" className="w-28">
-          <SelectValue />
+          <SelectValue placeholder={`${Math.round(style.fontScale * 100)}%`} />
         </SelectTrigger>
         <SelectContent>
           {SIZE_OPTIONS.map((s) => (
@@ -102,12 +106,17 @@ export function StyleToolbar({
           <div className="grid grid-cols-3 gap-1">
             {V_ALIGNS.map((v) =>
               H_ALIGNS.map((h) => {
-                const active = style.vAlign === v && style.hAlign === h;
+                const active =
+                  style.position == null &&
+                  style.vAlign === v &&
+                  style.hAlign === h;
                 return (
                   <button
                     key={`${v}-${h}`}
                     type="button"
-                    onClick={() => onStyle({ vAlign: v, hAlign: h })}
+                    onClick={() =>
+                      onStyle({ vAlign: v, hAlign: h, position: null })
+                    }
                     aria-label={`Position ${v} ${h}`}
                     className={cn(
                       "flex size-9 items-center justify-center rounded-md border transition-colors",
@@ -127,6 +136,11 @@ export function StyleToolbar({
               }),
             )}
           </div>
+          {style.position != null ? (
+            <p className="mt-2 max-w-40 text-[11px] leading-snug text-muted-foreground">
+              Custom position (dragged). Pick a preset to snap back.
+            </p>
+          ) : null}
         </PopoverContent>
       </Popover>
 

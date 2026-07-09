@@ -1,12 +1,7 @@
 "use client";
 
-import type { TimeRange } from "@workspace/compositions/compositions/CaptionedVideo/timeline";
-import {
-  buildKeeps,
-  editedDuration,
-  originalToEdited,
-} from "@workspace/compositions/compositions/CaptionedVideo/timeline";
 import type {
+  CaptionPos,
   FontKey,
   HAlign,
   VAlign,
@@ -17,7 +12,6 @@ import { useCallback, useMemo, useReducer, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { TranscribeResponse } from "@/app/api/shorts/transcribe/route";
 import {
-  type Cut,
   probeVideo,
   retimeSegment,
   type Segment,
@@ -32,24 +26,20 @@ import { type ProcessStep, UploadStage } from "./upload-stage";
 
 type DocState = {
   segments: Segment[];
-  cuts: Cut[];
 };
 
 type DocAction =
   | { type: "init"; segments: Segment[] }
   | { type: "edit-segment"; id: string; text: string }
   | { type: "toggle-hidden"; id: string }
-  | { type: "delete-segment"; id: string }
-  | { type: "add-cut"; range: TimeRange }
-  | { type: "remove-cut"; id: string };
+  | { type: "delete-segment"; id: string };
 
 function docReducer(state: DocState, action: DocAction): DocState {
   switch (action.type) {
     case "init":
-      return { segments: action.segments, cuts: [] };
+      return { segments: action.segments };
     case "edit-segment":
       return {
-        ...state,
         segments: state.segments.flatMap((s) => {
           if (s.id !== action.id) return [s];
           const words = retimeSegment(s, action.text);
@@ -58,23 +48,14 @@ function docReducer(state: DocState, action: DocAction): DocState {
       };
     case "toggle-hidden":
       return {
-        ...state,
         segments: state.segments.map((s) =>
           s.id === action.id ? { ...s, hidden: !s.hidden } : s,
         ),
       };
     case "delete-segment":
       return {
-        ...state,
         segments: state.segments.filter((s) => s.id !== action.id),
       };
-    case "add-cut":
-      return {
-        ...state,
-        cuts: [...state.cuts, { ...action.range, id: crypto.randomUUID() }],
-      };
-    case "remove-cut":
-      return { ...state, cuts: state.cuts.filter((c) => c.id !== action.id) };
     default:
       return state;
   }
@@ -85,6 +66,8 @@ export type CaptionStyle = {
   fontScale: number;
   vAlign: VAlign;
   hAlign: HAlign;
+  /** Dragged placement; null falls back to the vAlign/hAlign presets. */
+  position: CaptionPos | null;
   textColor: string;
   accentColor: string;
 };
@@ -94,6 +77,7 @@ const INITIAL_STYLE: CaptionStyle = {
   fontScale: 1,
   vAlign: "bottom",
   hAlign: "center",
+  position: null,
   textColor: "#ffffff",
   accentColor: "#facc15",
 };
@@ -111,12 +95,18 @@ export function CaptionEditor() {
   const [step, setStep] = useState<ProcessStep>("audio");
   const [error, setError] = useState<string | null>(null);
   const [video, setVideo] = useState<VideoMeta | null>(null);
-  const [doc, dispatchDoc] = useReducer(docReducer, {
-    segments: [],
-    cuts: [],
-  });
+  const [doc, dispatchDoc] = useReducer(docReducer, { segments: [] });
   const [style, dispatchStyle] = useReducer(styleReducer, INITIAL_STYLE);
   const busyRef = useRef(false);
+
+  // Stable identity: this feeds the Player's inputProps via drag callbacks —
+  // an inline lambda would churn them on every playhead-driven re-render and
+  // force the whole composition (video elements included) to reconcile per
+  // frame.
+  const patchStyle = useCallback(
+    (patch: Partial<CaptionStyle>) => dispatchStyle({ type: "patch", patch }),
+    [],
+  );
 
   const handleFile = useCallback(
     async (file: File) => {
@@ -162,22 +152,14 @@ export function CaptionEditor() {
     [video],
   );
 
-  const keeps = useMemo(
-    () => (video ? buildKeeps(doc.cuts, video.duration) : []),
-    [doc.cuts, video],
-  );
   const words = useMemo(() => visibleWords(doc.segments), [doc.segments]);
-  const editedSeconds = useMemo(() => editedDuration(keeps), [keeps]);
 
-  const [playheadOriginal, setPlayheadOriginal] = useState(0);
-  const seekRequestRef = useRef<((editedSeconds: number) => void) | null>(null);
+  const [playhead, setPlayhead] = useState(0);
+  const seekRequestRef = useRef<((seconds: number) => void) | null>(null);
 
-  const seekToOriginal = useCallback(
-    (t: number) => {
-      seekRequestRef.current?.(originalToEdited(t, keeps));
-    },
-    [keeps],
-  );
+  const seekTo = useCallback((t: number) => {
+    seekRequestRef.current?.(t);
+  }, []);
 
   if (stage !== "ready" || !video) {
     return (
@@ -195,9 +177,8 @@ export function CaptionEditor() {
       <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
         <SegmentsPanel
           segments={doc.segments}
-          keeps={keeps}
-          playheadOriginal={playheadOriginal}
-          onSeek={seekToOriginal}
+          playhead={playhead}
+          onSeek={seekTo}
           onEdit={(id, text) => dispatchDoc({ type: "edit-segment", id, text })}
           onToggleHidden={(id) => dispatchDoc({ type: "toggle-hidden", id })}
           onDelete={(id) => dispatchDoc({ type: "delete-segment", id })}
@@ -205,15 +186,9 @@ export function CaptionEditor() {
         <PreviewPanel
           video={video}
           words={words}
-          cuts={doc.cuts}
-          keeps={keeps}
-          editedSeconds={editedSeconds}
-          playheadOriginal={playheadOriginal}
           style={style}
-          onStyle={(patch) => dispatchStyle({ type: "patch", patch })}
-          onAddCut={(range) => dispatchDoc({ type: "add-cut", range })}
-          onRemoveCut={(id) => dispatchDoc({ type: "remove-cut", id })}
-          onPlayhead={setPlayheadOriginal}
+          onStyle={patchStyle}
+          onPlayhead={setPlayhead}
           seekRequestRef={seekRequestRef}
           onReplaceVideo={handleFile}
         />

@@ -45,7 +45,7 @@ export function UploadStage({
           </h1>
           <p className="mx-auto max-w-sm text-sm text-muted-foreground">
             Whisper transcribes every word with timestamps. Restyle the
-            captions, trim the dead air, export the MP4.
+            captions, place them anywhere, export the MP4.
           </p>
         </div>
 

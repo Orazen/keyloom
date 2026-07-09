@@ -10,8 +10,6 @@ export type Segment = {
   hidden: boolean;
 };
 
-export type Cut = TimeRange & { id: string };
-
 export type VideoMeta = {
   url: string;
   duration: number;

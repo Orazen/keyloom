@@ -13,6 +13,9 @@ export const ASPECT_RATIOS: AspectRatio[] = ["16:9", "9:16"];
 
 export type VAlign = "top" | "center" | "bottom";
 export type HAlign = "left" | "center" | "right";
+
+/** Free caption placement as fractions of composition size (box center). */
+export type CaptionPos = { x: number; y: number };
 export const V_ALIGNS: VAlign[] = ["top", "center", "bottom"];
 export const H_ALIGNS: HAlign[] = ["left", "center", "right"];
 

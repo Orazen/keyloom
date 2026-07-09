@@ -2,7 +2,7 @@
 import { Video } from "@remotion/media";
 import { AbsoluteFill, Sequence, useVideoConfig } from "remotion";
 import type { ClipStyle } from "../../clip-style";
-import type { HAlign, VAlign } from "../TikTokCaption/config";
+import type { CaptionPos, HAlign, VAlign } from "../TikTokCaption/config";
 import {
   type CaptionWord,
   TikTokCaptionLayer,
@@ -19,8 +19,13 @@ export type CaptionedVideoProps = {
   cuts: TimeRange[];
   captionVAlign?: VAlign;
   captionHAlign?: HAlign;
+  captionPos?: CaptionPos | null;
   fontScale?: number;
   clipStyle?: ClipStyle;
+  /** Player-only: enables drag/resize of the caption box (see TikTokCaption). */
+  editMode?: boolean;
+  onCaptionMove?: (pos: CaptionPos) => void;
+  onCaptionScale?: (fontScale: number) => void;
 };
 
 export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
@@ -30,8 +35,12 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
   cuts,
   captionVAlign,
   captionHAlign,
+  captionPos,
   fontScale,
   clipStyle,
+  editMode,
+  onCaptionMove,
+  onCaptionScale,
 }) => {
   const { fps } = useVideoConfig();
   const keeps = buildKeeps(cuts, durationSec);
@@ -67,9 +76,13 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
         words={editedWords}
         captionVAlign={captionVAlign}
         captionHAlign={captionHAlign}
+        captionPos={captionPos}
         fontScale={fontScale}
         clipStyle={clipStyle}
         hideWhenInactive
+        editMode={editMode}
+        onCaptionMove={onCaptionMove}
+        onCaptionScale={onCaptionScale}
       />
     </AbsoluteFill>
   );

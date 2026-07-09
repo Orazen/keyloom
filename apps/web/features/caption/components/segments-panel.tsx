@@ -7,8 +7,6 @@ import {
   ViewOffSlashIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import type { TimeRange } from "@workspace/compositions/compositions/CaptionedVideo/timeline";
-import { isKept } from "@workspace/compositions/compositions/CaptionedVideo/timeline";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import {
@@ -22,16 +20,14 @@ import { formatRange, type Segment, segmentRange } from "../lib/editor";
 
 export function SegmentsPanel({
   segments,
-  keeps,
-  playheadOriginal,
+  playhead,
   onSeek,
   onEdit,
   onToggleHidden,
   onDelete,
 }: {
   segments: Segment[];
-  keeps: TimeRange[];
-  playheadOriginal: number;
+  playhead: number;
   onSeek: (t: number) => void;
   onEdit: (id: string, text: string) => void;
   onToggleHidden: (id: string) => void;
@@ -40,7 +36,7 @@ export function SegmentsPanel({
   const activeId =
     segments.find((s) => {
       const r = segmentRange(s);
-      return playheadOriginal >= r.start && playheadOriginal < r.end;
+      return playhead >= r.start && playhead < r.end;
     })?.id ?? null;
 
   const wordCount = segments.reduce((sum, s) => sum + s.words.length, 0);
@@ -65,9 +61,8 @@ export function SegmentsPanel({
               <SegmentRow
                 key={seg.id}
                 segment={seg}
-                keeps={keeps}
                 active={seg.id === activeId}
-                playheadOriginal={seg.id === activeId ? playheadOriginal : -1}
+                playhead={seg.id === activeId ? playhead : -1}
                 onSeek={onSeek}
                 onEdit={onEdit}
                 onToggleHidden={onToggleHidden}
@@ -83,18 +78,16 @@ export function SegmentsPanel({
 
 const SegmentRow = memo(function SegmentRow({
   segment,
-  keeps,
   active,
-  playheadOriginal,
+  playhead,
   onSeek,
   onEdit,
   onToggleHidden,
   onDelete,
 }: {
   segment: Segment;
-  keeps: TimeRange[];
   active: boolean;
-  playheadOriginal: number;
+  playhead: number;
   onSeek: (t: number) => void;
   onEdit: (id: string, text: string) => void;
   onToggleHidden: (id: string) => void;
@@ -104,9 +97,6 @@ const SegmentRow = memo(function SegmentRow({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
   const range = segmentRange(segment);
-  const fullyCut = !segment.words.some((w) =>
-    isKept((w.start + w.end) / 2, keeps),
-  );
 
   useEffect(() => {
     if (active && !editing) {
@@ -128,7 +118,7 @@ const SegmentRow = memo(function SegmentRow({
       className={cn(
         "group relative rounded-lg px-3 py-2 transition-colors",
         active ? "bg-accent" : "hover:bg-accent/50",
-        (segment.hidden || fullyCut) && "opacity-50",
+        segment.hidden && "opacity-50",
       )}
     >
       {active ? (
@@ -141,7 +131,7 @@ const SegmentRow = memo(function SegmentRow({
           className="font-mono text-[10px] tabular-nums text-muted-foreground hover:text-foreground"
         >
           {formatRange(range)}
-          {fullyCut ? " · cut" : segment.hidden ? " · hidden" : ""}
+          {segment.hidden ? " · hidden" : ""}
         </button>
         <div className="flex items-center gap-0.5 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
           <RowAction
@@ -186,17 +176,11 @@ const SegmentRow = memo(function SegmentRow({
           className="mt-0.5 w-full text-left text-sm leading-snug"
         >
           {segment.words.map((w, i) => {
-            const mid = (w.start + w.end) / 2;
-            const cut = !isKept(mid, keeps);
-            const speaking =
-              playheadOriginal >= w.start && playheadOriginal < w.end;
+            const speaking = playhead >= w.start && playhead < w.end;
             return (
               <span
                 key={`${w.start}-${w.end}-${w.text}`}
-                className={cn(
-                  cut && "line-through opacity-40",
-                  speaking && "font-semibold text-primary",
-                )}
+                className={cn(speaking && "font-semibold text-primary")}
               >
                 {w.text}
                 {i < segment.words.length - 1 ? " " : ""}
