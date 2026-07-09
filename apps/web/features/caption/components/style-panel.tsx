@@ -1,7 +1,5 @@
 "use client";
 
-import { TextFontIcon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import {
   FONT_KEYS,
   FONTS,
@@ -12,12 +10,6 @@ import {
   CAPTION_THEME_LIST,
   type CaptionThemeDef,
 } from "@workspace/compositions/compositions/TikTokCaption/themes";
-import { Button } from "@workspace/ui/components/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@workspace/ui/components/popover";
 import {
   Select,
   SelectContent,
@@ -25,11 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 import { FILTER_PRESETS } from "../lib/filters";
 import type { CaptionStyle } from "./caption-editor";
@@ -42,7 +29,7 @@ const WORD_OPTIONS: { label: string; value: number }[] = [
   { label: "5 words", value: 5 },
 ];
 
-export function StyleToolbar({
+export function StylePanel({
   style,
   onStyle,
 }: {
@@ -50,102 +37,11 @@ export function StyleToolbar({
   onStyle: (patch: Partial<CaptionStyle>) => void;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <ThemePicker style={style} onStyle={onStyle} />
-
-      <Select
-        value={style.fontKey}
-        onValueChange={(v) => onStyle({ fontKey: v as FontKey })}
-      >
-        <SelectTrigger size="sm" className="w-40 gap-2">
-          <HugeiconsIcon
-            icon={TextFontIcon}
-            size={14}
-            className="text-muted-foreground"
-          />
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {FONT_KEYS.map((key) => (
-            <SelectItem key={key} value={key}>
-              <span style={{ fontFamily: FONTS[key].cssFamily }}>
-                {FONTS[key].label}
-              </span>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <Select
-        value={String(style.wordsPerCaption)}
-        onValueChange={(v) => onStyle({ wordsPerCaption: Number(v) })}
-      >
-        <SelectTrigger size="sm" className="w-28">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {WORD_OPTIONS.map((w) => (
-            <SelectItem key={w.value} value={String(w.value)}>
-              {w.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <Select
-        value={style.filterId}
-        onValueChange={(v) => onStyle({ filterId: v })}
-      >
-        <SelectTrigger size="sm" className="w-28">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {FILTER_PRESETS.map((f) => (
-            <SelectItem key={f.id} value={f.id}>
-              {f.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <ColorSwatch
-        label="Text color"
-        value={style.textColor}
-        onChange={(v) => onStyle({ textColor: v })}
-      />
-      <ColorSwatch
-        label="Highlight color"
-        value={style.accentColor}
-        onChange={(v) => onStyle({ accentColor: v })}
-      />
-    </div>
-  );
-}
-
-function ThemePicker({
-  style,
-  onStyle,
-}: {
-  style: CaptionStyle;
-  onStyle: (patch: Partial<CaptionStyle>) => void;
-}) {
-  const current =
-    CAPTION_THEME_LIST.find((t) => t.id === style.themeId) ??
-    CAPTION_THEME_LIST[0]!;
-  return (
-    <Popover>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 gap-2">
-              <ThemeSwatch theme={current} />
-              {current.label}
-            </Button>
-          </PopoverTrigger>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">Caption theme</TooltipContent>
-      </Tooltip>
-      <PopoverContent className="w-72 p-2" align="start">
+    <section className="rounded-2xl border border-border bg-card shadow-sm">
+      <header className="border-b border-border px-4 py-3">
+        <h2 className="text-sm font-semibold tracking-tight">Style</h2>
+      </header>
+      <div className="flex flex-col gap-4 p-4">
         <div className="grid grid-cols-2 gap-1.5">
           {CAPTION_THEME_LIST.map((t) => {
             const active = t.id === style.themeId;
@@ -175,14 +71,101 @@ function ThemePicker({
             );
           })}
         </div>
-      </PopoverContent>
-    </Popover>
+
+        <LabeledControl label="Font">
+          <Select
+            value={style.fontKey}
+            onValueChange={(v) => onStyle({ fontKey: v as FontKey })}
+          >
+            <SelectTrigger size="sm" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {FONT_KEYS.map((key) => (
+                <SelectItem key={key} value={key}>
+                  <span style={{ fontFamily: FONTS[key].cssFamily }}>
+                    {FONTS[key].label}
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </LabeledControl>
+
+        <div className="grid grid-cols-2 gap-3">
+          <LabeledControl label="Words at a time">
+            <Select
+              value={String(style.wordsPerCaption)}
+              onValueChange={(v) => onStyle({ wordsPerCaption: Number(v) })}
+            >
+              <SelectTrigger size="sm" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {WORD_OPTIONS.map((w) => (
+                  <SelectItem key={w.value} value={String(w.value)}>
+                    {w.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </LabeledControl>
+
+          <LabeledControl label="Filter">
+            <Select
+              value={style.filterId}
+              onValueChange={(v) => onStyle({ filterId: v })}
+            >
+              <SelectTrigger size="sm" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {FILTER_PRESETS.map((f) => (
+                  <SelectItem key={f.id} value={f.id}>
+                    {f.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </LabeledControl>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <ColorSwatch
+            label="Text"
+            value={style.textColor}
+            onChange={(v) => onStyle({ textColor: v })}
+          />
+          <ColorSwatch
+            label="Highlight"
+            value={style.accentColor}
+            onChange={(v) => onStyle({ accentColor: v })}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function LabeledControl({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-xs font-medium text-muted-foreground">{label}</span>
+      {children}
+    </div>
   );
 }
 
 // Mirrors TikTokCaption's word styling at thumbnail scale — same weight,
 // proportional stroke, the renderer's shadow formulas, and the accent chip /
-// line pill — so picking a theme gives exactly what the tile shows.
+// line pill / phrase box treatments — so picking a theme gives exactly what
+// the tile shows.
 function ThemePreviewText({ theme }: { theme: CaptionThemeDef }) {
   const fs = 15;
   const chip = Boolean(theme.activeWordBackground);
@@ -247,23 +230,6 @@ function ThemePreviewText({ theme }: { theme: CaptionThemeDef }) {
   );
 }
 
-function ThemeSwatch({ theme }: { theme: CaptionThemeDef }) {
-  return (
-    <span
-      className="flex h-4 w-6 items-center justify-center rounded-sm text-[8px] font-bold leading-none"
-      style={{
-        backgroundColor:
-          theme.phraseBackground ?? theme.lineBackground ?? "#3f3f46",
-        color: theme.hollow ? "transparent" : theme.textColor,
-        WebkitTextStroke: theme.hollow ? `0.5px ${theme.textColor}` : undefined,
-        fontFamily: FONTS[theme.fontKey].cssFamily,
-      }}
-    >
-      Aa
-    </span>
-  );
-}
-
 function ColorSwatch({
   label,
   value,
@@ -274,23 +240,21 @@ function ColorSwatch({
   onChange: (v: string) => void;
 }) {
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <label className="relative flex size-8 cursor-pointer items-center justify-center rounded-md border border-input shadow-xs transition-colors hover:bg-accent">
-          <input
-            type="color"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            className="absolute inset-0 size-full cursor-pointer opacity-0"
-            aria-label={label}
-          />
-          <span
-            className="size-4 rounded-full border border-border/60"
-            style={{ backgroundColor: value }}
-          />
-        </label>
-      </TooltipTrigger>
-      <TooltipContent side="bottom">{label}</TooltipContent>
-    </Tooltip>
+    <label className="flex cursor-pointer items-center gap-2">
+      <span className="relative flex size-8 items-center justify-center rounded-md border border-input shadow-xs transition-colors hover:bg-accent">
+        <input
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="absolute inset-0 size-full cursor-pointer opacity-0"
+          aria-label={label}
+        />
+        <span
+          className="size-4 rounded-full border border-border/60"
+          style={{ backgroundColor: value }}
+        />
+      </span>
+      <span className="text-xs font-medium text-muted-foreground">{label}</span>
+    </label>
   );
 }

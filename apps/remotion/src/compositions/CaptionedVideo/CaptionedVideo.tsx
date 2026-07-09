@@ -2,6 +2,7 @@
 import { useRef } from "react";
 import { AbsoluteFill, Sequence, useVideoConfig } from "remotion";
 import type { ClipStyle } from "../../clip-style";
+import { SmartAudio } from "../../smart-audio";
 import { SmartVideo } from "../../smart-video";
 import type { CaptionPos, HAlign, VAlign } from "../TikTokCaption/config";
 import {
@@ -24,6 +25,8 @@ export type CaptionedVideoProps = {
   captionWidth?: number | null;
   /** CSS filter applied to the source video (color grades, B&W, …). */
   videoFilter?: string;
+  /** Background music, looped under the video's own audio. */
+  music?: { src: string; volume: number } | null;
   fontScale?: number;
   maxWordsPerPhrase?: number;
   clipStyle?: ClipStyle;
@@ -41,6 +44,7 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
   words,
   cuts,
   videoFilter,
+  music,
   captionVAlign,
   captionHAlign,
   captionPos,
@@ -90,6 +94,7 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
           />
         </Sequence>
       ))}
+      {music ? <SmartAudio src={music.src} loop volume={music.volume} /> : null}
       <TikTokCaptionLayer
         words={editedWords}
         captionVAlign={captionVAlign}

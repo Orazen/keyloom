@@ -21,39 +21,26 @@ type WebRenderArgs = Parameters<typeof renderMediaOnWeb>[0];
 type WebRenderResult = Awaited<ReturnType<typeof renderMediaOnWeb>>;
 
 // Same ladder as the captions export: hardware encoders reject some configs
-// outright instead of falling back, so retry down the ladder on
-// encoder-config errors only.
+// outright instead of falling back, and can crash mid-render with opaque
+// internal errors — retry the whole ladder on any non-abort failure so the
+// software rung can rescue a flaky hardware path.
 const ACCELERATION_FALLBACK: WebRendererHardwareAcceleration[] = [
   "prefer-hardware",
   "no-preference",
   "prefer-software",
 ];
 
-function isEncoderConfigError(err: unknown): boolean {
-  const msg = err instanceof Error ? err.message : String(err);
-  return /not supported by this browser|encoder configuration|hardware acceleration|configuration is not supported|isConfigSupported/i.test(
-    msg,
-  );
-}
-
 async function renderWithFallback(
   baseOptions: Omit<WebRenderArgs, "hardwareAcceleration">,
 ): Promise<WebRenderResult> {
   const { renderMediaOnWeb } = await import("@remotion/web-renderer");
   let lastError: unknown;
-  for (let i = 0; i < ACCELERATION_FALLBACK.length; i++) {
-    const hardwareAcceleration = ACCELERATION_FALLBACK[i]!;
+  for (const hardwareAcceleration of ACCELERATION_FALLBACK) {
     try {
       return await renderMediaOnWeb({ ...baseOptions, hardwareAcceleration });
     } catch (err) {
       lastError = err;
       if (baseOptions.signal?.aborted) throw err;
-      if (
-        i === ACCELERATION_FALLBACK.length - 1 ||
-        !isEncoderConfigError(err)
-      ) {
-        throw err;
-      }
     }
   }
   throw lastError;

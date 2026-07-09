@@ -1,10 +1,16 @@
 import { ListObjectsV2Command, S3Client } from "@aws-sdk/client-s3";
 
 const VIDEO_EXT = /\.(webm|mp4|mov|m4v)$/i;
+const AUDIO_EXT = /\.(mp3|m4a|wav|ogg|aac|flac)$/i;
 
 export type R2Video = { id: string; title: string; key: string };
 export type R2ListResult = {
   videos: R2Video[];
+  configured: boolean;
+  error?: string;
+};
+export type R2AudioResult = {
+  tracks: R2Video[];
   configured: boolean;
   error?: string;
 };
@@ -19,9 +25,26 @@ function titleCase(base: string): string {
   return words.replace(/\b\w/g, (c) => c.toUpperCase()) || base || "Video";
 }
 
+export async function listR2Audio(prefix: string): Promise<R2AudioResult> {
+  const { videos, configured, error } = await listR2Objects(
+    prefix,
+    AUDIO_EXT,
+    titleCase,
+  );
+  return { tracks: videos, configured, error };
+}
+
 export async function listR2Videos(
   prefix: string,
   titleize: (base: string) => string = titleCase,
+): Promise<R2ListResult> {
+  return listR2Objects(prefix, VIDEO_EXT, titleize);
+}
+
+async function listR2Objects(
+  prefix: string,
+  ext: RegExp,
+  titleize: (base: string) => string,
 ): Promise<R2ListResult> {
   const accountId = env("R2_ACCOUNT_ID");
   const accessKeyId = env("R2_ACCESS_KEY_ID");
@@ -53,8 +76,8 @@ export async function listR2Videos(
       );
       for (const obj of out.Contents ?? []) {
         const key = obj.Key;
-        if (!key || key.endsWith("/") || !VIDEO_EXT.test(key)) continue;
-        const base = (key.split("/").pop() ?? key).replace(VIDEO_EXT, "");
+        if (!key || key.endsWith("/") || !ext.test(key)) continue;
+        const base = (key.split("/").pop() ?? key).replace(ext, "");
         videos.push({ id: base, title: titleize(base), key });
       }
       ContinuationToken = out.IsTruncated

@@ -13,8 +13,8 @@ import type { VideoMeta } from "../lib/editor";
 import { CAPTION_FPS, downloadBlob, exportCaptionedVideo } from "../lib/export";
 import { FILTERS_BY_ID } from "../lib/filters";
 import type { CaptionStyle } from "./caption-editor";
+import type { MusicTrack } from "./music-panel";
 import { PlayerControls } from "./player-controls";
-import { StyleToolbar } from "./style-toolbar";
 
 const NO_CUTS: { start: number; end: number }[] = [];
 
@@ -22,6 +22,7 @@ export function PreviewPanel({
   video,
   words,
   style,
+  music,
   onStyle,
   onPlayhead,
   seekRequestRef,
@@ -30,6 +31,7 @@ export function PreviewPanel({
   video: VideoMeta;
   words: CaptionWord[];
   style: CaptionStyle;
+  music: MusicTrack | null;
   onStyle: (patch: Partial<CaptionStyle>) => void;
   onPlayhead: (seconds: number) => void;
   seekRequestRef: React.MutableRefObject<((seconds: number) => void) | null>;
@@ -52,6 +54,7 @@ export function PreviewPanel({
       words,
       cuts: NO_CUTS,
       videoFilter: FILTERS_BY_ID[style.filterId]?.css,
+      music: music ? { src: music.src, volume: music.volume } : null,
       captionVAlign: style.vAlign,
       captionHAlign: style.hAlign,
       captionPos: style.position,
@@ -66,7 +69,7 @@ export function PreviewPanel({
         accent: style.accentColor,
       },
     }),
-    [video, words, style],
+    [video, words, style, music],
   );
 
   // Edit affordances (drag to move, corner handles to resize) live only on
@@ -140,7 +143,9 @@ export function PreviewPanel({
   return (
     <section className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
-        <StyleToolbar style={style} onStyle={onStyle} />
+        <span className="min-w-0 truncate text-sm font-medium text-muted-foreground">
+          {video.filename}
+        </span>
         <div className="ml-auto flex items-center gap-2">
           <Button
             variant="ghost"

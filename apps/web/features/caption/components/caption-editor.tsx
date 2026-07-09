@@ -21,8 +21,10 @@ import {
   visibleWords,
 } from "../lib/editor";
 import { prepareWhisperAudio } from "../lib/extract-audio";
+import { MusicPanel, type MusicTrack } from "./music-panel";
 import { PreviewPanel } from "./preview-panel";
 import { SegmentsPanel } from "./segments-panel";
+import { StylePanel } from "./style-panel";
 import { type ProcessStep, UploadStage } from "./upload-stage";
 
 type DocState = {
@@ -109,6 +111,7 @@ export function CaptionEditor() {
   const [video, setVideo] = useState<VideoMeta | null>(null);
   const [doc, dispatchDoc] = useReducer(docReducer, { segments: [] });
   const [style, dispatchStyle] = useReducer(styleReducer, INITIAL_STYLE);
+  const [music, setMusic] = useState<MusicTrack | null>(null);
   const busyRef = useRef(false);
 
   // Stable identity: this feeds the Player's inputProps via drag callbacks —
@@ -187,18 +190,25 @@ export function CaptionEditor() {
   return (
     <TooltipProvider delayDuration={300}>
       <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
-        <SegmentsPanel
-          segments={doc.segments}
-          playhead={playhead}
-          onSeek={seekTo}
-          onEdit={(id, text) => dispatchDoc({ type: "edit-segment", id, text })}
-          onToggleHidden={(id) => dispatchDoc({ type: "toggle-hidden", id })}
-          onDelete={(id) => dispatchDoc({ type: "delete-segment", id })}
-        />
+        <aside className="flex w-full flex-col gap-4 overflow-y-auto pb-1 lg:w-[380px] lg:shrink-0">
+          <StylePanel style={style} onStyle={patchStyle} />
+          <MusicPanel music={music} onChange={setMusic} />
+          <SegmentsPanel
+            segments={doc.segments}
+            playhead={playhead}
+            onSeek={seekTo}
+            onEdit={(id, text) =>
+              dispatchDoc({ type: "edit-segment", id, text })
+            }
+            onToggleHidden={(id) => dispatchDoc({ type: "toggle-hidden", id })}
+            onDelete={(id) => dispatchDoc({ type: "delete-segment", id })}
+          />
+        </aside>
         <PreviewPanel
           video={video}
           words={words}
           style={style}
+          music={music}
           onStyle={patchStyle}
           onPlayhead={setPlayhead}
           seekRequestRef={seekRequestRef}
