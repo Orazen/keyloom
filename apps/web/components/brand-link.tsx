@@ -13,7 +13,7 @@ export function BrandLink() {
         className="size-5"
       />
       <span className="font-heading text-[15px] font-semibold tracking-tight">
-        Keyloom
+        Clipbun
       </span>
     </Link>
   );

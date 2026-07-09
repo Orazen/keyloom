@@ -2,7 +2,7 @@
  * Thin server-side client for upload-post.com — our social posting provider.
  *
  * upload-post hosts the per-user OAuth connection (so we never touch Meta App
- * Review / TikTok audit) and handles scheduling. We map each Keyloom user to an
+ * Review / TikTok audit) and handles scheduling. We map each Clipbun user to an
  * upload-post "profile" keyed by their user id.
  *
  * Auth: every request sends `Authorization: Apikey <UPLOAD_POST_API_KEY>`. The
@@ -49,7 +49,7 @@ async function call<T>(
   return data as T;
 }
 
-/** Stable upload-post profile name for a Keyloom user. */
+/** Stable upload-post profile name for a Clipbun user. */
 export function profileFor(userId: string): string {
   return `kl_${userId}`;
 }

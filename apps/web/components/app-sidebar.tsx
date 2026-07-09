@@ -132,7 +132,7 @@ export function AppSidebar({ footer }: { footer?: React.ReactNode }) {
               className="size-6 shrink-0"
             />
             <span className="font-heading text-base font-semibold tracking-tight group-data-[collapsible=icon]:hidden">
-              Keyloom
+              Clipbun
             </span>
           </Link>
         </SidebarHeader>

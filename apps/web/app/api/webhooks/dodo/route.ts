@@ -28,7 +28,7 @@ function parseDate(value: unknown): Date | undefined {
   return undefined;
 }
 
-/** Maps a Dodo event's subscription/customer back to a keyloom user — by the
+/** Maps a Dodo event's subscription/customer back to a clipbun user — by the
  *  metadata we set at checkout, falling back to the customer email. */
 async function resolveUserId(
   data: Record<string, unknown>,

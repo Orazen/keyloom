@@ -219,7 +219,7 @@ export async function renderProjectLocally({
   });
 
   const blob = await result.getBlob();
-  const filename = `keyloom-${new Date()
+  const filename = `clipbun-${new Date()
     .toISOString()
     .replace(/[:.]/g, "-")
     .slice(0, 19)}.mp4`;

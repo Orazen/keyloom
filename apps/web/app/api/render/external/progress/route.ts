@@ -104,7 +104,7 @@ export async function POST(request: Request) {
         progress.outKey,
         typeof body.filename === "string"
           ? body.filename
-          : `keyloom-${body.renderId}.mp4`,
+          : `clipbun-${body.renderId}.mp4`,
       ),
     });
   } catch (err) {

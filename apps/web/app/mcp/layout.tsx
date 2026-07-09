@@ -3,7 +3,7 @@ import { AppShell } from "@/components/app-shell";
 
 export const metadata: Metadata = {
   title: "MCP",
-  description: "Connect Keyloom to Claude Code, Cursor, and other MCP clients.",
+  description: "Connect Clipbun to Claude Code, Cursor, and other MCP clients.",
 };
 
 export default function McpLayout({

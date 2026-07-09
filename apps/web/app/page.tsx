@@ -9,7 +9,7 @@ import { HeroReelBadges } from "@/components/landing/hero-reel-badges";
 import NavbarMenuFull from "@/components/landing/navbar-menu";
 import { PhoneMockup } from "@/components/landing/phone-mockup";
 import { ViralSection } from "@/components/landing/viral-section";
-import { WhyKeyloom } from "@/components/landing/why-keyloom";
+import { WhyClipbun } from "@/components/landing/why-clipbun";
 import { SiteFooter } from "@/components/site-footer";
 
 export default function LandingPage() {
@@ -79,7 +79,7 @@ export default function LandingPage() {
         </div>
       </main>
 
-      <WhyKeyloom />
+      <WhyClipbun />
 
       <ComponentShowcase />
 

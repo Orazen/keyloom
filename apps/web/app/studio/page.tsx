@@ -6,7 +6,7 @@ import { Builder } from "@/features/studio/components/builder";
 export const metadata: Metadata = {
   title: "Studio",
   description:
-    "Compose, preview, and export Remotion videos in the Keyloom editor.",
+    "Compose, preview, and export Remotion videos in the Clipbun editor.",
 };
 
 export default function StudioPage() {

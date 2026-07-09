@@ -34,7 +34,7 @@ function dodoClient(): DodoPayments {
 
 /**
  * Creates a Dodo checkout session for the Pro subscription and returns the
- * hosted checkout URL to redirect the user to. The keyloom user id is stashed
+ * hosted checkout URL to redirect the user to. The clipbun user id is stashed
  * in `metadata` so the webhook can map the resulting subscription back to them.
  */
 export async function createProCheckout(opts: {
@@ -53,6 +53,8 @@ export async function createProCheckout(opts: {
   const session = await client.checkoutSessions.create({
     product_cart: [{ product_id: productId, quantity: 1 }],
     customer: { email: opts.email, name: opts.name ?? opts.email },
+    // Key name predates the Clipbun rename. Live subscriptions in Dodo carry
+    // it, so renaming would orphan every existing paying customer.
     metadata: { keyloom_user_id: opts.userId },
     return_url: opts.returnUrl,
   });
@@ -91,7 +93,7 @@ export type ActiveDodoSubscription = {
  *      `metadata` field is documented as payment-level, and `subscription_data`
  *      has no metadata field), so the id is frequently absent here.
  *   2. EMAIL FALLBACK — match the customer email, but ONLY for subscriptions
- *      that are NOT tagged for some *other* keyloom user. Without this a real
+ *      that are NOT tagged for some *other* clipbun user. Without this a real
  *      payment leaves the account on Free whenever Dodo drops the metadata.
  *
  * The email fallback is safe because `reconcileProFromDodo` only runs when the
@@ -120,7 +122,7 @@ export async function findActiveDodoSubscription(opts: {
     (s) => !!opts.userId && s.metadata?.keyloom_user_id === opts.userId,
   );
   // 2) Email fallback — only untagged subscriptions, so we never hijack one
-  //    Dodo explicitly tagged for a different keyloom account.
+  //    Dodo explicitly tagged for a different clipbun account.
   if (!match && wantEmail) {
     match = active.find(
       (s) =>

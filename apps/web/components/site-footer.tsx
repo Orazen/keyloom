@@ -85,10 +85,10 @@ export function SiteFooter() {
                   height={28}
                   className="size-7"
                 />
-                <span className="text-xl font-semibold">Keyloom</span>
+                <span className="text-xl font-semibold">Clipbun</span>
               </Link>
               <p className="mt-5 text-pretty text-sm leading-relaxed text-white/85">
-                Keyloom is a library of cinematic scenes for Remotion — browse,
+                Clipbun is a library of cinematic scenes for Remotion — browse,
                 preview, and drop them straight into a video. Built for creators
                 who want polished motion without starting from scratch.
               </p>

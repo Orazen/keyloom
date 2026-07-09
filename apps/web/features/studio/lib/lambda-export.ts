@@ -131,7 +131,7 @@ async function runLambdaRender(
           filename:
             progress.filename ??
             render.filename ??
-            `keyloom-${render.renderId}.mp4`,
+            `clipbun-${render.renderId}.mp4`,
         };
       }
 

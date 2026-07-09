@@ -51,7 +51,7 @@ Add to the client's MCP config:
 ```json
 {
   "mcpServers": {
-    "keyloom-video": {
+    "clipbun-video": {
       "command": "bun",
       "args": ["run", "--cwd", "/ABSOLUTE/PATH/TO/aesthetic/apps/web", "mcp"]
     }

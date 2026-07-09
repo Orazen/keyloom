@@ -12,7 +12,7 @@ const id = (prefix: string) =>
     .primaryKey()
     .$defaultFn(() => `${prefix}_${nanoid(24)}`);
 
-/** A keyloom user. `id` is the WorkOS user id (auth is delegated to WorkOS). */
+/** A clipbun user. `id` is the WorkOS user id (auth is delegated to WorkOS). */
 export const users = pgTable("users", {
   id: text("id").primaryKey(), // WorkOS user id
   email: text("email").notNull(),

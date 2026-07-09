@@ -6,7 +6,7 @@ import Link from "next/link";
 import { CreatorPreviewCard } from "@/components/creators/creator-preview-card";
 
 export const metadata: Metadata = {
-  title: "Creators — Keyloom",
+  title: "Creators — Clipbun",
   description:
     "Components built for short-form creators — TikTok-style captions, vertical voiceover tools, and viral-content scenes.",
 };

@@ -254,7 +254,7 @@
       "compositionId": "GitHubStarButton",
       "props": {
         "owner": "theexperiencecompany",
-        "repo": "keyloom",
+        "repo": "clipbun",
         "startCount": 1240,
         "endCount": 1872,
         "theme": "light"
@@ -269,7 +269,7 @@
       "id": "clip-16",
       "compositionId": "TweetCard",
       "props": {
-        "displayName": "Keyloom",
+        "displayName": "Clipbun",
         "handle": "@motionstudio",
         "avatarUrl": "https://avatars.githubusercontent.com/theexperiencecompany?s=200",
         "verified": "yes",
@@ -428,7 +428,7 @@
         "contactName": "general",
         "messages": [
           {
-            "text": "ship keyloom v1?",
+            "text": "ship clipbun v1?",
             "side": "left",
             "typingFrames": 30,
             "delay": 12
@@ -464,7 +464,7 @@
       "id": "clip-22",
       "compositionId": "DiscordMessages",
       "props": {
-        "contactName": "keyloom",
+        "contactName": "clipbun",
         "messages": [
           {
             "text": "tried the new charts?",
@@ -626,7 +626,7 @@
       "compositionId": "TitleSlideUp",
       "props": {
         "headline": "Ship the reel.",
-        "subtitle": "keyloom.heygaia.io"
+        "subtitle": "clipbun.heygaia.io"
       },
       "durationInFrames": 168,
       "transition": {

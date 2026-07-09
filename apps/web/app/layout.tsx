@@ -18,8 +18,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: {
-    default: "Keyloom — Cinematic scenes for Remotion",
-    template: "%s — Keyloom",
+    default: "Clipbun — Cinematic scenes for Remotion",
+    template: "%s — Clipbun",
   },
   description:
     "A library of cinematic scenes for Remotion. No After Effects, no animation team — drop in, render, ship.",

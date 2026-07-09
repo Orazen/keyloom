@@ -64,7 +64,7 @@ export function forkToProject(fork: UserComponent): Project {
  * caller navigates to /studio, where the Builder loads + clears it on mount.
  * Used for forks, whose source code is too large for a URL param.
  */
-const STUDIO_OPEN_KEY = "keyloom-studio-open";
+const STUDIO_OPEN_KEY = "clipbun-studio-open";
 
 export function stashStudioProject(project: Project): void {
   if (typeof window === "undefined") return;

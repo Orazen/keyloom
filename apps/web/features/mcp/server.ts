@@ -1,5 +1,5 @@
 /**
- * Keyloom MCP server — the thin "face" over the feature logic in this folder.
+ * Clipbun MCP server — the thin "face" over the feature logic in this folder.
  *
  * It exposes four deterministic tools (no LLM in the server; the MCP client's
  * model does the field-filling):
@@ -19,7 +19,7 @@ import { getComponentSchema, listComponents } from "./components";
 import { renderComponent, renderProject } from "./render";
 import type { ProjectClipInput } from "./types";
 
-const server = new McpServer({ name: "keyloom-video", version: "0.1.0" });
+const server = new McpServer({ name: "clipbun-video", version: "0.1.0" });
 
 type ToolResult = {
   content: { type: "text"; text: string }[];

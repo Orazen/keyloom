@@ -166,7 +166,7 @@ export function NavbarWithMenu({ sections }: { sections: NavMenuSection[] }) {
             height={20}
             className="size-5"
           />
-          <span className="text-sm font-semibold">Keyloom</span>
+          <span className="text-sm font-semibold">Clipbun</span>
         </Link>
 
         <div className="ml-auto flex shrink-0 items-center gap-1">
