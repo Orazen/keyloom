@@ -20,12 +20,15 @@ export type CaptionedVideoProps = {
   captionVAlign?: VAlign;
   captionHAlign?: HAlign;
   captionPos?: CaptionPos | null;
+  captionWidth?: number | null;
   fontScale?: number;
   clipStyle?: ClipStyle;
+  clipTheme?: string;
   /** Player-only: enables drag/resize of the caption box (see TikTokCaption). */
   editMode?: boolean;
   onCaptionMove?: (pos: CaptionPos) => void;
   onCaptionScale?: (fontScale: number) => void;
+  onCaptionWidth?: (widthFrac: number) => void;
 };
 
 export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
@@ -36,11 +39,14 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
   captionVAlign,
   captionHAlign,
   captionPos,
+  captionWidth,
   fontScale,
   clipStyle,
+  clipTheme,
   editMode,
   onCaptionMove,
   onCaptionScale,
+  onCaptionWidth,
 }) => {
   const { fps } = useVideoConfig();
   const keeps = buildKeeps(cuts, durationSec);
@@ -77,12 +83,15 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
         captionVAlign={captionVAlign}
         captionHAlign={captionHAlign}
         captionPos={captionPos}
+        captionWidth={captionWidth}
         fontScale={fontScale}
         clipStyle={clipStyle}
+        clipTheme={clipTheme}
         hideWhenInactive
         editMode={editMode}
         onCaptionMove={onCaptionMove}
         onCaptionScale={onCaptionScale}
+        onCaptionWidth={onCaptionWidth}
       />
     </AbsoluteFill>
   );

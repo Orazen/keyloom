@@ -7,6 +7,7 @@ import type {
   VAlign,
 } from "@workspace/compositions/compositions/TikTokCaption/config";
 import { DEFAULT_FONT_KEY } from "@workspace/compositions/compositions/TikTokCaption/config";
+import { DEFAULT_CAPTION_THEME } from "@workspace/compositions/compositions/TikTokCaption/themes";
 import { TooltipProvider } from "@workspace/ui/components/tooltip";
 import { useCallback, useMemo, useReducer, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -62,22 +63,27 @@ function docReducer(state: DocState, action: DocAction): DocState {
 }
 
 export type CaptionStyle = {
+  themeId: string;
   fontKey: FontKey;
   fontScale: number;
   vAlign: VAlign;
   hAlign: HAlign;
   /** Dragged placement; null falls back to the vAlign/hAlign presets. */
   position: CaptionPos | null;
+  /** Squeezed box width (fraction of video width); null hugs the text. */
+  width: number | null;
   textColor: string;
   accentColor: string;
 };
 
 const INITIAL_STYLE: CaptionStyle = {
+  themeId: DEFAULT_CAPTION_THEME,
   fontKey: DEFAULT_FONT_KEY,
   fontScale: 1,
   vAlign: "bottom",
   hAlign: "center",
   position: null,
+  width: null,
   textColor: "#ffffff",
   accentColor: "#facc15",
 };

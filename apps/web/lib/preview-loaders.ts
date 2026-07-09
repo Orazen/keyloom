@@ -18,29 +18,19 @@ export const previewLoaders: Record<
   "CaptionTrack/CaptionTrack": () =>
     import("@workspace/compositions/compositions/CaptionTrack/CaptionTrack"),
   "CaptionedVideo/CaptionedVideo": () =>
-    import(
-      "@workspace/compositions/compositions/CaptionedVideo/CaptionedVideo"
-    ),
+    import("@workspace/compositions/compositions/CaptionedVideo/CaptionedVideo"),
   "CursorWalkthrough/CursorWalkthrough": () =>
-    import(
-      "@workspace/compositions/compositions/CursorWalkthrough/CursorWalkthrough"
-    ),
+    import("@workspace/compositions/compositions/CursorWalkthrough/CursorWalkthrough"),
   "DiscordMessages/DiscordMessages": () =>
-    import(
-      "@workspace/compositions/compositions/DiscordMessages/DiscordMessages"
-    ),
+    import("@workspace/compositions/compositions/DiscordMessages/DiscordMessages"),
   "GaiaScenario/GaiaScenario": () =>
     import("@workspace/compositions/compositions/GaiaScenario/GaiaScenario"),
   "GitHubStarButton/GitHubStarButton": () =>
-    import(
-      "@workspace/compositions/compositions/GitHubStarButton/GitHubStarButton"
-    ),
+    import("@workspace/compositions/compositions/GitHubStarButton/GitHubStarButton"),
   "ImageScene/ImageScene": () =>
     import("@workspace/compositions/compositions/ImageScene/ImageScene"),
   "InstagramMessages/InstagramMessages": () =>
-    import(
-      "@workspace/compositions/compositions/InstagramMessages/InstagramMessages"
-    ),
+    import("@workspace/compositions/compositions/InstagramMessages/InstagramMessages"),
   "InstagramPost/InstagramPost": () =>
     import("@workspace/compositions/compositions/InstagramPost/InstagramPost"),
   "LaptopFrame/LaptopFrame": () =>
@@ -48,15 +38,11 @@ export const previewLoaders: Record<
   "LineChart/LineChart": () =>
     import("@workspace/compositions/compositions/LineChart/LineChart"),
   "LockScreenMessage/LockScreenMessage": () =>
-    import(
-      "@workspace/compositions/compositions/LockScreenMessage/LockScreenMessage"
-    ),
+    import("@workspace/compositions/compositions/LockScreenMessage/LockScreenMessage"),
   "LogoCloud/LogoCloud": () =>
     import("@workspace/compositions/compositions/LogoCloud/LogoCloud"),
   "MessageBubbles/MessageBubbles": () =>
-    import(
-      "@workspace/compositions/compositions/MessageBubbles/MessageBubbles"
-    ),
+    import("@workspace/compositions/compositions/MessageBubbles/MessageBubbles"),
   "PhoneFrame/PhoneFrame": () =>
     import("@workspace/compositions/compositions/PhoneFrame/PhoneFrame"),
   "PieChart/PieChart": () =>
@@ -80,114 +66,65 @@ export const previewLoaders: Record<
   "StatCounter/StatCounter": () =>
     import("@workspace/compositions/compositions/StatCounter/StatCounter"),
   "TelegramMessages/TelegramMessages": () =>
-    import(
-      "@workspace/compositions/compositions/TelegramMessages/TelegramMessages"
-    ),
+    import("@workspace/compositions/compositions/TelegramMessages/TelegramMessages"),
   "Terminal/Terminal": () =>
     import("@workspace/compositions/compositions/Terminal/Terminal"),
   "TestimonialCard/TestimonialCard": () =>
-    import(
-      "@workspace/compositions/compositions/TestimonialCard/TestimonialCard"
-    ),
-  "Text/Text": () => import("@workspace/compositions/compositions/Text/Text"),
+    import("@workspace/compositions/compositions/TestimonialCard/TestimonialCard"),
+  "Text/Text": () =>
+    import("@workspace/compositions/compositions/Text/Text"),
   "TextBlurOutUp/TextBlurOutUp": () =>
     import("@workspace/compositions/compositions/TextBlurOutUp/TextBlurOutUp"),
   "TextBottomUpLetters/TextBottomUpLetters": () =>
-    import(
-      "@workspace/compositions/compositions/TextBottomUpLetters/TextBottomUpLetters"
-    ),
+    import("@workspace/compositions/compositions/TextBottomUpLetters/TextBottomUpLetters"),
   "TextDepthParallaxWords/TextDepthParallaxWords": () =>
-    import(
-      "@workspace/compositions/compositions/TextDepthParallaxWords/TextDepthParallaxWords"
-    ),
+    import("@workspace/compositions/compositions/TextDepthParallaxWords/TextDepthParallaxWords"),
   "TextFadeThrough/TextFadeThrough": () =>
-    import(
-      "@workspace/compositions/compositions/TextFadeThrough/TextFadeThrough"
-    ),
+    import("@workspace/compositions/compositions/TextFadeThrough/TextFadeThrough"),
   "TextFocusBlurResolve/TextFocusBlurResolve": () =>
-    import(
-      "@workspace/compositions/compositions/TextFocusBlurResolve/TextFocusBlurResolve"
-    ),
+    import("@workspace/compositions/compositions/TextFocusBlurResolve/TextFocusBlurResolve"),
   "TextKineticCenterBuild/TextKineticCenterBuild": () =>
-    import(
-      "@workspace/compositions/compositions/TextKineticCenterBuild/TextKineticCenterBuild"
-    ),
+    import("@workspace/compositions/compositions/TextKineticCenterBuild/TextKineticCenterBuild"),
   "TextLineByLineSlide/TextLineByLineSlide": () =>
-    import(
-      "@workspace/compositions/compositions/TextLineByLineSlide/TextLineByLineSlide"
-    ),
+    import("@workspace/compositions/compositions/TextLineByLineSlide/TextLineByLineSlide"),
   "TextMagicMove/TextMagicMove": () =>
     import("@workspace/compositions/compositions/TextMagicMove/TextMagicMove"),
   "TextMaskRevealUp/TextMaskRevealUp": () =>
-    import(
-      "@workspace/compositions/compositions/TextMaskRevealUp/TextMaskRevealUp"
-    ),
+    import("@workspace/compositions/compositions/TextMaskRevealUp/TextMaskRevealUp"),
   "TextMicroScaleFade/TextMicroScaleFade": () =>
-    import(
-      "@workspace/compositions/compositions/TextMicroScaleFade/TextMicroScaleFade"
-    ),
+    import("@workspace/compositions/compositions/TextMicroScaleFade/TextMicroScaleFade"),
   "TextMorph/TextMorph": () =>
     import("@workspace/compositions/compositions/TextMorph/TextMorph"),
   "TextPerCharacterRise/TextPerCharacterRise": () =>
-    import(
-      "@workspace/compositions/compositions/TextPerCharacterRise/TextPerCharacterRise"
-    ),
+    import("@workspace/compositions/compositions/TextPerCharacterRise/TextPerCharacterRise"),
   "TextPerWordCrossfade/TextPerWordCrossfade": () =>
-    import(
-      "@workspace/compositions/compositions/TextPerWordCrossfade/TextPerWordCrossfade"
-    ),
+    import("@workspace/compositions/compositions/TextPerWordCrossfade/TextPerWordCrossfade"),
   "TextScaleDownFade/TextScaleDownFade": () =>
-    import(
-      "@workspace/compositions/compositions/TextScaleDownFade/TextScaleDownFade"
-    ),
+    import("@workspace/compositions/compositions/TextScaleDownFade/TextScaleDownFade"),
   "TextSharedAxisX/TextSharedAxisX": () =>
-    import(
-      "@workspace/compositions/compositions/TextSharedAxisX/TextSharedAxisX"
-    ),
+    import("@workspace/compositions/compositions/TextSharedAxisX/TextSharedAxisX"),
   "TextSharedAxisY/TextSharedAxisY": () =>
-    import(
-      "@workspace/compositions/compositions/TextSharedAxisY/TextSharedAxisY"
-    ),
+    import("@workspace/compositions/compositions/TextSharedAxisY/TextSharedAxisY"),
   "TextSharedAxisZ/TextSharedAxisZ": () =>
-    import(
-      "@workspace/compositions/compositions/TextSharedAxisZ/TextSharedAxisZ"
-    ),
+    import("@workspace/compositions/compositions/TextSharedAxisZ/TextSharedAxisZ"),
   "TextShimmerSweep/TextShimmerSweep": () =>
-    import(
-      "@workspace/compositions/compositions/TextShimmerSweep/TextShimmerSweep"
-    ),
+    import("@workspace/compositions/compositions/TextShimmerSweep/TextShimmerSweep"),
   "TextShortSlideDown/TextShortSlideDown": () =>
-    import(
-      "@workspace/compositions/compositions/TextShortSlideDown/TextShortSlideDown"
-    ),
+    import("@workspace/compositions/compositions/TextShortSlideDown/TextShortSlideDown"),
   "TextShortSlideRight/TextShortSlideRight": () =>
-    import(
-      "@workspace/compositions/compositions/TextShortSlideRight/TextShortSlideRight"
-    ),
+    import("@workspace/compositions/compositions/TextShortSlideRight/TextShortSlideRight"),
   "TextSoftBlurIn/TextSoftBlurIn": () =>
-    import(
-      "@workspace/compositions/compositions/TextSoftBlurIn/TextSoftBlurIn"
-    ),
+    import("@workspace/compositions/compositions/TextSoftBlurIn/TextSoftBlurIn"),
   "TextSpringScaleIn/TextSpringScaleIn": () =>
-    import(
-      "@workspace/compositions/compositions/TextSpringScaleIn/TextSpringScaleIn"
-    ),
+    import("@workspace/compositions/compositions/TextSpringScaleIn/TextSpringScaleIn"),
   "TextStaggerFromCenter/TextStaggerFromCenter": () =>
-    import(
-      "@workspace/compositions/compositions/TextStaggerFromCenter/TextStaggerFromCenter"
-    ),
+    import("@workspace/compositions/compositions/TextStaggerFromCenter/TextStaggerFromCenter"),
   "TextStaggerFromEdges/TextStaggerFromEdges": () =>
-    import(
-      "@workspace/compositions/compositions/TextStaggerFromEdges/TextStaggerFromEdges"
-    ),
+    import("@workspace/compositions/compositions/TextStaggerFromEdges/TextStaggerFromEdges"),
   "TextTopDownLetters/TextTopDownLetters": () =>
-    import(
-      "@workspace/compositions/compositions/TextTopDownLetters/TextTopDownLetters"
-    ),
+    import("@workspace/compositions/compositions/TextTopDownLetters/TextTopDownLetters"),
   "TextTypewriter/TextTypewriter": () =>
-    import(
-      "@workspace/compositions/compositions/TextTypewriter/TextTypewriter"
-    ),
+    import("@workspace/compositions/compositions/TextTypewriter/TextTypewriter"),
   "TikTokCaption/TikTokCaption": () =>
     import("@workspace/compositions/compositions/TikTokCaption/TikTokCaption"),
   "TitleFade/TitleFade": () =>
@@ -203,33 +140,19 @@ export const previewLoaders: Record<
   "TweetPost/TweetPost": () =>
     import("@workspace/compositions/compositions/TweetPost/TweetPost"),
   "TypingComposer/TypingComposer": () =>
-    import(
-      "@workspace/compositions/compositions/TypingComposer/TypingComposer"
-    ),
+    import("@workspace/compositions/compositions/TypingComposer/TypingComposer"),
   "TypingSearch/TypingSearch": () =>
     import("@workspace/compositions/compositions/TypingSearch/TypingSearch"),
   "WhatsAppMessages/WhatsAppMessages": () =>
-    import(
-      "@workspace/compositions/compositions/WhatsAppMessages/WhatsAppMessages"
-    ),
+    import("@workspace/compositions/compositions/WhatsAppMessages/WhatsAppMessages"),
   "backgrounds/AuroraGradient/AuroraGradient": () =>
-    import(
-      "@workspace/compositions/compositions/backgrounds/AuroraGradient/AuroraGradient"
-    ),
+    import("@workspace/compositions/compositions/backgrounds/AuroraGradient/AuroraGradient"),
   "backgrounds/BlueGrid/BlueGrid": () =>
-    import(
-      "@workspace/compositions/compositions/backgrounds/BlueGrid/BlueGrid"
-    ),
+    import("@workspace/compositions/compositions/backgrounds/BlueGrid/BlueGrid"),
   "backgrounds/FuturisticArch/FuturisticArch": () =>
-    import(
-      "@workspace/compositions/compositions/backgrounds/FuturisticArch/FuturisticArch"
-    ),
+    import("@workspace/compositions/compositions/backgrounds/FuturisticArch/FuturisticArch"),
   "backgrounds/LiquidChrome/LiquidChrome": () =>
-    import(
-      "@workspace/compositions/compositions/backgrounds/LiquidChrome/LiquidChrome"
-    ),
+    import("@workspace/compositions/compositions/backgrounds/LiquidChrome/LiquidChrome"),
   "backgrounds/WhiteRadialBurst/WhiteRadialBurst": () =>
-    import(
-      "@workspace/compositions/compositions/backgrounds/WhiteRadialBurst/WhiteRadialBurst"
-    ),
+    import("@workspace/compositions/compositions/backgrounds/WhiteRadialBurst/WhiteRadialBurst"),
 };

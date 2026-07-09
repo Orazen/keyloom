@@ -12,8 +12,8 @@ import { toast } from "sonner";
 import type { VideoMeta } from "../lib/editor";
 import { CAPTION_FPS, downloadBlob, exportCaptionedVideo } from "../lib/export";
 import type { CaptionStyle } from "./caption-editor";
+import { PlayerControls } from "./player-controls";
 import { StyleToolbar } from "./style-toolbar";
-import "./caption-player.css";
 
 const NO_CUTS: { start: number; end: number }[] = [];
 
@@ -53,7 +53,9 @@ export function PreviewPanel({
       captionVAlign: style.vAlign,
       captionHAlign: style.hAlign,
       captionPos: style.position,
+      captionWidth: style.width,
       fontScale: style.fontScale,
+      clipTheme: style.themeId,
       clipStyle: {
         background: "transparent",
         color: style.textColor,
@@ -73,6 +75,7 @@ export function PreviewPanel({
       onCaptionMove: (position: { x: number; y: number }) =>
         onStyle({ position }),
       onCaptionScale: (fontScale: number) => onStyle({ fontScale }),
+      onCaptionWidth: (width: number) => onStyle({ width }),
     }),
     [inputProps, onStyle],
   );
@@ -168,7 +171,7 @@ export function PreviewPanel({
         </div>
       </div>
 
-      <div className="caption-player relative flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-2xl border border-border bg-muted/30">
+      <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-2xl border border-border bg-muted/30">
         <Player
           ref={playerRef}
           component={CaptionedVideo}
@@ -178,12 +181,17 @@ export function PreviewPanel({
           compositionWidth={video.width}
           compositionHeight={video.height}
           style={{ width: "100%", height: "100%" }}
-          controls
           clickToPlay={false}
           spaceKeyToPlayOrPause
           acknowledgeRemotionLicense
         />
       </div>
+
+      <PlayerControls
+        playerRef={playerRef}
+        durationInFrames={durationInFrames}
+        fps={CAPTION_FPS}
+      />
     </section>
   );
 }

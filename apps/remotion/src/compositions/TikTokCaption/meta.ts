@@ -1,6 +1,7 @@
 import type { CompositionInfo } from "../../schema";
 import { ASPECT_DIMENSIONS } from "./config";
 import type { TikTokCaptionProps } from "./TikTokCaption";
+import { CAPTION_THEME_LIST } from "./themes";
 
 export const TIKTOK_CAPTION_FPS = 30;
 export const TIKTOK_CAPTION_WIDTH = ASPECT_DIMENSIONS["16:9"].width;
@@ -32,6 +33,7 @@ export const tikTokCaptionInfo: CompositionInfo<TikTokCaptionProps> = {
   width: TIKTOK_CAPTION_WIDTH,
   height: TIKTOK_CAPTION_HEIGHT,
   defaultProps: tikTokCaptionDefaultProps,
+  themes: CAPTION_THEME_LIST.map(({ id, label }) => ({ id, label })),
   fields: [
     {
       kind: "audio",

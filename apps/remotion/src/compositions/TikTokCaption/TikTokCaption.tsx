@@ -8,7 +8,8 @@ import {
 } from "remotion";
 import { type ClipStyle, resolveClipStyle } from "../../clip-style";
 import { useFontReady } from "../../use-font-ready";
-import type { CaptionPos, HAlign, VAlign } from "./config";
+import { type CaptionPos, FONTS, type HAlign, type VAlign } from "./config";
+import { CAPTION_THEMES, DEFAULT_CAPTION_THEME } from "./themes";
 
 export type CaptionWord = {
   start: number;
@@ -27,9 +28,16 @@ export type TikTokCaptionProps = {
    * overrides the alignment props. Written by dragging in the caption editor.
    */
   captionPos?: CaptionPos | null;
+  /**
+   * Caption box width as a fraction of composition width. Text wraps to fit.
+   * Written by dragging the side handles; null uses the natural text width.
+   */
+  captionWidth?: number | null;
   // Multiplier on the base font size. 1 = medium, 0.7 small, 1.6 huge.
   fontScale?: number;
   clipStyle?: ClipStyle;
+  /** Curated look from ./themes — same id the studio stores at clip.style.theme. */
+  clipTheme?: string;
   /**
    * By default the last phrase lingers through silence (classic TikTok
    * hold). Captioned-video flows with deletable segments set this so
@@ -44,6 +52,7 @@ export type TikTokCaptionProps = {
   editMode?: boolean;
   onCaptionMove?: (pos: CaptionPos) => void;
   onCaptionScale?: (fontScale: number) => void;
+  onCaptionWidth?: (widthFrac: number) => void;
 };
 
 const BASE_FONT_SIZE = 132;
@@ -97,11 +106,17 @@ const MAX_FONT_SCALE = 2.6;
 const clamp = (v: number, min: number, max: number) =>
   Math.min(max, Math.max(min, v));
 
-const HANDLE_CORNERS = [
-  { key: "nw", left: 0, top: 0, cursor: "nwse-resize" },
-  { key: "ne", left: 1, top: 0, cursor: "nesw-resize" },
-  { key: "sw", left: 0, top: 1, cursor: "nesw-resize" },
-  { key: "se", left: 1, top: 1, cursor: "nwse-resize" },
+const MIN_WIDTH_FRAC = 0.15;
+const MAX_WIDTH_FRAC = 0.96;
+
+// Corners scale the font; side midpoints squeeze the box width (text wraps).
+const HANDLES = [
+  { key: "nw", left: 0, top: 0, cursor: "nwse-resize", kind: "scale" },
+  { key: "ne", left: 1, top: 0, cursor: "nesw-resize", kind: "scale" },
+  { key: "sw", left: 0, top: 1, cursor: "nesw-resize", kind: "scale" },
+  { key: "se", left: 1, top: 1, cursor: "nwse-resize", kind: "scale" },
+  { key: "w", left: 0, top: 0.5, cursor: "ew-resize", kind: "width" },
+  { key: "e", left: 1, top: 0.5, cursor: "ew-resize", kind: "width" },
 ] as const;
 
 type DragState =
@@ -118,6 +133,10 @@ type DragState =
       centerY: number;
       startDist: number;
       startScale: number;
+    }
+  | {
+      mode: "width";
+      centerX: number;
     };
 
 const CaptionDragLayer: React.FC<{
@@ -128,6 +147,7 @@ const CaptionDragLayer: React.FC<{
   accent: string;
   onMove?: (pos: CaptionPos) => void;
   onScale?: (fontScale: number) => void;
+  onWidth?: (widthFrac: number) => void;
   children: React.ReactNode;
 }> = ({
   containerRef,
@@ -137,6 +157,7 @@ const CaptionDragLayer: React.FC<{
   accent,
   onMove,
   onScale,
+  onWidth,
   children,
 }) => {
   const scale = useCurrentScale();
@@ -172,6 +193,8 @@ const CaptionDragLayer: React.FC<{
   };
   useEffect(() => cancelHide, []);
 
+  // These record intent only; the event continues bubbling to the box's
+  // pointerdown, which sees dragRef set and just takes pointer capture.
   const startResize = (e: React.PointerEvent) => {
     if (!onScale) return;
     const box = boxRef.current;
@@ -179,8 +202,6 @@ const CaptionDragLayer: React.FC<{
     const r = box.getBoundingClientRect();
     const centerX = r.left + r.width / 2;
     const centerY = r.top + r.height / 2;
-    // Records resize intent only; the event continues bubbling to the box's
-    // pointerdown, which sees dragRef set and just takes pointer capture.
     dragRef.current = {
       mode: "resize",
       centerX,
@@ -191,6 +212,14 @@ const CaptionDragLayer: React.FC<{
       ),
       startScale: fontScale,
     };
+  };
+
+  const startWidthResize = () => {
+    if (!onWidth) return;
+    const box = boxRef.current;
+    if (!box) return;
+    const r = box.getBoundingClientRect();
+    dragRef.current = { mode: "width", centerX: r.left + r.width / 2 };
   };
 
   const onBoxPointerDown = (e: React.PointerEvent) => {
@@ -225,7 +254,7 @@ const CaptionDragLayer: React.FC<{
         x: Math.round(clamp(cx / width, 0.04, 0.96) * 1000) / 1000,
         y: Math.round(clamp(cy / height, 0.04, 0.96) * 1000) / 1000,
       });
-    } else {
+    } else if (d.mode === "resize") {
       const dist = Math.hypot(e.clientX - d.centerX, e.clientY - d.centerY);
       const next = clamp(
         d.startScale * (dist / d.startDist),
@@ -233,6 +262,16 @@ const CaptionDragLayer: React.FC<{
         MAX_FONT_SCALE,
       );
       onScale?.(Math.round(next * 100) / 100);
+    } else {
+      // Symmetric squeeze around the box center: the pointer's horizontal
+      // distance from center is half the new box width.
+      const halfWidth = Math.abs(e.clientX - d.centerX) / scale;
+      const frac = clamp(
+        (halfWidth * 2) / width,
+        MIN_WIDTH_FRAC,
+        MAX_WIDTH_FRAC,
+      );
+      onWidth?.(Math.round(frac * 1000) / 1000);
     }
   };
 
@@ -276,18 +315,26 @@ const CaptionDragLayer: React.FC<{
     >
       {children}
       {outlineVisible
-        ? HANDLE_CORNERS.map((h) => (
+        ? HANDLES.filter((h) =>
+            h.kind === "width" ? Boolean(onWidth) : Boolean(onScale),
+          ).map((h) => (
             <div
               key={h.key}
-              onPointerDown={startResize}
+              onPointerDown={
+                h.kind === "width" ? startWidthResize : startResize
+              }
               style={{
                 position: "absolute",
                 left: `${h.left * 100}%`,
                 top: `${h.top * 100}%`,
                 width: handleHit,
                 height: handleHit,
-                marginLeft: -handleHit / 2 + (h.left === 0 ? -6 : 6) / scale,
-                marginTop: -handleHit / 2 + (h.top === 0 ? -6 : 6) / scale,
+                marginLeft:
+                  -handleHit / 2 +
+                  (h.left === 0 ? -6 : h.left === 1 ? 6 : 0) / scale,
+                marginTop:
+                  -handleHit / 2 +
+                  (h.top === 0 ? -6 : h.top === 1 ? 6 : 0) / scale,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -295,14 +342,25 @@ const CaptionDragLayer: React.FC<{
               }}
             >
               <div
-                style={{
-                  width: handleSize,
-                  height: handleSize,
-                  borderRadius: "50%",
-                  background: "#ffffff",
-                  border: `${outlineWidth}px solid ${accent}`,
-                  boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
-                }}
+                style={
+                  h.kind === "width"
+                    ? {
+                        width: handleSize * 0.45,
+                        height: handleSize * 1.4,
+                        borderRadius: handleSize,
+                        background: "#ffffff",
+                        border: `${outlineWidth}px solid ${accent}`,
+                        boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
+                      }
+                    : {
+                        width: handleSize,
+                        height: handleSize,
+                        borderRadius: "50%",
+                        background: "#ffffff",
+                        border: `${outlineWidth}px solid ${accent}`,
+                        boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
+                      }
+                }
               />
             </div>
           ))
@@ -316,12 +374,15 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
   captionVAlign = "center",
   captionHAlign = "center",
   captionPos,
+  captionWidth,
   fontScale = 1,
   clipStyle,
+  clipTheme,
   hideWhenInactive = false,
   editMode = false,
   onCaptionMove,
   onCaptionScale,
+  onCaptionWidth,
 }) => {
   // Real frame — word timestamps from Whisper are wall-clock seconds, so
   // they must be compared against real time, not the 60fps design frame.
@@ -329,13 +390,17 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
   const { fps, width, height } = useVideoConfig();
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const theme =
+    CAPTION_THEMES[clipTheme ?? ""] ?? CAPTION_THEMES[DEFAULT_CAPTION_THEME]!;
+
   // Inactive words use `color`, active word uses `accent`, font is
-  // `fontFamily` — all editable from the universal Style section.
+  // `fontFamily` — all editable from the universal Style section. The theme
+  // supplies the defaults so picking one restyles unstained clips too.
   const s = resolveClipStyle(clipStyle, {
     background: "transparent",
-    color: "#ffffff",
-    fontFamily: "'Anton', Impact, sans-serif",
-    accent: "#facc15",
+    color: theme.textColor,
+    fontFamily: FONTS[theme.fontKey].cssFamily,
+    accent: theme.accentColor,
   });
 
   useFontReady(s.fontFamily);
@@ -378,6 +443,17 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
 
   const isTransparent = s.background === "transparent";
   const positioned = captionPos != null;
+  const boxWidth = captionWidth != null ? captionWidth * width : null;
+
+  const shadowFor = (level: "none" | "soft" | "heavy"): string | undefined => {
+    if (level === "none") return undefined;
+    if (level === "heavy") {
+      return `0 ${fontSize * 0.05}px ${fontSize * 0.1}px rgba(0,0,0,0.85), 0 ${fontSize * 0.12}px ${fontSize * 0.3}px rgba(0,0,0,0.5)`;
+    }
+    return isTransparent
+      ? `0 ${fontSize * 0.025}px ${fontSize * 0.06}px rgba(0,0,0,0.55)`
+      : `0 ${fontSize * 0.02}px ${fontSize * 0.04}px rgba(0,0,0,0.5)`;
+  };
 
   const phrase = activePhrase ? (
     <div
@@ -387,12 +463,22 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
         gap: `${fontSize * 0.12}px ${fontSize * 0.28}px`,
         justifyContent: HORIZ_TO_ALIGN[captionHAlign],
         textAlign: HORIZ_TO_TEXT_ALIGN[captionHAlign],
-        maxWidth: width * 0.88,
+        width: boxWidth ?? undefined,
+        maxWidth: boxWidth ?? width * 0.88,
         lineHeight: 1.05,
+        ...(theme.phraseBackground
+          ? {
+              background: theme.phraseBackground,
+              padding: `${fontSize * 0.16}px ${fontSize * 0.3}px`,
+              borderRadius: fontSize * 0.2,
+            }
+          : {}),
       }}
     >
       {activePhrase.map((w, i) => {
         const isActive = w === words[activeIndex];
+        const chipActive = Boolean(theme.activeWordBackground) && isActive;
+        const hollowFill = Boolean(theme.hollow) && !isActive;
         return (
           <span
             key={`${w.start}-${i}`}
@@ -401,12 +487,28 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
               fontSize,
               fontWeight: 800,
               letterSpacing: "-0.01em",
-              color: isActive ? s.accent : s.color,
-              WebkitTextStroke: `${strokeWidth}px #000`,
+              textTransform: theme.uppercase ? "uppercase" : undefined,
+              fontStyle: theme.italic ? "italic" : undefined,
+              color: hollowFill
+                ? "transparent"
+                : isActive && !chipActive
+                  ? s.accent
+                  : s.color,
+              WebkitTextStroke: theme.stroke
+                ? `${strokeWidth}px ${theme.hollow ? s.color : "#000"}`
+                : undefined,
               paintOrder: "stroke fill",
-              textShadow: isTransparent
-                ? `0 ${fontSize * 0.025}px ${fontSize * 0.06}px rgba(0,0,0,0.55)`
-                : `0 ${fontSize * 0.02}px ${fontSize * 0.04}px rgba(0,0,0,0.5)`,
+              textShadow: shadowFor(theme.shadow),
+              // Padding + matching negative margin: the chip paints without
+              // shifting word layout as the active word advances.
+              ...(chipActive
+                ? {
+                    background: s.accent,
+                    borderRadius: fontSize * 0.16,
+                    padding: `${fontSize * 0.05}px ${fontSize * 0.12}px`,
+                    margin: `-${fontSize * 0.05}px -${fontSize * 0.12}px`,
+                  }
+                : {}),
             }}
           >
             {w.text}
@@ -426,6 +528,7 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
         accent={s.accent}
         onMove={onCaptionMove}
         onScale={onCaptionScale}
+        onWidth={onCaptionWidth}
       >
         {phrase}
       </CaptionDragLayer>
@@ -472,7 +575,7 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
                 // identical at every position (the phrase's own maxWidth
                 // still caps it).
                 width: "max-content",
-                maxWidth: width * 0.88,
+                maxWidth: boxWidth ?? width * 0.88,
               }
             : { display: "flex", justifyContent: HORIZ_TO_ALIGN[captionHAlign] }
         }

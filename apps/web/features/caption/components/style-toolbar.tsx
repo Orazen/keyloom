@@ -11,6 +11,10 @@ import {
   V_ALIGNS,
   type VAlign,
 } from "@workspace/compositions/compositions/TikTokCaption/config";
+import {
+  CAPTION_THEME_LIST,
+  type CaptionThemeDef,
+} from "@workspace/compositions/compositions/TikTokCaption/themes";
 import { Button } from "@workspace/ui/components/button";
 import {
   Popover,
@@ -48,6 +52,8 @@ export function StyleToolbar({
 }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
+      <ThemePicker style={style} onStyle={onStyle} />
+
       <Select
         value={style.fontKey}
         onValueChange={(v) => onStyle({ fontKey: v as FontKey })}
@@ -115,7 +121,12 @@ export function StyleToolbar({
                     key={`${v}-${h}`}
                     type="button"
                     onClick={() =>
-                      onStyle({ vAlign: v, hAlign: h, position: null })
+                      onStyle({
+                        vAlign: v,
+                        hAlign: h,
+                        position: null,
+                        width: null,
+                      })
                     }
                     aria-label={`Position ${v} ${h}`}
                     className={cn(
@@ -155,6 +166,109 @@ export function StyleToolbar({
         onChange={(v) => onStyle({ accentColor: v })}
       />
     </div>
+  );
+}
+
+function ThemePicker({
+  style,
+  onStyle,
+}: {
+  style: CaptionStyle;
+  onStyle: (patch: Partial<CaptionStyle>) => void;
+}) {
+  const current =
+    CAPTION_THEME_LIST.find((t) => t.id === style.themeId) ??
+    CAPTION_THEME_LIST[0]!;
+  return (
+    <Popover>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-8 gap-2">
+              <ThemeSwatch theme={current} />
+              {current.label}
+            </Button>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">Caption theme</TooltipContent>
+      </Tooltip>
+      <PopoverContent className="w-72 p-2" align="start">
+        <div className="grid grid-cols-2 gap-1.5">
+          {CAPTION_THEME_LIST.map((t) => {
+            const active = t.id === style.themeId;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() =>
+                  onStyle({
+                    themeId: t.id,
+                    fontKey: t.fontKey,
+                    textColor: t.textColor,
+                    accentColor: t.accentColor,
+                  })
+                }
+                className={cn(
+                  "flex h-12 items-center justify-center rounded-lg border transition-colors",
+                  active
+                    ? "border-primary/60 ring-1 ring-primary/40"
+                    : "border-transparent hover:border-border",
+                )}
+                style={{ backgroundColor: "#3f3f46" }}
+                aria-label={`Theme ${t.label}`}
+              >
+                <ThemePreviewText theme={t} />
+              </button>
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function ThemePreviewText({ theme }: { theme: CaptionThemeDef }) {
+  return (
+    <span
+      className="px-1.5 text-[13px] leading-none"
+      style={{
+        fontFamily: FONTS[theme.fontKey].cssFamily,
+        color: theme.hollow ? "transparent" : theme.textColor,
+        WebkitTextStroke: theme.stroke
+          ? `1px ${theme.hollow ? theme.textColor : "#000"}`
+          : undefined,
+        paintOrder: "stroke fill",
+        textTransform: theme.uppercase ? "uppercase" : undefined,
+        fontStyle: theme.italic ? "italic" : undefined,
+        textShadow:
+          theme.shadow === "none" ? undefined : "0 1px 3px rgba(0,0,0,0.7)",
+        ...(theme.phraseBackground
+          ? {
+              background: theme.phraseBackground,
+              borderRadius: 4,
+              padding: "3px 7px",
+            }
+          : {}),
+      }}
+    >
+      {theme.label}
+    </span>
+  );
+}
+
+function ThemeSwatch({ theme }: { theme: CaptionThemeDef }) {
+  return (
+    <span
+      className="flex h-4 w-6 items-center justify-center rounded-sm text-[8px] font-bold leading-none"
+      style={{
+        backgroundColor: theme.phraseBackground ?? "#3f3f46",
+        color: theme.hollow ? "transparent" : theme.textColor,
+        WebkitTextStroke: theme.hollow ? `0.5px ${theme.textColor}` : undefined,
+        fontFamily: FONTS[theme.fontKey].cssFamily,
+      }}
+    >
+      Aa
+    </span>
   );
 }
 
