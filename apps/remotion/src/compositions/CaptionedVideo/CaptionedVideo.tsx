@@ -22,6 +22,8 @@ export type CaptionedVideoProps = {
   captionHAlign?: HAlign;
   captionPos?: CaptionPos | null;
   captionWidth?: number | null;
+  /** CSS filter applied to the source video (color grades, B&W, …). */
+  videoFilter?: string;
   fontScale?: number;
   maxWordsPerPhrase?: number;
   clipStyle?: ClipStyle;
@@ -38,6 +40,7 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
   durationSec,
   words,
   cuts,
+  videoFilter,
   captionVAlign,
   captionHAlign,
   captionPos,
@@ -82,7 +85,7 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
             trimBefore={s.trimBefore}
             trimAfter={s.trimAfter}
             objectFit="contain"
-            style={{ width: "100%", height: "100%" }}
+            style={{ width: "100%", height: "100%", filter: videoFilter }}
             mediaRef={syncToMedia ? previewVideoRef : undefined}
           />
         </Sequence>

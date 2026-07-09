@@ -76,6 +76,8 @@ export type CaptionStyle = {
   wordsPerCaption: number;
   textColor: string;
   accentColor: string;
+  /** Color-grade preset id from FILTER_PRESETS. */
+  filterId: string;
 };
 
 const INITIAL_STYLE: CaptionStyle = {
@@ -89,6 +91,7 @@ const INITIAL_STYLE: CaptionStyle = {
   wordsPerCaption: 3,
   textColor: "#ffffff",
   accentColor: "#facc15",
+  filterId: "none",
 };
 
 type StyleAction = { type: "patch"; patch: Partial<CaptionStyle> };

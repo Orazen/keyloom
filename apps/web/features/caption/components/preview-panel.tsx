@@ -11,6 +11,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { VideoMeta } from "../lib/editor";
 import { CAPTION_FPS, downloadBlob, exportCaptionedVideo } from "../lib/export";
+import { FILTERS_BY_ID } from "../lib/filters";
 import type { CaptionStyle } from "./caption-editor";
 import { PlayerControls } from "./player-controls";
 import { StyleToolbar } from "./style-toolbar";
@@ -50,6 +51,7 @@ export function PreviewPanel({
       durationSec: video.duration,
       words,
       cuts: NO_CUTS,
+      videoFilter: FILTERS_BY_ID[style.filterId]?.css,
       captionVAlign: style.vAlign,
       captionHAlign: style.hAlign,
       captionPos: style.position,

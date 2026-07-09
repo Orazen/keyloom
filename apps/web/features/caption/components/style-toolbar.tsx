@@ -31,6 +31,7 @@ import {
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
+import { FILTER_PRESETS } from "../lib/filters";
 import type { CaptionStyle } from "./caption-editor";
 
 const WORD_OPTIONS: { label: string; value: number }[] = [
@@ -86,6 +87,22 @@ export function StyleToolbar({
           {WORD_OPTIONS.map((w) => (
             <SelectItem key={w.value} value={String(w.value)}>
               {w.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        value={style.filterId}
+        onValueChange={(v) => onStyle({ filterId: v })}
+      >
+        <SelectTrigger size="sm" className="w-28">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {FILTER_PRESETS.map((f) => (
+            <SelectItem key={f.id} value={f.id}>
+              {f.label}
             </SelectItem>
           ))}
         </SelectContent>
