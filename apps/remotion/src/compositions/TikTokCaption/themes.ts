@@ -48,12 +48,26 @@ export const CAPTION_THEME_LIST: CaptionThemeDef[] = [
     shadow: "soft",
   },
   {
+    // The podcast-clip look everywhere on TikTok/Reels: slanted heavy caps,
+    // black stroke, spoken word flips yellow.
+    id: "viral",
+    label: "VIRAL",
+    fontKey: "montserrat",
+    textColor: "#ffffff",
+    accentColor: "#fde047",
+    uppercase: true,
+    italic: true,
+    stroke: true,
+    shadow: "heavy",
+  },
+  {
     id: "hormozi",
     label: "Hormozi",
     fontKey: "montserrat",
     textColor: "#ffffff",
     accentColor: "#4ade80",
     uppercase: true,
+    italic: true,
     stroke: true,
     shadow: "heavy",
   },
@@ -120,6 +134,70 @@ export const CAPTION_THEME_LIST: CaptionThemeDef[] = [
     accentColor: "#fda4af",
     lowercase: true,
     italic: true,
+    shadow: "soft",
+  },
+  {
+    // Opus Clip's viral podcast look: caps with a purple chip popping on
+    // the spoken word.
+    id: "podcast",
+    label: "Podcast",
+    fontKey: "montserrat",
+    textColor: "#ffffff",
+    accentColor: "#8b5cf6",
+    uppercase: true,
+    shadow: "heavy",
+    activeWordBackground: true,
+  },
+  {
+    // The clean CapCut "documentary" look: heavy sentence-case type, no
+    // stroke, just depth — luxury/self-improvement channels.
+    id: "docu",
+    label: "Docu",
+    fontKey: "archivoBlack",
+    textColor: "#ffffff",
+    accentColor: "#facc15",
+    shadow: "heavy",
+  },
+  {
+    // Fashion-edit outline type: hollow glyphs, the spoken word fills solid.
+    id: "outline",
+    label: "OUTLINE",
+    fontKey: "anton",
+    textColor: "#ffffff",
+    accentColor: "#ffffff",
+    uppercase: true,
+    stroke: true,
+    hollow: true,
+    shadow: "soft",
+  },
+  {
+    // Y2K girlblogger glow: lowercase with a hot-pink halo.
+    id: "y2k",
+    label: "y2k",
+    fontKey: "poppins",
+    textColor: "#ffffff",
+    accentColor: "#f472b6",
+    lowercase: true,
+    shadow: "glow",
+  },
+  {
+    // Indie vlog / interview typewriter subtitles.
+    id: "typewriter",
+    label: "typewriter",
+    fontKey: "courierPrime",
+    textColor: "#ffffff",
+    accentColor: "#fbbf24",
+    lowercase: true,
+    shadow: "soft",
+  },
+  {
+    // Hand-drawn marker for prank/comedy/doodle content.
+    id: "marker",
+    label: "Marker",
+    fontKey: "permanentMarker",
+    textColor: "#ffffff",
+    accentColor: "#4ade80",
+    stroke: true,
     shadow: "soft",
   },
 ];

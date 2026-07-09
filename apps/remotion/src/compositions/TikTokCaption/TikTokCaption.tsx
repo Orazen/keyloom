@@ -26,6 +26,9 @@ const WEIGHT_BY_FONT: Partial<Record<FontKey, number>> = {
   montserrat: 900,
   inter: 700,
   playfair: 700,
+  courierPrime: 700,
+  // Synthetic bold smears the marker strokes — render at its native weight.
+  permanentMarker: 400,
 };
 
 export type CaptionWord = {

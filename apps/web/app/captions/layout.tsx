@@ -3,9 +3,11 @@ import {
   Anton,
   Archivo_Black,
   Bebas_Neue,
+  Courier_Prime,
   Inter,
   Lilita_One,
   Montserrat,
+  Permanent_Marker,
   Playfair_Display,
   Poppins,
 } from "next/font/google";
@@ -47,6 +49,7 @@ const poppins = Poppins({
 const montserrat = Montserrat({
   subsets: ["latin"],
   weight: "900",
+  style: ["normal", "italic"],
   display: "swap",
   variable: "--font-montserrat",
 });
@@ -69,6 +72,18 @@ const playfair = Playfair_Display({
   display: "swap",
   variable: "--font-playfair",
 });
+const courierPrime = Courier_Prime({
+  subsets: ["latin"],
+  weight: "700",
+  display: "swap",
+  variable: "--font-courier-prime",
+});
+const permanentMarker = Permanent_Marker({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-permanent-marker",
+});
 
 export default function CaptionsLayout({
   children,
@@ -76,7 +91,7 @@ export default function CaptionsLayout({
   return (
     <AppShell>
       <div
-        className={`${anton.variable} ${bebas.variable} ${archivoBlack.variable} ${poppins.variable} ${montserrat.variable} ${lilitaOne.variable} ${inter.variable} ${playfair.variable} flex h-[calc(100svh-3rem)] flex-col`}
+        className={`${anton.variable} ${bebas.variable} ${archivoBlack.variable} ${poppins.variable} ${montserrat.variable} ${lilitaOne.variable} ${inter.variable} ${playfair.variable} ${courierPrime.variable} ${permanentMarker.variable} flex h-[calc(100svh-3rem)] flex-col`}
       >
         {children}
       </div>

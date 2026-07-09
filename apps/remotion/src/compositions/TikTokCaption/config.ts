@@ -27,7 +27,9 @@ export type FontKey =
   | "montserrat"
   | "lilitaOne"
   | "inter"
-  | "playfair";
+  | "playfair"
+  | "courierPrime"
+  | "permanentMarker";
 
 export const FONTS: Record<
   FontKey,
@@ -95,6 +97,20 @@ export const FONTS: Record<
     weight: 700,
     cssFamily: "'Playfair Display', Georgia, serif",
   },
+  courierPrime: {
+    label: "Courier Prime",
+    family: "Courier Prime",
+    fallback: "'Courier New', monospace",
+    weight: 700,
+    cssFamily: "'Courier Prime', 'Courier New', monospace",
+  },
+  permanentMarker: {
+    label: "Permanent Marker",
+    family: "Permanent Marker",
+    fallback: "'Comic Sans MS', cursive",
+    weight: 400,
+    cssFamily: "'Permanent Marker', 'Comic Sans MS', cursive",
+  },
 };
 
 export const FONT_KEYS: FontKey[] = [
@@ -106,6 +122,8 @@ export const FONT_KEYS: FontKey[] = [
   "lilitaOne",
   "inter",
   "playfair",
+  "courierPrime",
+  "permanentMarker",
 ];
 export const DEFAULT_FONT_KEY: FontKey = "anton";
 
@@ -120,6 +138,8 @@ export function fontKeyFromFamily(family: string | undefined): FontKey {
   if (f.includes("montserrat")) return "montserrat";
   if (f.includes("lilita")) return "lilitaOne";
   if (f.includes("playfair")) return "playfair";
+  if (f.includes("courier")) return "courierPrime";
+  if (f.includes("marker")) return "permanentMarker";
   if (f.includes("inter")) return "inter";
   if (f.includes("anton")) return "anton";
   return DEFAULT_FONT_KEY;

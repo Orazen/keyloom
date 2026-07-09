@@ -75,6 +75,8 @@ export const previewLoaders: Record<
     import("@workspace/compositions/compositions/Showcase/Showcase"),
   "SlackMessages/SlackMessages": () =>
     import("@workspace/compositions/compositions/SlackMessages/SlackMessages"),
+  "SplitStack/SplitStack": () =>
+    import("@workspace/compositions/compositions/SplitStack/SplitStack"),
   "SpotifyPlayer/SpotifyPlayer": () =>
     import("@workspace/compositions/compositions/SpotifyPlayer/SpotifyPlayer"),
   "StatCounter/StatCounter": () =>
