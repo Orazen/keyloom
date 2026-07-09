@@ -2,24 +2,24 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 
 export function GallerySkeleton() {
   return (
-    <div className="px-3 pb-3">
-      <div className="flex min-h-[calc(100dvh-4.25rem)] flex-col rounded-3xl bg-[#0e0f13] px-5 py-5 sm:px-8 sm:py-6">
+    <div className="px-5 pb-5 pt-4 sm:px-8 lg:px-10">
+      <div className="flex min-h-[calc(100dvh-5.25rem)] flex-col">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
-            <Skeleton className="h-8 w-72 bg-white/10" />
-            <Skeleton className="h-4 w-96 max-w-full bg-white/5" />
+            <Skeleton className="h-8 w-72" />
+            <Skeleton className="h-4 w-96 max-w-full" />
           </div>
           <div className="flex items-center gap-1.5">
             {["hot", "a", "b"].map((k) => (
-              <Skeleton key={k} className="h-8 w-20 rounded-full bg-white/10" />
+              <Skeleton key={k} className="h-8 w-20 rounded-full" />
             ))}
           </div>
         </div>
 
         <div className="flex flex-1 items-center justify-center gap-6 pb-16 pt-4">
-          <Skeleton className="hidden h-[min(42vh,380px)] rounded-3xl bg-white/5 [aspect-ratio:9/16] lg:block" />
-          <Skeleton className="h-[min(58vh,540px)] rounded-[1.75rem] bg-white/10 [aspect-ratio:9/16]" />
-          <Skeleton className="hidden h-[min(42vh,380px)] rounded-3xl bg-white/5 [aspect-ratio:9/16] lg:block" />
+          <Skeleton className="hidden h-[min(42vh,380px)] rounded-3xl [aspect-ratio:9/16] lg:block" />
+          <Skeleton className="h-[min(58vh,540px)] rounded-[1.75rem] [aspect-ratio:9/16]" />
+          <Skeleton className="hidden h-[min(42vh,380px)] rounded-3xl [aspect-ratio:9/16] lg:block" />
         </div>
 
         <div className="flex items-center justify-center gap-1.5">
@@ -27,7 +27,7 @@ export function GallerySkeleton() {
             <Skeleton
               // biome-ignore lint/suspicious/noArrayIndexKey: fixed static placeholders
               key={i}
-              className="h-14 w-9 rounded-lg bg-white/10"
+              className="h-14 w-9 rounded-lg"
             />
           ))}
         </div>

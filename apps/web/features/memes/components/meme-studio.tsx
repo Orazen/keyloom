@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { parseAsString, useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   type MemeTemplate,
   memeAsset,
@@ -41,8 +41,6 @@ export function MemeStudio() {
     "t",
     parseAsString.withOptions({ history: "push" }),
   );
-  const [caption, setCaption] = useState("");
-
   useEffect(() => {
     loadMemeFonts();
   }, []);
@@ -70,7 +68,7 @@ export function MemeStudio() {
       <div className="px-5 py-6 sm:px-8 lg:px-10">
         <MemeEditor
           template={selected}
-          initialCaption={caption}
+          initialCaption=""
           onBack={() => setTemplateId(null)}
         />
       </div>
@@ -78,13 +76,8 @@ export function MemeStudio() {
   }
   if (isPending) return <GallerySkeleton />;
   return (
-    <div className="px-3 pb-3">
-      <MemeSurf
-        templates={list}
-        caption={caption}
-        onCaptionChange={setCaption}
-        onSelect={(t) => setTemplateId(t.id)}
-      />
+    <div className="px-5 pb-5 pt-4 sm:px-8 lg:px-10">
+      <MemeSurf templates={list} onSelect={(t) => setTemplateId(t.id)} />
     </div>
   );
 }

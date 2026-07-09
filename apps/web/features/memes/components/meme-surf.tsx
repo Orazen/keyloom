@@ -9,7 +9,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@workspace/ui/components/button";
-import { Input } from "@workspace/ui/components/input";
 import { cn } from "@workspace/ui/lib/utils";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -19,7 +18,6 @@ import {
   CHART_TAGS,
   type ChartEntry,
   type ChartFilter,
-  chartWeekLabel,
 } from "@/features/memes/lib/meme-chart";
 import { DEFAULT_CAPTION } from "@/features/memes/lib/meme-layout";
 import {
@@ -52,13 +50,9 @@ function mod(n: number, m: number): number {
 
 export function MemeSurf({
   templates,
-  caption,
-  onCaptionChange,
   onSelect,
 }: {
   templates: MemeTemplate[];
-  caption: string;
-  onCaptionChange: (next: string) => void;
   onSelect: (t: MemeTemplate) => void;
 }) {
   const [filter, setFilter] = useQueryState(
@@ -66,10 +60,10 @@ export function MemeSurf({
     parseAsStringLiteral(CHART_FILTERS).withDefault("all"),
   );
   const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState<1 | -1>(1);
   const [muted, setMuted] = useState(true);
 
   const chart = useMemo(() => buildChart(templates, new Date()), [templates]);
-  const weekLabel = useMemo(() => chartWeekLabel(new Date()), []);
 
   const presentTags = useMemo(
     () =>
@@ -88,7 +82,16 @@ export function MemeSurf({
   const prevEntry = total > 1 ? filtered[mod(current - 1, total)] : undefined;
   const nextEntry = total > 1 ? filtered[mod(current + 1, total)] : undefined;
 
-  const surf = (dir: 1 | -1) => setIndex(current + dir);
+  const surf = (dir: 1 | -1) => {
+    setDirection(dir);
+    setIndex(current + dir);
+  };
+
+  const jump = (target: number) => {
+    if (target === current) return;
+    setDirection(target > current ? 1 : -1);
+    setIndex(target);
+  };
 
   const selectFilter = (next: ChartFilter) => {
     setFilter(next);
@@ -132,7 +135,7 @@ export function MemeSurf({
           <h2 className="text-lg font-medium tracking-tight">
             No templates yet
           </h2>
-          <p className="mt-1.5 max-w-sm text-sm text-white/50">
+          <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">
             Upload transparent <code>.webm</code> clips to the{" "}
             <code>memes/</code> folder of your R2 bucket and they'll show up
             here.
@@ -149,7 +152,7 @@ export function MemeSurf({
           <h1 className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
             Flip through. Sound on.
           </h1>
-          <p className="mt-1 text-sm text-white/50">
+          <p className="mt-1 text-sm text-muted-foreground">
             One at a time, like it'll actually be seen. Arrow keys to surf.
           </p>
         </div>
@@ -175,7 +178,7 @@ export function MemeSurf({
 
       {!active ? (
         <div className="flex flex-1 items-center justify-center">
-          <p className="text-sm text-white/50">
+          <p className="text-sm text-muted-foreground">
             Nothing on the chart for this filter.
           </p>
         </div>
@@ -201,12 +204,12 @@ export function MemeSurf({
             <ActiveCard
               key={active.template.id}
               entry={active}
-              caption={caption}
+              direction={direction}
               muted={muted}
               onToggleMuted={() => setMuted((m) => !m)}
               onAutoplayBlocked={() => setMuted(true)}
               onOpen={() => onSelect(active.template)}
-              metaLine={`${active.uses} uses${active.tag ? ` · ${active.tag}` : ""} · ${current + 1} of ${total}`}
+              onSwipe={total > 1 ? surf : undefined}
             />
 
             <SurfArrow
@@ -218,31 +221,13 @@ export function MemeSurf({
             />
 
             {nextEntry ? (
-              <div className="relative hidden lg:block">
-                <GhostCard entry={nextEntry} onClick={() => surf(1)} />
-                <CaptionPanel
-                  caption={caption}
-                  onCaptionChange={onCaptionChange}
-                  onOpen={() => onSelect(active.template)}
-                  className="absolute left-1/2 top-1/2 w-64 -translate-x-1/2 -translate-y-1/2"
-                />
-              </div>
-            ) : (
-              <CaptionPanel
-                caption={caption}
-                onCaptionChange={onCaptionChange}
-                onOpen={() => onSelect(active.template)}
-                className="hidden w-64 lg:block"
+              <GhostCard
+                entry={nextEntry}
+                className="hidden lg:block"
+                onClick={() => surf(1)}
               />
-            )}
+            ) : null}
           </div>
-
-          <CaptionPanel
-            caption={caption}
-            onCaptionChange={onCaptionChange}
-            onOpen={() => onSelect(active.template)}
-            className="mx-auto w-full max-w-sm lg:hidden"
-          />
 
           <footer className="relative mt-4 grid items-center gap-3 sm:grid-cols-[1fr_auto_1fr]">
             <div className="flex items-center gap-3 max-sm:justify-center">
@@ -250,10 +235,8 @@ export function MemeSurf({
               <Hint keys={["M"]} label="sound" />
               <Hint keys={["↵"]} label="edit" />
             </div>
-            <FilmStrip entries={filtered} current={current} onJump={setIndex} />
-            <p className="text-right font-mono text-[10px] uppercase tracking-[0.14em] text-white/35 max-sm:hidden">
-              Week of {weekLabel} · refreshes Sundays
-            </p>
+            <FilmStrip entries={filtered} current={current} onJump={jump} />
+            <div aria-hidden className="max-sm:hidden" />
           </footer>
         </>
       )}
@@ -263,38 +246,37 @@ export function MemeSurf({
 
 function Stage({ children }: { children: React.ReactNode }) {
   return (
-    <section className="relative flex min-h-[calc(100dvh-4.25rem)] flex-col overflow-hidden rounded-3xl bg-[#0e0f13] px-5 py-5 text-white sm:px-8 sm:py-6">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(640px_520px_at_50%_42%,color-mix(in_oklab,var(--primary)_14%,transparent),transparent_70%)]"
-      />
+    <section className="relative flex min-h-[calc(100dvh-5.25rem)] flex-col">
       {children}
     </section>
   );
 }
 
+const SWIPE_THRESHOLD = 90;
+
 function ActiveCard({
   entry,
-  caption,
+  direction,
   muted,
-  metaLine,
   onToggleMuted,
   onAutoplayBlocked,
   onOpen,
+  onSwipe,
 }: {
   entry: ChartEntry;
-  caption: string;
+  direction: 1 | -1;
   muted: boolean;
-  metaLine: string;
   onToggleMuted: () => void;
   onAutoplayBlocked: () => void;
   onOpen: () => void;
+  onSwipe?: (dir: 1 | -1) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const drag = useRef({ startX: 0, dx: 0, active: false, captured: false });
   const [duration, setDuration] = useState<number | null>(null);
   const bgSrc = backgroundForTemplate(entry.template.id)?.src;
-  const previewCaption = caption.trim() || DEFAULT_CAPTION.text;
 
   useEffect(() => {
     const v = videoRef.current;
@@ -305,13 +287,71 @@ function ActiveCard({
     });
   }, [muted, onAutoplayBlocked]);
 
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!onSwipe || e.button !== 0) return;
+    drag.current = { startX: e.clientX, dx: 0, active: true, captured: false };
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!drag.current.active) return;
+    const el = cardRef.current;
+    if (!el) return;
+    const dx = e.clientX - drag.current.startX;
+    drag.current.dx = dx;
+    if (!drag.current.captured) {
+      if (Math.abs(dx) < 8) return;
+      drag.current.captured = true;
+      el.setPointerCapture(e.pointerId);
+      el.style.transition = "none";
+    }
+    el.style.transform = `translateX(${dx}px) rotate(${dx * 0.05}deg)`;
+  };
+
+  const endDrag = () => {
+    if (!drag.current.active) return;
+    drag.current.active = false;
+    const el = cardRef.current;
+    if (!el || !drag.current.captured) return;
+    const { dx } = drag.current;
+    if (onSwipe && Math.abs(dx) > SWIPE_THRESHOLD) {
+      const sign = Math.sign(dx);
+      el.style.transition = "transform 0.3s ease-out, opacity 0.3s ease-out";
+      el.style.transform = `translateX(${sign * window.innerWidth * 0.8}px) rotate(${sign * 24}deg)`;
+      el.style.opacity = "0";
+      window.setTimeout(() => onSwipe(dx < 0 ? 1 : -1), 220);
+    } else {
+      el.style.transition = "transform 0.25s ease-out";
+      el.style.transform = "";
+    }
+  };
+
+  const suppressDragClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (Math.abs(drag.current.dx) > 8) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
   return (
-    <div className="relative">
+    <div
+      ref={cardRef}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      onClickCapture={suppressDragClick}
+      onDragStart={(e) => e.preventDefault()}
+      style={{ touchAction: "pan-y" }}
+      className={cn(
+        "relative select-none animate-in fade-in duration-300",
+        direction === 1 ? "slide-in-from-right-8" : "slide-in-from-left-8",
+      )}
+    >
       <button
         type="button"
         onClick={onOpen}
         aria-label={`Open ${entry.template.title} in the editor`}
-        className="group relative block h-[min(58vh,540px)] cursor-pointer overflow-hidden rounded-[1.75rem] shadow-[0_24px_80px_-24px_color-mix(in_oklab,var(--primary)_45%,transparent)] outline-none ring-1 ring-white/10 transition-transform duration-300 focus-visible:ring-2 focus-visible:ring-primary"
+        className="group relative block h-[min(58vh,540px)] cursor-pointer overflow-hidden rounded-[1.75rem] border border-border/60 bg-card shadow-lg shadow-black/10 outline-none transition-shadow duration-300 hover:shadow-xl hover:shadow-black/15 focus-visible:ring-2 focus-visible:ring-primary"
         style={{ aspectRatio: "9 / 16" }}
       >
         {bgSrc ? (
@@ -351,12 +391,8 @@ function ActiveCard({
           className="absolute inset-x-[6%] top-[12%] text-center text-[clamp(14px,1.9vh,20px)] font-extrabold leading-snug text-white [text-shadow:-2px_-2px_0_#000,2px_-2px_0_#000,-2px_2px_0_#000,2px_2px_0_#000,0_2px_0_#000,0_-2px_0_#000,2px_0_0_#000,-2px_0_0_#000]"
           style={{ fontFamily: "'TikTok Sans', sans-serif" }}
         >
-          {previewCaption}
+          {DEFAULT_CAPTION.text}
         </p>
-
-        <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-primary-foreground">
-          <HugeiconsIcon icon={FireIcon} size={11} />#{entry.rank} this week
-        </span>
 
         {duration ? (
           <span className="absolute right-3 top-3 rounded-full bg-black/60 px-2 py-1 font-mono text-[10px] tabular-nums text-white/80">
@@ -364,7 +400,7 @@ function ActiveCard({
           </span>
         ) : null}
 
-        <div className="absolute inset-x-0 bottom-0 h-1 bg-white/10">
+        <div className="absolute inset-x-0 bottom-0 h-1 bg-black/15">
           <div ref={barRef} className="h-full w-0 bg-primary" />
         </div>
       </button>
@@ -373,7 +409,7 @@ function ActiveCard({
         type="button"
         onClick={onToggleMuted}
         aria-label={muted ? "Unmute" : "Mute"}
-        className="absolute -right-2 bottom-14 z-10 flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/70 text-white/80 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="absolute -right-2 bottom-14 z-10 flex size-9 items-center justify-center rounded-full border border-border/60 bg-card text-muted-foreground shadow-sm transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
         <HugeiconsIcon
           icon={muted ? VolumeMute02Icon : VolumeHighIcon}
@@ -385,9 +421,6 @@ function ActiveCard({
         <h2 className="truncate font-heading text-lg font-semibold tracking-tight">
           {entry.template.title}
         </h2>
-        <p className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">
-          {metaLine}
-        </p>
       </div>
     </div>
   );
@@ -410,7 +443,7 @@ function GhostCard({
       onClick={onClick}
       aria-label={`Surf to ${entry.template.title}`}
       className={cn(
-        "relative h-[min(42vh,380px)] shrink-0 overflow-hidden rounded-3xl ring-1 ring-white/5 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+        "relative h-[min(42vh,380px)] shrink-0 overflow-hidden rounded-3xl border border-border/60 bg-card shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
         className,
       )}
       style={{ aspectRatio: "9 / 16" }}
@@ -420,52 +453,27 @@ function GhostCard({
         <img
           src={bgSrc}
           alt=""
-          className="absolute inset-0 size-full object-cover opacity-20 saturate-50"
+          className="absolute inset-0 size-full object-cover"
         />
-      ) : null}
-      <span className="absolute inset-0 flex items-center justify-center px-4 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-white/25">
-        {entry.template.title}
-      </span>
-    </button>
-  );
-}
-
-function CaptionPanel({
-  caption,
-  onCaptionChange,
-  onOpen,
-  className,
-}: {
-  caption: string;
-  onCaptionChange: (next: string) => void;
-  onOpen: () => void;
-  className?: string;
-}) {
-  return (
-    <div
-      className={cn(
-        "flex flex-col gap-3 rounded-2xl border border-white/10 bg-[#15171d]/95 p-4 shadow-2xl",
-        className,
+      ) : (
+        <span
+          aria-hidden
+          className="absolute inset-0"
+          style={{ backgroundColor: pastelFor(entry.template.id) }}
+        />
       )}
-    >
-      <label
-        htmlFor="surf-caption"
-        className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/40"
-      >
-        Your caption — rides every flip
-      </label>
-      <Input
-        id="surf-caption"
-        value={caption}
-        onChange={(e) => onCaptionChange(e.target.value)}
-        placeholder={DEFAULT_CAPTION.text}
-        className="border-white/10 bg-white/5 text-[13px] text-white placeholder:text-white/25"
+      {/* biome-ignore lint/a11y/useMediaCaption: muted meme template preview, no caption track */}
+      <video
+        src={entry.template.src}
+        muted
+        autoPlay
+        loop
+        playsInline
+        preload="metadata"
+        className="absolute inset-0 size-full object-contain"
       />
-      <Button className="w-full rounded-full" onClick={onOpen}>
-        Open in editor
-        <HugeiconsIcon icon={ArrowRight02Icon} size={15} />
-      </Button>
-    </div>
+      <span aria-hidden className="absolute inset-0 bg-background/50" />
+    </button>
   );
 }
 
@@ -490,7 +498,7 @@ function SurfArrow({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "shrink-0 rounded-full border-white/10 bg-white/5 text-white hover:bg-white/15 hover:text-white max-sm:absolute max-sm:top-1/2 max-sm:z-10 max-sm:-translate-y-1/2",
+        "shrink-0 rounded-full max-sm:absolute max-sm:top-1/2 max-sm:z-10 max-sm:-translate-y-1/2",
         side === "left" ? "max-sm:left-0" : "max-sm:right-0",
       )}
     >
@@ -532,7 +540,7 @@ function FilmStrip({
               "relative h-14 w-9 shrink-0 overflow-hidden rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
               isActive
                 ? "ring-2 ring-primary"
-                : "opacity-40 ring-1 ring-white/10 hover:opacity-70",
+                : "opacity-50 ring-1 ring-border hover:opacity-80",
             )}
           >
             {bgSrc ? (
@@ -557,7 +565,7 @@ function FilmStrip({
           type="button"
           onClick={() => onJump(start + STRIP_SIZE)}
           aria-label={`${overflow} more clips`}
-          className="flex h-14 w-9 shrink-0 items-center justify-center rounded-lg bg-white/5 font-mono text-[10px] text-white/50 ring-1 ring-white/10 transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="flex h-14 w-9 shrink-0 items-center justify-center rounded-lg bg-card font-mono text-[10px] text-muted-foreground shadow-sm ring-1 ring-border transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
           +{overflow}
         </button>
@@ -568,11 +576,11 @@ function FilmStrip({
 
 function Hint({ keys, label }: { keys: string[]; label: string }) {
   return (
-    <span className="flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">
+    <span className="flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground/70">
       {keys.map((k) => (
         <kbd
           key={k}
-          className="flex h-5 min-w-5 items-center justify-center rounded border border-white/15 px-1 font-mono text-[10px] text-white/60"
+          className="flex h-5 min-w-5 items-center justify-center rounded border bg-card px-1 font-mono text-[10px] text-muted-foreground"
         >
           {k}
         </kbd>
@@ -598,8 +606,8 @@ function FilterPill({
       className={cn(
         "flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors",
         active
-          ? "bg-white text-zinc-900"
-          : "text-white/55 hover:bg-white/10 hover:text-white",
+          ? "bg-foreground text-background"
+          : "bg-card text-muted-foreground shadow-sm hover:text-foreground",
       )}
     >
       {children}
