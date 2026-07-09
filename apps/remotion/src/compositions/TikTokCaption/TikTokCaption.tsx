@@ -142,7 +142,7 @@ const INACTIVE_HOLD_SECONDS = 0.2;
 // forward bias only. Anything larger pushes the active-word highlight a
 // full word ahead during fast speech now that the preview clocks off the
 // audible media element.
-const TIMING_LEAD_SECONDS = 0.03;
+const TIMING_LEAD_SECONDS = 0.06;
 // After a real pause, pop the upcoming word a beat early instead of holding
 // the previous one until the exact timestamp. Bounded by the previous
 // word's end, so mid-phrase highlights stay on the spoken word.
