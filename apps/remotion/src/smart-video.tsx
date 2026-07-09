@@ -12,6 +12,8 @@ type SmartVideoProps = {
   trimAfter?: number;
   objectFit?: "fill" | "contain" | "cover";
   style?: React.CSSProperties;
+  /** Preview-only handle to the underlying HTMLVideoElement. */
+  mediaRef?: React.Ref<HTMLVideoElement>;
 };
 
 /**
@@ -24,12 +26,22 @@ type SmartVideoProps = {
  * so the preview uses it and only the client-side render swaps in the
  * WebCodecs one.
  */
-export function SmartVideo({ objectFit, style, ...props }: SmartVideoProps) {
+export function SmartVideo({
+  objectFit,
+  style,
+  mediaRef,
+  ...props
+}: SmartVideoProps) {
   const env = useRemotionEnvironment();
   if (env.isRendering && env.isClientSideRendering) {
     return <MediaVideo {...props} objectFit={objectFit} style={style} />;
   }
   return (
-    <Html5Video pauseWhenBuffering {...props} style={{ ...style, objectFit }} />
+    <Html5Video
+      ref={mediaRef}
+      pauseWhenBuffering
+      {...props}
+      style={{ ...style, objectFit }}
+    />
   );
 }

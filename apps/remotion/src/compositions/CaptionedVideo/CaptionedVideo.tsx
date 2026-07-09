@@ -1,4 +1,5 @@
 "use client";
+import { useRef } from "react";
 import { AbsoluteFill, Sequence, useVideoConfig } from "remotion";
 import type { ClipStyle } from "../../clip-style";
 import { SmartVideo } from "../../smart-video";
@@ -53,6 +54,10 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
   const { fps } = useVideoConfig();
   const keeps = buildKeeps(cuts, durationSec);
   const editedWords = remapWords(words, keeps);
+  // Media-clock caption sync only holds while source time == timeline time;
+  // cuts remap the timeline, so they fall back to the frame clock.
+  const previewVideoRef = useRef<HTMLVideoElement>(null);
+  const syncToMedia = cuts.length === 0;
 
   let offset = 0;
   const sequences = keeps.map((k) => {
@@ -78,6 +83,7 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
             trimAfter={s.trimAfter}
             objectFit="contain"
             style={{ width: "100%", height: "100%" }}
+            mediaRef={syncToMedia ? previewVideoRef : undefined}
           />
         </Sequence>
       ))}
@@ -96,6 +102,7 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
         onCaptionMove={onCaptionMove}
         onCaptionScale={onCaptionScale}
         onCaptionWidth={onCaptionWidth}
+        previewMediaRef={syncToMedia ? previewVideoRef : undefined}
       />
     </AbsoluteFill>
   );

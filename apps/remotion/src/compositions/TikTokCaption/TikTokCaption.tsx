@@ -4,6 +4,7 @@ import {
   AbsoluteFill,
   useCurrentFrame,
   useCurrentScale,
+  useRemotionEnvironment,
   useVideoConfig,
 } from "remotion";
 import { type ClipStyle, resolveClipStyle } from "../../clip-style";
@@ -79,6 +80,13 @@ export type TikTokCaptionProps = {
   onCaptionMove?: (pos: CaptionPos) => void;
   onCaptionScale?: (fontScale: number) => void;
   onCaptionWidth?: (widthFrac: number) => void;
+  /**
+   * Preview-only: sync the caption clock to the audible media element
+   * instead of the timeline frame. The HTML5 preview video may drift a few
+   * hundred ms from the timeline, which word-pop captions make obvious;
+   * exports render frame-exact and ignore this.
+   */
+  previewMediaRef?: React.RefObject<HTMLVideoElement | null>;
 };
 
 const BASE_FONT_SIZE = 132;
@@ -420,11 +428,13 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
   onCaptionMove,
   onCaptionScale,
   onCaptionWidth,
+  previewMediaRef,
 }) => {
   // Real frame — word timestamps from Whisper are wall-clock seconds, so
   // they must be compared against real time, not the 60fps design frame.
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
+  const env = useRemotionEnvironment();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const theme =
@@ -442,7 +452,15 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
 
   useFontReady(s.fontFamily);
 
-  const timeSeconds = frame / fps + TIMING_LEAD_SECONDS;
+  // In the Player, clock off the audible media element when provided — the
+  // HTML5 preview video drifts from the timeline and captions must follow
+  // the voice, not the frame counter. Renders always use the frame.
+  const mediaEl = env.isRendering ? null : previewMediaRef?.current;
+  const baseSeconds =
+    mediaEl && Number.isFinite(mediaEl.currentTime)
+      ? mediaEl.currentTime
+      : frame / fps;
+  const timeSeconds = baseSeconds + TIMING_LEAD_SECONDS;
 
   // Monotone "last word that started" selection. Testing frame time against
   // each word's [start, end) window skips any word shorter than a frame
@@ -550,6 +568,10 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
           width: boxWidth ?? undefined,
           maxWidth: boxWidth ?? width * 0.88,
           lineHeight: 1.55,
+          // The pill span's background paints its own line box, which is
+          // sized by THIS element's font — without it the pill collapses to
+          // a thin strip under the (much larger) word spans.
+          fontSize,
         }}
       >
         <span
