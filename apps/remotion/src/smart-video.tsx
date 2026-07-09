@@ -30,6 +30,13 @@ export function SmartVideo({ objectFit, style, ...props }: SmartVideoProps) {
     return <MediaVideo {...props} objectFit={objectFit} style={style} />;
   }
   return (
-    <Html5Video pauseWhenBuffering {...props} style={{ ...style, objectFit }} />
+    <Html5Video
+      pauseWhenBuffering
+      // Default drift tolerance is 0.45s — enough to make word-pop captions
+      // visibly lag the voice. Keep the element within ~0.15s of the timeline.
+      acceptableTimeShiftInSeconds={0.15}
+      {...props}
+      style={{ ...style, objectFit }}
+    />
   );
 }

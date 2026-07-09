@@ -130,6 +130,12 @@ export function groupIntoPhrases(
 export type TikTokCaptionLayerProps = Omit<TikTokCaptionProps, "audioUrl">;
 
 const INACTIVE_HOLD_SECONDS = 0.2;
+// Whisper word starts run slightly behind the audible onset, and a late
+// caption reads far worse than a hair-early one — bias the clock forward.
+const TIMING_LEAD_SECONDS = 0.08;
+// Inside a short mid-speech gap, pop the upcoming word a beat early instead
+// of holding the previous one until the exact start timestamp.
+const EARLY_POP_SECONDS = 0.15;
 const MIN_FONT_SCALE = 0.4;
 const MAX_FONT_SCALE = 2.6;
 
@@ -436,7 +442,7 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
 
   useFontReady(s.fontFamily);
 
-  const timeSeconds = frame / fps;
+  const timeSeconds = frame / fps + TIMING_LEAD_SECONDS;
 
   let activeIndex = -1;
   for (let i = 0; i < words.length; i++) {
@@ -447,7 +453,7 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
       break;
     }
     if (timeSeconds < w.start) {
-      activeIndex = i - 1;
+      activeIndex = w.start - timeSeconds <= EARLY_POP_SECONDS ? i : i - 1;
       break;
     }
     if (i === words.length - 1 && timeSeconds >= w.end) {
