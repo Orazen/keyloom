@@ -208,12 +208,13 @@ export const CAPTION_THEME_LIST: CaptionThemeDef[] = [
     shadow: "glow",
   },
   {
-    // Cinematic image-in-text: glyphs masked over ocean water.
-    // Photo: "Água do Mar" by Elvis Boaventura, CC BY 3.0, Wikimedia Commons.
+    // Cinematic image-in-text: glyphs masked over blue ocean water.
+    // Photo: "Ocean waves drone view of Palm Coast beach" (crop), CC0,
+    // Wikimedia Commons.
     id: "ocean",
     label: "OCEAN",
     fontKey: "poppins",
-    textColor: "#7dd3fc",
+    textColor: "#38bdf8",
     accentColor: "#e0f2fe",
     uppercase: true,
     shadow: "none",
