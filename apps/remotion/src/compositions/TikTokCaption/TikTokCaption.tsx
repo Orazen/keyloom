@@ -566,8 +566,11 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
       ...(imageFill
         ? {
             backgroundImage: `url(${textImageUrl})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center 40%",
+            // Oversized + sinusoidal drift: the water texture sloshes
+            // through the glyphs like flowing water. Sine keeps the motion
+            // seamless (no tile edges) and deterministic for exports.
+            backgroundSize: "auto 300%",
+            backgroundPosition: `calc(50% + ${(Math.sin(timeSeconds * 0.9) * fontSize * 0.5).toFixed(1)}px) calc(40% + ${(Math.cos(timeSeconds * 0.6) * fontSize * 0.25).toFixed(1)}px)`,
             WebkitBackgroundClip: "text",
             backgroundClip: "text",
             filter: "brightness(1.35) saturate(1.4)",
