@@ -43,6 +43,14 @@ const SIZE_OPTIONS: { label: string; value: number }[] = [
   { label: "Huge", value: 1.6 },
 ];
 
+const WORD_OPTIONS: { label: string; value: number }[] = [
+  { label: "1 word", value: 1 },
+  { label: "2 words", value: 2 },
+  { label: "3 words", value: 3 },
+  { label: "4 words", value: 4 },
+  { label: "5 words", value: 5 },
+];
+
 export function StyleToolbar({
   style,
   onStyle,
@@ -96,6 +104,31 @@ export function StyleToolbar({
           ))}
         </SelectContent>
       </Select>
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div>
+            <Select
+              value={String(style.wordsPerCaption)}
+              onValueChange={(v) => onStyle({ wordsPerCaption: Number(v) })}
+            >
+              <SelectTrigger size="sm" className="w-28">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {WORD_OPTIONS.map((w) => (
+                  <SelectItem key={w.value} value={String(w.value)}>
+                    {w.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          Words shown at a time — 1 for word-pop
+        </TooltipContent>
+      </Tooltip>
 
       <Popover>
         <Tooltip>

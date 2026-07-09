@@ -72,6 +72,8 @@ export type CaptionStyle = {
   position: CaptionPos | null;
   /** Squeezed box width (fraction of video width); null hugs the text. */
   width: number | null;
+  /** Max words shown at once. 1 = word-pop; pauses still break phrases. */
+  wordsPerCaption: number;
   textColor: string;
   accentColor: string;
 };
@@ -84,6 +86,7 @@ const INITIAL_STYLE: CaptionStyle = {
   hAlign: "center",
   position: null,
   width: null,
+  wordsPerCaption: 3,
   textColor: "#ffffff",
   accentColor: "#facc15",
 };

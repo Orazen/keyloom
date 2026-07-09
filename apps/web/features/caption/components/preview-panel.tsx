@@ -55,6 +55,7 @@ export function PreviewPanel({
       captionPos: style.position,
       captionWidth: style.width,
       fontScale: style.fontScale,
+      maxWordsPerPhrase: style.wordsPerCaption,
       clipTheme: style.themeId,
       clipStyle: {
         background: "transparent",

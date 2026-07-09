@@ -52,6 +52,12 @@ export type TikTokCaptionProps = {
   captionWidth?: number | null;
   // Multiplier on the base font size. 1 = medium, 0.7 small, 1.6 huge.
   fontScale?: number;
+  /**
+   * Max words shown per caption. 1 gives the viral word-pop style; ~3
+   * (default) matches speech pace; 5+ reads like subtitle lines. Pauses in
+   * speech still force a break regardless.
+   */
+  maxWordsPerPhrase?: number;
   clipStyle?: ClipStyle;
   /** Curated look from ./themes — same id the studio stores at clip.style.theme. */
   clipTheme?: string;
@@ -96,13 +102,17 @@ const HORIZ_TO_TEXT_ALIGN: Record<HAlign, "left" | "center" | "right"> = {
   right: "right",
 };
 
-export function groupIntoPhrases(words: CaptionWord[]): CaptionWord[][] {
+export function groupIntoPhrases(
+  words: CaptionWord[],
+  maxWords: number = PHRASE_MAX_WORDS,
+): CaptionWord[][] {
   const phrases: CaptionWord[][] = [];
   let current: CaptionWord[] = [];
+  const limit = Math.max(1, Math.round(maxWords));
   for (const w of words) {
     const prev = current[current.length - 1];
     const shouldBreak =
-      current.length >= PHRASE_MAX_WORDS ||
+      current.length >= limit ||
       (prev && w.start - prev.end > PHRASE_MAX_GAP_SECONDS);
     if (shouldBreak && current.length > 0) {
       phrases.push(current);
@@ -393,6 +403,7 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
   captionPos,
   captionWidth,
   fontScale = 1,
+  maxWordsPerPhrase,
   clipStyle,
   clipTheme,
   hideWhenInactive = false,
@@ -441,7 +452,7 @@ export const TikTokCaptionLayer: React.FC<TikTokCaptionLayerProps> = ({
     }
   }
 
-  const phrases = groupIntoPhrases(words);
+  const phrases = groupIntoPhrases(words, maxWordsPerPhrase);
   let activePhrase =
     activeIndex >= 0
       ? phrases.find((p) => p.some((w) => w === words[activeIndex]))

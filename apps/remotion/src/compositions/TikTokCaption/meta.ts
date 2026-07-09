@@ -20,6 +20,7 @@ export const tikTokCaptionDefaultProps: TikTokCaptionProps = {
   captionVAlign: "center",
   captionHAlign: "center",
   fontScale: 1,
+  maxWordsPerPhrase: 3,
 };
 
 export const tikTokCaptionInfo: CompositionInfo<TikTokCaptionProps> = {
@@ -68,6 +69,13 @@ export const tikTokCaptionInfo: CompositionInfo<TikTokCaptionProps> = {
       label: "Font scale",
       min: 0.5,
       max: 2,
+    },
+    {
+      kind: "number",
+      key: "maxWordsPerPhrase",
+      label: "Words per caption",
+      min: 1,
+      max: 6,
     },
   ],
   calculateMetadata: ({ props }) => {

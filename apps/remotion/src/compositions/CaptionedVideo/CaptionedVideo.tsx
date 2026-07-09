@@ -22,6 +22,7 @@ export type CaptionedVideoProps = {
   captionPos?: CaptionPos | null;
   captionWidth?: number | null;
   fontScale?: number;
+  maxWordsPerPhrase?: number;
   clipStyle?: ClipStyle;
   clipTheme?: string;
   /** Player-only: enables drag/resize of the caption box (see TikTokCaption). */
@@ -41,6 +42,7 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
   captionPos,
   captionWidth,
   fontScale,
+  maxWordsPerPhrase,
   clipStyle,
   clipTheme,
   editMode,
@@ -85,6 +87,7 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
         captionPos={captionPos}
         captionWidth={captionWidth}
         fontScale={fontScale}
+        maxWordsPerPhrase={maxWordsPerPhrase}
         clipStyle={clipStyle}
         clipTheme={clipTheme}
         hideWhenInactive
