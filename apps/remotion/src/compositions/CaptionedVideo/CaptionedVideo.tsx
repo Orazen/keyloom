@@ -77,7 +77,7 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
   });
 
   return (
-    <AbsoluteFill style={{ backgroundColor: "#000" }}>
+    <AbsoluteFill style={{ backgroundColor: "#000", filter: videoFilter }}>
       {sequences.map((s) => (
         <Sequence key={s.key} from={s.from} durationInFrames={s.duration}>
           <SmartVideo
@@ -85,7 +85,7 @@ export const CaptionedVideo: React.FC<CaptionedVideoProps> = ({
             trimBefore={s.trimBefore}
             trimAfter={s.trimAfter}
             objectFit="contain"
-            style={{ width: "100%", height: "100%", filter: videoFilter }}
+            style={{ width: "100%", height: "100%" }}
             mediaRef={syncToMedia ? previewVideoRef : undefined}
           />
         </Sequence>
