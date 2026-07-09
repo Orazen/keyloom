@@ -64,7 +64,7 @@ export function PlayerControls({
   };
 
   return (
-    <div className="flex flex-col gap-2.5 rounded-2xl border border-border bg-card p-3 shadow-sm">
+    <div className="mx-auto flex w-full max-w-xl flex-col gap-2.5 rounded-2xl border border-border bg-card p-3 shadow-sm">
       <Slider
         value={[frame]}
         min={0}

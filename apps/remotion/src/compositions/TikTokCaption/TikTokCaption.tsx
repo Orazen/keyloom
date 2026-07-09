@@ -138,12 +138,15 @@ export function groupIntoPhrases(
 export type TikTokCaptionLayerProps = Omit<TikTokCaptionProps, "audioUrl">;
 
 const INACTIVE_HOLD_SECONDS = 0.2;
-// Whisper word starts run slightly behind the audible onset, and a late
-// caption reads far worse than a hair-early one — bias the clock forward.
-const TIMING_LEAD_SECONDS = 0.08;
-// Inside a short mid-speech gap, pop the upcoming word a beat early instead
-// of holding the previous one until the exact start timestamp.
-const EARLY_POP_SECONDS = 0.15;
+// Whisper word starts run slightly behind the audible onset — a small
+// forward bias only. Anything larger pushes the active-word highlight a
+// full word ahead during fast speech now that the preview clocks off the
+// audible media element.
+const TIMING_LEAD_SECONDS = 0.03;
+// After a real pause, pop the upcoming word a beat early instead of holding
+// the previous one until the exact timestamp. Bounded by the previous
+// word's end, so mid-phrase highlights stay on the spoken word.
+const EARLY_POP_SECONDS = 0.1;
 const MIN_FONT_SCALE = 0.4;
 const MAX_FONT_SCALE = 2.6;
 
