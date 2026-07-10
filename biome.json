@@ -21,6 +21,7 @@
       "!!**/.vercel",
       "!!**/.turbo",
       "!!**/coverage",
+      "!!worktrees",
       "!**/*.lock",
       "!**/.env*",
       "!**/*.d.ts",

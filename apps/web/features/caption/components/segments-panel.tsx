@@ -39,40 +39,29 @@ export function SegmentsPanel({
       return playhead >= r.start && playhead < r.end;
     })?.id ?? null;
 
-  const wordCount = segments.reduce((sum, s) => sum + s.words.length, 0);
-
   return (
-    <section className="flex w-full flex-col rounded-2xl border border-border bg-card shadow-sm">
-      <header className="flex items-baseline justify-between border-b border-border px-4 py-3">
-        <h2 className="text-sm font-semibold tracking-tight">Captions</h2>
-        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-          {wordCount} words · {segments.length} lines
-        </span>
-      </header>
-      <div className="p-2">
-        {segments.length === 0 ? (
-          <p className="p-4 text-sm text-muted-foreground">
-            Every caption line was deleted. Upload the video again to start
-            over.
-          </p>
-        ) : (
-          <ul className="space-y-0.5">
-            {segments.map((seg) => (
-              <SegmentRow
-                key={seg.id}
-                segment={seg}
-                active={seg.id === activeId}
-                playhead={seg.id === activeId ? playhead : -1}
-                onSeek={onSeek}
-                onEdit={onEdit}
-                onToggleHidden={onToggleHidden}
-                onDelete={onDelete}
-              />
-            ))}
-          </ul>
-        )}
-      </div>
-    </section>
+    <div className="p-2">
+      {segments.length === 0 ? (
+        <p className="p-4 text-sm text-muted-foreground">
+          Every caption line was deleted. Upload the video again to start over.
+        </p>
+      ) : (
+        <ul className="space-y-0.5">
+          {segments.map((seg) => (
+            <SegmentRow
+              key={seg.id}
+              segment={seg}
+              active={seg.id === activeId}
+              playhead={seg.id === activeId ? playhead : -1}
+              onSeek={onSeek}
+              onEdit={onEdit}
+              onToggleHidden={onToggleHidden}
+              onDelete={onDelete}
+            />
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

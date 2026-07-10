@@ -7,14 +7,19 @@ import { CaptionedVideo } from "@workspace/compositions/compositions/CaptionedVi
 import { FONTS } from "@workspace/compositions/compositions/TikTokCaption/config";
 import type { CaptionWord } from "@workspace/compositions/compositions/TikTokCaption/TikTokCaption";
 import { Button } from "@workspace/ui/components/button";
+import { RaisedButton } from "@workspace/ui/components/raised-button";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { VideoMeta } from "../lib/editor";
 import { CAPTION_FPS, downloadBlob, exportCaptionedVideo } from "../lib/export";
 import { FILTERS_BY_ID } from "../lib/filters";
 import type { CaptionStyle } from "./caption-editor";
-import type { MusicTrack } from "./music-panel";
 import { PlayerControls } from "./player-controls";
+import {
+  FilterPopover,
+  MusicPopover,
+  type MusicTrack,
+} from "./preview-toolbar";
 
 const NO_CUTS: { start: number; end: number }[] = [];
 
@@ -24,6 +29,7 @@ export function PreviewPanel({
   style,
   music,
   onStyle,
+  onMusic,
   onPlayhead,
   seekRequestRef,
   onReplaceVideo,
@@ -33,6 +39,7 @@ export function PreviewPanel({
   style: CaptionStyle;
   music: MusicTrack | null;
   onStyle: (patch: Partial<CaptionStyle>) => void;
+  onMusic: (music: MusicTrack | null) => void;
   onPlayhead: (seconds: number) => void;
   seekRequestRef: React.MutableRefObject<((seconds: number) => void) | null>;
   onReplaceVideo: (file: File) => void;
@@ -143,9 +150,12 @@ export function PreviewPanel({
   return (
     <section className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="min-w-0 truncate text-sm font-medium text-muted-foreground">
-          {video.filename}
-        </span>
+        <MusicPopover music={music} onChange={onMusic} />
+        <FilterPopover
+          filterId={style.filterId}
+          videoSrc={video.url}
+          onChange={(filterId) => onStyle({ filterId })}
+        />
         <div className="ml-auto flex items-center gap-2">
           <Button
             variant="ghost"
@@ -155,7 +165,11 @@ export function PreviewPanel({
             <HugeiconsIcon icon={CloudUploadIcon} size={15} />
             Replace video
           </Button>
-          <Button size="sm" onClick={handleExport} className="min-w-28">
+          <RaisedButton
+            size="sm"
+            onClick={handleExport}
+            className="h-8 min-w-28"
+          >
             {exportProgress != null ? (
               `Cancel · ${Math.round(exportProgress * 100)}%`
             ) : (
@@ -164,7 +178,7 @@ export function PreviewPanel({
                 Export MP4
               </>
             )}
-          </Button>
+          </RaisedButton>
           <input
             ref={replaceInputRef}
             type="file"
@@ -195,11 +209,13 @@ export function PreviewPanel({
         />
       </div>
 
-      <PlayerControls
-        playerRef={playerRef}
-        durationInFrames={durationInFrames}
-        fps={CAPTION_FPS}
-      />
+      <div className="mx-auto w-full max-w-xl">
+        <PlayerControls
+          playerRef={playerRef}
+          durationInFrames={durationInFrames}
+          fps={CAPTION_FPS}
+        />
+      </div>
     </section>
   );
 }

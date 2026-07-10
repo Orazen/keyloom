@@ -18,7 +18,6 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { cn } from "@workspace/ui/lib/utils";
-import { FILTER_PRESETS } from "../lib/filters";
 import type { CaptionStyle } from "./caption-editor";
 
 const WORD_OPTIONS: { label: string; value: number }[] = [
@@ -29,7 +28,7 @@ const WORD_OPTIONS: { label: string; value: number }[] = [
   { label: "5 words", value: 5 },
 ];
 
-export function StylePanel({
+export function ThemePanel({
   style,
   onStyle,
 }: {
@@ -37,113 +36,98 @@ export function StylePanel({
   onStyle: (patch: Partial<CaptionStyle>) => void;
 }) {
   return (
-    <section className="rounded-2xl border border-border bg-card shadow-sm">
-      <header className="border-b border-border px-4 py-3">
-        <h2 className="text-sm font-semibold tracking-tight">Style</h2>
-      </header>
-      <div className="flex flex-col gap-4 p-4">
-        <div className="grid grid-cols-2 gap-1.5">
-          {CAPTION_THEME_LIST.map((t) => {
-            const active = t.id === style.themeId;
-            return (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() =>
-                  onStyle({
-                    themeId: t.id,
-                    fontKey: t.fontKey,
-                    textColor: t.textColor,
-                    accentColor: t.accentColor,
-                  })
-                }
-                className={cn(
-                  "flex h-14 items-center justify-center overflow-hidden rounded-lg border transition-colors",
-                  active
-                    ? "border-primary/60 ring-1 ring-primary/40"
-                    : "border-transparent hover:border-border",
-                )}
-                style={{ backgroundColor: "#1c1c21" }}
-                aria-label={`Theme ${t.label}`}
-              >
-                <ThemePreviewText theme={t} />
-              </button>
-            );
-          })}
-        </div>
-
-        <LabeledControl label="Font">
-          <Select
-            value={style.fontKey}
-            onValueChange={(v) => onStyle({ fontKey: v as FontKey })}
+    <div className="grid grid-cols-2 gap-1.5 p-4">
+      {CAPTION_THEME_LIST.map((t) => {
+        const active = t.id === style.themeId;
+        return (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() =>
+              onStyle({
+                themeId: t.id,
+                fontKey: t.fontKey,
+                textColor: t.textColor,
+                accentColor: t.accentColor,
+              })
+            }
+            className={cn(
+              "flex h-14 items-center justify-center overflow-hidden rounded-lg border transition-colors",
+              active
+                ? "border-primary/60 ring-1 ring-primary/40"
+                : "border-transparent hover:border-border",
+            )}
+            style={{ backgroundColor: "#1c1c21" }}
+            aria-label={`Theme ${t.label}`}
           >
-            <SelectTrigger size="sm" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {FONT_KEYS.map((key) => (
-                <SelectItem key={key} value={key}>
-                  <span style={{ fontFamily: FONTS[key].cssFamily }}>
-                    {FONTS[key].label}
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </LabeledControl>
+            <ThemePreviewText theme={t} />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
-        <div className="grid grid-cols-2 gap-3">
-          <LabeledControl label="Words at a time">
-            <Select
-              value={String(style.wordsPerCaption)}
-              onValueChange={(v) => onStyle({ wordsPerCaption: Number(v) })}
-            >
-              <SelectTrigger size="sm" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {WORD_OPTIONS.map((w) => (
-                  <SelectItem key={w.value} value={String(w.value)}>
-                    {w.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </LabeledControl>
+export function TextPanel({
+  style,
+  onStyle,
+}: {
+  style: CaptionStyle;
+  onStyle: (patch: Partial<CaptionStyle>) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-4 p-4">
+      <LabeledControl label="Font">
+        <Select
+          value={style.fontKey}
+          onValueChange={(v) => onStyle({ fontKey: v as FontKey })}
+        >
+          <SelectTrigger size="sm" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {FONT_KEYS.map((key) => (
+              <SelectItem key={key} value={key}>
+                <span style={{ fontFamily: FONTS[key].cssFamily }}>
+                  {FONTS[key].label}
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </LabeledControl>
 
-          <LabeledControl label="Filter">
-            <Select
-              value={style.filterId}
-              onValueChange={(v) => onStyle({ filterId: v })}
-            >
-              <SelectTrigger size="sm" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {FILTER_PRESETS.map((f) => (
-                  <SelectItem key={f.id} value={f.id}>
-                    {f.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </LabeledControl>
-        </div>
+      <LabeledControl label="Words at a time">
+        <Select
+          value={String(style.wordsPerCaption)}
+          onValueChange={(v) => onStyle({ wordsPerCaption: Number(v) })}
+        >
+          <SelectTrigger size="sm" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {WORD_OPTIONS.map((w) => (
+              <SelectItem key={w.value} value={String(w.value)}>
+                {w.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </LabeledControl>
 
-        <div className="flex items-center gap-4">
-          <ColorSwatch
-            label="Text"
-            value={style.textColor}
-            onChange={(v) => onStyle({ textColor: v })}
-          />
-          <ColorSwatch
-            label="Highlight"
-            value={style.accentColor}
-            onChange={(v) => onStyle({ accentColor: v })}
-          />
-        </div>
+      <div className="flex items-center gap-4">
+        <ColorSwatch
+          label="Text"
+          value={style.textColor}
+          onChange={(v) => onStyle({ textColor: v })}
+        />
+        <ColorSwatch
+          label="Highlight"
+          value={style.accentColor}
+          onChange={(v) => onStyle({ accentColor: v })}
+        />
       </div>
-    </section>
+    </div>
   );
 }
 
