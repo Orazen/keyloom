@@ -6,19 +6,15 @@ import {
 import { Suspense } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarUsage } from "@/components/usage-card";
-import { withAuth } from "@/lib/auth";
 
 /**
  * Shared application shell: the collapsible sidebar plus the inset content
- * area with a sticky header. Used by every signed-in surface (dashboard,
- * account, …) so they share one layout instead of duplicating it. Signed-out
- * visitors are sent to sign-in (the route handler owns the PKCE cookie).
- * The usage card streams in behind Suspense so its subscription query never
- * blocks route transitions.
+ * area with a sticky header. Used by every app surface (dashboard, account,
+ * …) so they share one layout instead of duplicating it. The usage card
+ * streams in behind Suspense so its subscription query never blocks route
+ * transitions.
  */
 export async function AppShell({ children }: { children: React.ReactNode }) {
-  const { user } = await withAuth();
-
   return (
     <SidebarProvider>
       <AppSidebar

@@ -1,7 +1,7 @@
 /**
  * Public origin of the deployed app, used to build short download links the MCP
  * hands to clients. Prefers an explicit `APP_BASE_URL`, then derives the origin
- * from the WorkOS redirect URI (already set per-environment), then Vercel's
+ * from the configured app URL (already set per-environment), then Vercel's
  * production URL, falling back to localhost for dev.
  */
 export function publicBaseUrl(): string {

@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 /**
  * API-key-authed Lambda render for EXTERNAL apps (e.g. the standalone HaloAI
  * editor). Mirrors the studio's `/api/render/lambda` project path, but instead
- * of a WorkOS session it authenticates a `kl_live_…` bearer token and renders
+ * of a browser session it authenticates a `kl_live_…` bearer token and renders
  * the multi-clip "Project" composition. Pair with `./progress`.
  */
 

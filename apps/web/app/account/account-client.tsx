@@ -32,7 +32,7 @@ function ProfileAvatar({
   fallback: string;
 }) {
   if (src) {
-    // External WorkOS avatar — plain <img> avoids next/image remote config.
+    // External avatar URL — plain <img> avoids next/image remote config.
     return (
       <img
         src={src}

@@ -23,7 +23,7 @@ export async function ensureUserRow(
   await db.insert(users).values({ id: userId, email }).onConflictDoNothing();
 }
 
-/** Upsert the signed-in WorkOS user, and ensure they have a subscription row
+/** Upsert the local user, and ensure they have a subscription row
  *  (free tier on first sight). Idempotent — safe to call on every sign-in. */
 export async function ensureAccount(
   userId: string,

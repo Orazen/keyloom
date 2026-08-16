@@ -1,7 +1,7 @@
 "use client";
 /**
  * Client access to the user's forked components, backed by the DB through
- * `/api/components` (scoped to the signed-in WorkOS user). The component `id`
+ * `/api/components` (scoped to the local user). The component `id`
  * is assigned by the server and is also the clip.compositionId used inside a
  * project's `customComponents`.
  */

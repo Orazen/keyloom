@@ -6,7 +6,7 @@ export type RenderClaim =
   | { ok: false; status: number; reason: string };
 
 /**
- * Gate a web render entry point: require a signed-in WorkOS session and
+ * Gate a web render entry point: resolve the local user and
  * atomically claim one render against the user's quota.
  *
  * The MCP route already enforces quota via `consumeRender`, but the studio's

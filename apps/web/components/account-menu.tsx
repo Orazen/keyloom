@@ -17,7 +17,7 @@ import { useAuth } from "@/lib/auth-client";
 /**
  * Navbar account control. Reflects the local single-user session:
  *  - loading  → neutral disabled button (no layout shift)
- *  - signed out → "Sign in" → /account (middleware redirects to WorkOS)
+ *  - always signed in as the local user (see lib/auth.ts)
  *  - signed in → dropdown with email, account link, and sign out.
  */
 export function AccountMenu() {
@@ -39,7 +39,7 @@ export function AccountMenu() {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="gap-1.5">
           {user.profilePictureUrl ? (
-            // External WorkOS avatar — plain <img> avoids next/image remote-pattern config.
+            // External avatar URL — plain <img> avoids next/image remote-pattern config.
             <img
               src={user.profilePictureUrl}
               alt=""
