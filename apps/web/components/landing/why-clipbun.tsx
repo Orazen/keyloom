@@ -85,7 +85,7 @@ export function WhyClipbun() {
         className="relative mx-auto mt-16 w-full max-w-sm"
       >
         <Image
-          src="/landing/girl.png"
+          src="/landing/girl.webp"
           alt="A founder building in a field while the world blooms around them"
           width={1254}
           height={1254}

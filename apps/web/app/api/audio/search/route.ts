@@ -36,37 +36,10 @@ const ARCHIVE_SEARCH = "https://archive.org/advancedsearch.php";
 const ARCHIVE_METADATA = "https://archive.org/metadata";
 const ARCHIVE_DOWNLOAD = "https://archive.org/download";
 
-// Local bundled samples used as the very-final fallback if the Archive
-// search fails entirely (network down, IA outage). Always playable.
-const FALLBACK_TRACKS: Track[] = [
-  {
-    id: "fallback-relaxed",
-    title: "Relaxed Vlog Background",
-    duration: 147,
-    previewUrl: "/audio/samples/relaxed-vlog.mp3",
-    downloadUrl: "/audio/samples/relaxed-vlog.mp3",
-    tags: ["relaxed", "vlog", "background"],
-    user: "Pixabay",
-  },
-  {
-    id: "fallback-cinematic",
-    title: "Cinematic Documentary",
-    duration: 426,
-    previewUrl: "/audio/samples/cinematic-doc.mp3",
-    downloadUrl: "/audio/samples/cinematic-doc.mp3",
-    tags: ["cinematic", "documentary", "ambient"],
-    user: "SoundHelix",
-  },
-  {
-    id: "fallback-upbeat",
-    title: "Upbeat Corporate",
-    duration: 344,
-    previewUrl: "/audio/samples/upbeat-corporate.mp3",
-    downloadUrl: "/audio/samples/upbeat-corporate.mp3",
-    tags: ["corporate", "upbeat", "tech"],
-    user: "SoundHelix",
-  },
-];
+// Final fallback if the Archive search fails entirely (network down, IA
+// outage). Bundled sample MP3s were removed to keep the repo small, so
+// this is empty — the client renders an empty result set.
+const FALLBACK_TRACKS: Track[] = [];
 
 function readCache(key: string): Track[] | null {
   const entry = cache.get(key);

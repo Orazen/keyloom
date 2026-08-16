@@ -26,11 +26,7 @@ export type MusicTrack = {
   volume: number;
 };
 
-const BUNDLED_TRACKS: { src: string; name: string }[] = [
-  { src: "/audio/samples/upbeat-corporate.mp3", name: "Upbeat Corporate" },
-  { src: "/audio/samples/relaxed-vlog.mp3", name: "Relaxed Vlog" },
-  { src: "/audio/samples/cinematic-doc.mp3", name: "Cinematic Doc" },
-];
+const BUNDLED_TRACKS: { src: string; name: string }[] = [];
 
 const DEFAULT_VOLUME = 0.2;
 

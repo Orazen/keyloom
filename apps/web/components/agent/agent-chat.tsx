@@ -75,7 +75,7 @@ export function AgentChat({
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 z-0 h-72 bg-cover bg-center opacity-[0.55]"
           style={{
-            backgroundImage: "url(/background.png)",
+            backgroundImage: "url(/background.webp)",
             maskImage:
               "linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 45%, transparent 100%)",
             WebkitMaskImage:
