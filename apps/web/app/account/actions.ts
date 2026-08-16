@@ -1,6 +1,5 @@
 "use server";
 
-import { withAuth } from "@workos-inc/authkit-nextjs";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
@@ -9,6 +8,7 @@ import {
   reconcileProFromDodo,
   revokeApiKey,
 } from "@/lib/account";
+import { withAuth } from "@/lib/auth";
 import { createProCheckout } from "@/lib/billing";
 
 export type CreateKeyState = {

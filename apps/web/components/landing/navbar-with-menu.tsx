@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth } from "@workos-inc/authkit-nextjs/components";
 import { Button } from "@workspace/ui/components/button";
 import {
   NavigationMenu,
@@ -15,6 +14,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import * as React from "react";
+import { useAuth } from "@/lib/auth-client";
 
 export type NavMenuLink = {
   label: string;
@@ -56,7 +56,7 @@ function AuthCta() {
     <RaisedButton
       size="sm"
       onClick={() => {
-        window.location.href = user ? "/components" : "/api/auth/signin";
+        window.location.href = "/components";
       }}
     >
       {user ? "Create" : "Login"}
@@ -166,7 +166,7 @@ export function NavbarWithMenu({ sections }: { sections: NavMenuSection[] }) {
             height={20}
             className="size-5"
           />
-          <span className="text-sm font-semibold">Clipbun</span>
+          <span className="text-sm font-semibold">Keyloom</span>
         </Link>
 
         <div className="ml-auto flex shrink-0 items-center gap-1">
@@ -237,7 +237,7 @@ export function NavbarWithMenu({ sections }: { sections: NavMenuSection[] }) {
             asChild
           >
             <Link
-              href="https://github.com/theexperiencecompany/motion-studio"
+              href="https://github.com/theexperiencecompany/keyloom"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"

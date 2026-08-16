@@ -12,7 +12,7 @@ const EASE = [0.22, 1, 0.36, 1] as const;
  * the pixel-art scene below feathered into the page. Everything reveals on
  * scroll with a gentle staggered fade-up.
  */
-export function WhyClipbun() {
+export function WhyKeyloom() {
   return (
     <section className="overflow-hidden px-5 py-24 text-center sm:py-32">
       <motion.div
@@ -30,7 +30,7 @@ export function WhyClipbun() {
           transition={{ duration: 0.6, ease: EASE }}
           className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground"
         >
-          Why Clipbun
+          Why Keyloom
         </motion.p>
 
         <motion.h2
@@ -53,7 +53,7 @@ export function WhyClipbun() {
           className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg"
         >
           Most founders stay heads-down building, while the trends that could
-          launch them pass by. With Clipbun, a meme or motion-graphic reel takes
+          launch them pass by. With Keyloom, a meme or motion-graphic reel takes
           minutes, then you get back to building.
         </motion.p>
 

@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       region: region as AwsRegion,
     });
 
-    const objectKey = `clipbun-uploads/audio/${crypto.randomUUID()}-${safeName(
+    const objectKey = `keyloom-uploads/audio/${crypto.randomUUID()}-${safeName(
       file.name,
     )}`;
     const body = new Uint8Array(await file.arrayBuffer());

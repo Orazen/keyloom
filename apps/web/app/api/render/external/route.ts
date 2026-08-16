@@ -87,7 +87,7 @@ function findBlobUrl(value: unknown, path = "project"): string | null {
 }
 
 function filenameForNow(): string {
-  return `clipbun-${new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)}.mp4`;
+  return `keyloom-${new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)}.mp4`;
 }
 
 function bearer(request: Request): string | null {

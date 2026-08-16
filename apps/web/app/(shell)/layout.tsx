@@ -1,4 +1,5 @@
 import { DocsHeader } from "@/components/docs-header";
+import { DocsSidebar } from "@/components/docs-sidebar";
 import { SiteFooter } from "@/components/site-footer";
 
 export default function ShellLayout({
@@ -9,7 +10,10 @@ export default function ShellLayout({
   return (
     <div className="mx-auto flex max-w-[1600px] min-h-screen flex-col border-x border-dashed border-border">
       <DocsHeader />
-      <main className="flex-1 min-w-0">{children}</main>
+      <div className="flex flex-1">
+        <DocsSidebar />
+        <main className="flex-1 min-w-0">{children}</main>
+      </div>
       <SiteFooter />
     </div>
   );

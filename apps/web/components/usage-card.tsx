@@ -1,7 +1,7 @@
-import { withAuth } from "@workos-inc/authkit-nextjs";
 import { Progress } from "@workspace/ui/components/progress";
 import Link from "next/link";
 import { getSubscription } from "@/lib/account";
+import { withAuth } from "@/lib/auth";
 
 export type RenderUsage = {
   plan: string;

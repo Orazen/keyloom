@@ -1,10 +1,9 @@
-import { withAuth } from "@workos-inc/authkit-nextjs";
-import { redirect } from "next/navigation";
 import {
   ensureAccount,
   getSubscription,
   reconcileProFromDodo,
 } from "@/lib/account";
+import { withAuth } from "@/lib/auth";
 import { AccountClient } from "./account-client";
 
 // Always fresh — keys/usage change per request.
@@ -19,7 +18,6 @@ export default async function AccountPage({
   // PKCE cookie (forbidden in render). Instead send signed-out users to the
   // sign-in route handler, which can set it.
   const { user } = await withAuth();
-  if (!user) redirect("/api/auth/signin");
   await ensureAccount(user.id, user.email);
   // Verify-on-return: ONLY when the user is returning from a successful Dodo
   // checkout (`?upgrade=success`). Running this on every load made unrelated

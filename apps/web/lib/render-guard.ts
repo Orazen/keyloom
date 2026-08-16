@@ -1,5 +1,5 @@
-import { withAuth } from "@workos-inc/authkit-nextjs";
 import { consumeRender, ensureAccount } from "@/lib/account";
+import { withAuth } from "@/lib/auth";
 
 export type RenderClaim =
   | { ok: true; userId: string }

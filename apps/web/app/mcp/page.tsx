@@ -1,14 +1,12 @@
-import { withAuth } from "@workos-inc/authkit-nextjs";
-import { redirect } from "next/navigation";
 import { McpClient } from "@/components/mcp/mcp-client";
 import { ensureAccount, getSubscription, listApiKeys } from "@/lib/account";
+import { withAuth } from "@/lib/auth";
 
 // Always fresh — keys change per request.
 export const dynamic = "force-dynamic";
 
 export default async function McpPage() {
   const { user } = await withAuth();
-  if (!user) redirect("/api/auth/signin");
   await ensureAccount(user.id, user.email);
 
   const [subscription, keys] = await Promise.all([

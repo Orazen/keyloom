@@ -1,5 +1,5 @@
-import { withAuth } from "@workos-inc/authkit-nextjs";
 import { ensureUserRow } from "@/lib/account";
+import { withAuth } from "@/lib/auth";
 import { createComponent, listComponents } from "@/lib/components";
 
 export async function GET() {

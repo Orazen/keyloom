@@ -7,16 +7,16 @@ export const TERMINAL_WIDTH = 1920;
 export const TERMINAL_HEIGHT = 1080;
 
 export const terminalDefaultProps: TerminalProps = {
-  title: "~/projects/clipbun",
+  title: "~/projects/keyloom",
   prompt: "❯",
   lines: [
     { kind: "comment", text: "# Install the CLI" },
-    { kind: "command", text: "npm install -g clipbun" },
+    { kind: "command", text: "npm install -g keyloom" },
     { kind: "output", text: "added 247 packages in 3.2s" },
     { kind: "success", text: "ready" },
     { kind: "comment", text: "" },
     { kind: "comment", text: "# Scaffold a project" },
-    { kind: "command", text: "clipbun init my-video" },
+    { kind: "command", text: "keyloom init my-video" },
     { kind: "output", text: "created my-video/" },
   ],
   charactersPerSecond: 28,

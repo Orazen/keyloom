@@ -10,7 +10,7 @@ type Contributor = {
 };
 
 const REPO_OWNER = "theexperiencecompany";
-const REPO_NAME = "motion-studio";
+const REPO_NAME = "keyloom";
 
 export function ContributorsGrid() {
   const [contributors, setContributors] = React.useState<Contributor[] | null>(

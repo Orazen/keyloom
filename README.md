@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="apps/web/public/images/clapperboard.png" alt="Clipbun" width="160" />
+  <img src="apps/web/public/images/clapperboard.png" alt="Keyloom" width="160" />
 </p>
 
-<h1 align="center">Clipbun</h1>
+<h1 align="center">Keyloom</h1>
 
 <p align="center">
   An open-source library of animated video primitives, plus a browser studio to assemble them — built on <a href="https://www.remotion.dev">Remotion</a>.
@@ -13,11 +13,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/theexperiencecompany/motion-studio/blob/master/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue" alt="License: MIT" /></a>
-  <a href="https://github.com/theexperiencecompany/motion-studio/stargazers"><img src="https://img.shields.io/github/stars/theexperiencecompany/motion-studio?style=flat&logo=github&color=yellow" alt="Stars" /></a>
-  <a href="https://github.com/theexperiencecompany/motion-studio/commits/master"><img src="https://img.shields.io/github/commit-activity/m/theexperiencecompany/motion-studio" alt="Last update" /></a>
-  <a href="https://github.com/theexperiencecompany/motion-studio/issues"><img src="https://img.shields.io/github/issues/theexperiencecompany/motion-studio" alt="Issues" /></a>
-  <a href="https://deepwiki.com/theexperiencecompany/motion-studio"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
+  <a href="https://github.com/theexperiencecompany/keyloom/blob/master/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue" alt="License: MIT" /></a>
+  <a href="https://github.com/theexperiencecompany/keyloom/stargazers"><img src="https://img.shields.io/github/stars/theexperiencecompany/keyloom?style=flat&logo=github&color=yellow" alt="Stars" /></a>
+  <a href="https://github.com/theexperiencecompany/keyloom/commits/master"><img src="https://img.shields.io/github/commit-activity/m/theexperiencecompany/keyloom" alt="Last update" /></a>
+  <a href="https://github.com/theexperiencecompany/keyloom/issues"><img src="https://img.shields.io/github/issues/theexperiencecompany/keyloom" alt="Issues" /></a>
+  <a href="https://deepwiki.com/theexperiencecompany/keyloom"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
 </p>
 
 <p align="center">
@@ -32,7 +32,7 @@
 
 <p align="center">
   <video
-    src="https://github.com/theexperiencecompany/motion-studio/raw/refs/heads/master/apps/remotion/public/motion.mp4"
+    src="https://github.com/theexperiencecompany/keyloom/raw/refs/heads/master/apps/remotion/public/motion.mp4"
     poster="apps/web/public/images/screenshots/studio.jpg"
     controls
     autoplay
@@ -41,7 +41,7 @@
     playsinline
     width="100%"
   >
-    <a href="https://github.com/theexperiencecompany/motion-studio/raw/refs/heads/master/apps/remotion/public/motion.mp4">▶ Watch the Clipbun showcase</a>
+    <a href="https://github.com/theexperiencecompany/keyloom/raw/refs/heads/master/apps/remotion/public/motion.mp4">▶ Watch the Keyloom showcase</a>
   </video>
 </p>
 
@@ -50,11 +50,11 @@
 <table align="center">
   <tr>
     <td width="50%" valign="top">
-      <img src="apps/web/public/images/screenshots/components.jpg" alt="Browse the Clipbun component library" />
+      <img src="apps/web/public/images/screenshots/components.jpg" alt="Browse the Keyloom component library" />
       <p align="center"><sub><i>Browse 70+ animated scenes — every preview is a one-click drop onto the timeline.</i></sub></p>
     </td>
     <td width="50%" valign="top">
-      <img src="apps/web/public/images/screenshots/studio.jpg" alt="The Clipbun editor — timeline, preview and inspector" />
+      <img src="apps/web/public/images/screenshots/studio.jpg" alt="The Keyloom editor — timeline, preview and inspector" />
       <p align="center"><sub><i>Assemble scenes on a timeline, edit per-clip styling and transitions, export to MP4.</i></sub></p>
     </td>
   </tr>
@@ -97,7 +97,7 @@ No SDK. No install. The library and the studio share the same scene registry, so
 
 ## Tech Stack
 
-Clipbun is a Bun + Turbo monorepo. The web app is Next.js; the video engine is Remotion; the agent flow runs on the Vercel AI SDK with OpenAI.
+Keyloom is a Bun + Turbo monorepo. The web app is Next.js; the video engine is Remotion; the agent flow runs on the Vercel AI SDK with OpenAI.
 
 <table>
   <tr>
@@ -194,19 +194,19 @@ MIT.
 ## Contributing
 
 <p align="center">
-  <a href="https://github.com/theexperiencecompany/motion-studio/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=theexperiencecompany/motion-studio" alt="Contributors" />
+  <a href="https://github.com/theexperiencecompany/keyloom/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=theexperiencecompany/keyloom" alt="Contributors" />
   </a>
 </p>
 
 ## Star History
 
 <p align="center">
-  <a href="https://www.star-history.com/#theexperiencecompany/motion-studio&Date">
+  <a href="https://www.star-history.com/#theexperiencecompany/keyloom&Date">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=theexperiencecompany/motion-studio&type=Date&theme=dark" />
-      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=theexperiencecompany/motion-studio&type=Date" />
-      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=theexperiencecompany/motion-studio&type=Date" />
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=theexperiencecompany/keyloom&type=Date&theme=dark" />
+      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=theexperiencecompany/keyloom&type=Date" />
+      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=theexperiencecompany/keyloom&type=Date" />
     </picture>
   </a>
 </p>

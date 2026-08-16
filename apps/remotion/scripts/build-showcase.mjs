@@ -210,7 +210,7 @@ const project = {
       "GitHubStarButton",
       {
         owner: "theexperiencecompany",
-        repo: "motion-studio",
+        repo: "keyloom",
         startCount: 1240,
         endCount: 1872,
         theme: "light",
@@ -313,7 +313,7 @@ const project = {
     clip(
       "DiscordMessages",
       {
-        contactName: "motion-studio",
+        contactName: "keyloom",
         messages: [
           { text: "tried the new charts?", side: "left", typingFrames: 30, delay: 12 },
           { text: "the radar one goes hard", side: "right", typingFrames: 32, delay: 80 },
@@ -411,7 +411,7 @@ const project = {
       "TitleSlideUp",
       {
         headline: "Ship the reel.",
-        subtitle: "motion-studio.heygaia.io",
+        subtitle: "keyloom.heygaia.io",
       },
       2.8,
       "zoom-in",

@@ -1,4 +1,3 @@
-import { AuthKitProvider } from "@workos-inc/authkit-nextjs/components";
 import { MotionConfig } from "motion/react";
 import type { Metadata } from "next";
 import {
@@ -18,8 +17,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: {
-    default: "Clipbun — Cinematic scenes for Remotion",
-    template: "%s — Clipbun",
+    default: "Keyloom — Cinematic scenes for Remotion",
+    template: "%s — Keyloom",
   },
   description:
     "A library of cinematic scenes for Remotion. No After Effects, no animation team — drop in, render, ship.",
@@ -59,11 +58,9 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground overflow-x-hidden">
         <ThemeProvider>
           <MotionConfig reducedMotion="user">
-            <AuthKitProvider>
-              <NuqsAdapter>
-                <QueryProvider>{children}</QueryProvider>
-              </NuqsAdapter>
-            </AuthKitProvider>
+            <NuqsAdapter>
+              <QueryProvider>{children}</QueryProvider>
+            </NuqsAdapter>
             <Toaster position="bottom-right" richColors />
           </MotionConfig>
         </ThemeProvider>

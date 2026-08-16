@@ -2,7 +2,6 @@
 
 import { Logout02Icon, UserCircleIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useAuth } from "@workos-inc/authkit-nextjs/components";
 import { Button } from "@workspace/ui/components/button";
 import {
   DropdownMenu,
@@ -13,9 +12,10 @@ import {
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth-client";
 
 /**
- * Navbar account control. Reflects the live auth state from AuthKit:
+ * Navbar account control. Reflects the local single-user session:
  *  - loading  → neutral disabled button (no layout shift)
  *  - signed out → "Sign in" → /account (middleware redirects to WorkOS)
  *  - signed in → dropdown with email, account link, and sign out.
@@ -28,17 +28,6 @@ export function AccountMenu() {
       <Button variant="outline" size="sm" className="gap-1.5" disabled>
         <HugeiconsIcon icon={UserCircleIcon} className="size-4" />
         <span className="hidden text-xs sm:inline">Account</span>
-      </Button>
-    );
-  }
-
-  if (!user) {
-    return (
-      <Button variant="outline" size="sm" className="gap-1.5" asChild>
-        <a href="/api/auth/signin" title="Sign in">
-          <HugeiconsIcon icon={UserCircleIcon} className="size-4" />
-          <span className="hidden text-xs sm:inline">Sign in</span>
-        </a>
       </Button>
     );
   }

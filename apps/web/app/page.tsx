@@ -319,7 +319,7 @@ export default function LandingPage() {
               </Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link href="https://github.com/theexperiencecompany/motion-studio">
+              <Link href="https://github.com/theexperiencecompany/keyloom">
                 GitHub
               </Link>
             </Button>

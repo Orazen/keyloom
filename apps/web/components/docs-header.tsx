@@ -49,10 +49,10 @@ function formatStars(count: number): string {
 
 function GitHubButton() {
   const { data: stars } = useQuery({
-    queryKey: ["github-stars", "theexperiencecompany/motion-studio"],
+    queryKey: ["github-stars", "theexperiencecompany/keyloom"],
     queryFn: async () => {
       const res = await fetch(
-        "https://api.github.com/repos/theexperiencecompany/motion-studio",
+        "https://api.github.com/repos/theexperiencecompany/keyloom",
       );
       const data = (await res.json()) as { stargazers_count?: number };
       return typeof data.stargazers_count === "number"
@@ -65,7 +65,7 @@ function GitHubButton() {
   return (
     <Button variant="ghost" size="sm" className="gap-1.5 px-2" asChild>
       <Link
-        href="https://github.com/theexperiencecompany/motion-studio"
+        href="https://github.com/theexperiencecompany/keyloom"
         title="GitHub"
         target="_blank"
         rel="noopener noreferrer"
@@ -130,7 +130,7 @@ function MoreMenu() {
   );
 }
 
-// Lazy + Suspense: the account menu pulls in AuthKit's client code and runs
+// Lazy + Suspense: the account menu is a client component that runs
 // useAuth() on mount. Loading it lazily keeps it off the header's critical path
 // so it can't block/freeze the page — the rest of the navbar paints immediately
 // and the menu streams in behind a lightweight fallback.
@@ -146,11 +146,27 @@ function AccountMenuFallback() {
   );
 }
 
-const navLinks = [{ label: "Studio", href: "/studio" }];
+const navLinks = [
+  { label: "Docs", href: "/docs" },
+  { label: "Components", href: "/docs/components" },
+  { label: "Studio", href: "/studio" },
+];
 
 export function DocsHeader() {
   const [searchOpen, setSearchOpen] = React.useState(false);
   const pathname = usePathname();
+
+  // Only the most specific link lights up. "/docs" is a prefix of
+  // "/docs/components", so a plain startsWith would mark both active on the
+  // components page; the longest matching href wins instead.
+  const activeHref = React.useMemo(() => {
+    const matches = navLinks.filter((l) =>
+      l.href === "/"
+        ? pathname === "/"
+        : pathname === l.href || pathname.startsWith(`${l.href}/`),
+    );
+    return matches.sort((a, b) => b.href.length - a.href.length)[0]?.href;
+  }, [pathname]);
 
   React.useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -172,8 +188,7 @@ export function DocsHeader() {
 
           <nav className="hidden items-center gap-1 md:flex">
             {navLinks.map((l) => {
-              const active =
-                l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
+              const active = l.href === activeHref;
               return (
                 <Link
                   key={l.href}

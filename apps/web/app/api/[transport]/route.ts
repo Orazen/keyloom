@@ -34,7 +34,7 @@ const errorText = (message: string): ToolResult => ({
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "https://www.keyloom.app")
   .trim()
   .replace(/\/$/, "");
-const PRO_REQUIRED = `MCP access is a Pro feature. Upgrade to Pro at ${APP_URL}/account to use the Clipbun MCP tools. (Editing components on the website stays free.)`;
+const PRO_REQUIRED = `MCP access is a Pro feature. Upgrade to Pro at ${APP_URL}/account to use the Keyloom MCP tools. (Editing components on the website stays free.)`;
 
 async function isProUser(userId: string): Promise<boolean> {
   const sub = await getSubscription(userId);
@@ -282,7 +282,7 @@ const baseHandler = createMcpHandler(
 );
 
 /**
- * Gate every MCP request on a clipbun API key (`kl_live_…`) sent as
+ * Gate every MCP request on a keyloom API key (`kl_live_…`) sent as
  * `Authorization: Bearer …`. verifyToken resolves the key to its owner; the
  * userId is threaded to tool handlers via authInfo.extra for quota accounting.
  */

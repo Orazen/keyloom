@@ -1,13 +1,12 @@
-import { withAuth } from "@workos-inc/authkit-nextjs";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@workspace/ui/components/sidebar";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarUsage } from "@/components/usage-card";
+import { withAuth } from "@/lib/auth";
 
 /**
  * Shared application shell: the collapsible sidebar plus the inset content
@@ -19,7 +18,6 @@ import { SidebarUsage } from "@/components/usage-card";
  */
 export async function AppShell({ children }: { children: React.ReactNode }) {
   const { user } = await withAuth();
-  if (!user) redirect("/api/auth/signin");
 
   return (
     <SidebarProvider>

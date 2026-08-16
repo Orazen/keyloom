@@ -161,7 +161,7 @@ export function McpClient({ mcpUrl, isPro, keys }: Props) {
   const connectorSnippet = JSON.stringify(
     {
       mcpServers: {
-        "clipbun-video": {
+        "keyloom-video": {
           url: mcpUrl,
           headers: { Authorization: "Bearer kl_live_…" },
         },
@@ -176,7 +176,7 @@ export function McpClient({ mcpUrl, isPro, keys }: Props) {
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-tight">MCP</h1>
         <p className="text-sm text-muted-foreground">
-          Drive Clipbun from Claude Code, Cursor, or any MCP client — list,
+          Drive Keyloom from Claude Code, Cursor, or any MCP client — list,
           fork, edit, and render components from your editor.
         </p>
       </header>

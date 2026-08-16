@@ -19,8 +19,9 @@ const columns: { title: string; links: FooterLink[] }[] = [
   {
     title: "Resources",
     links: [
-      { label: "Playground", href: "/playground" },
-      { label: "Build", href: "/build" },
+      { label: "Docs", href: "/docs" },
+      { label: "Components", href: "/docs/components" },
+      { label: "Creators", href: "/creators" },
       { label: "Account", href: "/account" },
     ],
   },
@@ -30,7 +31,7 @@ const columns: { title: string; links: FooterLink[] }[] = [
       { label: "GAIA", href: "https://heygaia.io", external: true },
       {
         label: "GitHub",
-        href: "https://github.com/theexperiencecompany/motion-studio",
+        href: "https://github.com/theexperiencecompany/keyloom",
         external: true,
       },
       { label: "X (Twitter)", href: "https://x.com/madebyexp", external: true },
@@ -41,7 +42,7 @@ const columns: { title: string; links: FooterLink[] }[] = [
 const socials = [
   {
     label: "GitHub",
-    href: "https://github.com/theexperiencecompany/motion-studio",
+    href: "https://github.com/theexperiencecompany/keyloom",
     icon: <HugeiconsIcon icon={Github01Icon} size={18} />,
   },
   {
@@ -85,10 +86,10 @@ export function SiteFooter() {
                   height={28}
                   className="size-7"
                 />
-                <span className="text-xl font-semibold">Clipbun</span>
+                <span className="text-xl font-semibold">Keyloom</span>
               </Link>
               <p className="mt-5 text-pretty text-sm leading-relaxed text-white/85">
-                Clipbun is a library of cinematic scenes for Remotion — browse,
+                Keyloom is a library of cinematic scenes for Remotion — browse,
                 preview, and drop them straight into a video. Built for creators
                 who want polished motion without starting from scratch.
               </p>

@@ -1,5 +1,5 @@
-import { withAuth } from "@workos-inc/authkit-nextjs";
 import { NextResponse } from "next/server";
+import { withAuth } from "@/lib/auth";
 import { getProfile, profileFor } from "@/lib/upload-post";
 
 export const runtime = "nodejs";

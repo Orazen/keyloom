@@ -21,7 +21,6 @@ import {
   VideoReplayIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useAuth } from "@workos-inc/authkit-nextjs/components";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,6 +49,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import * as React from "react";
+import { useAuth } from "@/lib/auth-client";
 
 type NavItem = {
   label: string;
@@ -132,7 +132,7 @@ export function AppSidebar({ footer }: { footer?: React.ReactNode }) {
               className="size-6 shrink-0"
             />
             <span className="font-heading text-base font-semibold tracking-tight group-data-[collapsible=icon]:hidden">
-              Clipbun
+              Keyloom
             </span>
           </Link>
         </SidebarHeader>
@@ -240,17 +240,6 @@ function SidebarUser() {
           <div className="h-3 w-20 animate-pulse rounded bg-muted" />
           <div className="h-2.5 w-28 animate-pulse rounded bg-muted" />
         </div>
-      </SidebarMenuButton>
-    );
-  }
-
-  if (!user) {
-    return (
-      <SidebarMenuButton size="lg" asChild tooltip="Sign in">
-        <a href="/api/auth/signin">
-          <HugeiconsIcon icon={UserCircleIcon} size={20} />
-          <span className="font-medium">Sign in</span>
-        </a>
       </SidebarMenuButton>
     );
   }
