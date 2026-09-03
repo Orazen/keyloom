@@ -1,0 +1,7 @@
+node_modules
+.git
+.github
+.next
+.turbo
+apps/remotion/node_modules
+packages/*/node_modules

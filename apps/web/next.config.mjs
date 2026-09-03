@@ -2,6 +2,7 @@ import createMDX from "@next/mdx"
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   pageExtensions: ["ts", "tsx", "mdx"],
   transpilePackages: ["@workspace/ui", "@workspace/compositions"],
   experimental: {
