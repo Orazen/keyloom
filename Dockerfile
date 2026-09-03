@@ -5,6 +5,7 @@ ENV PATH="/root/.bun/bin:${PATH}"
 WORKDIR /app
 
 COPY package.json bun.lock ./
+COPY patches ./patches
 COPY packages/eslint-config ./packages/eslint-config
 COPY packages/typescript-config ./packages/typescript-config
 COPY packages/ui ./packages/ui
