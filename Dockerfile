@@ -12,6 +12,9 @@ COPY packages/ui ./packages/ui
 RUN bun install --frozen-lockfile --no-save
 
 FROM node:22-alpine AS builder
+RUN apk add --no-cache libc6-compat curl bash
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:${PATH}"
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
